@@ -44,7 +44,7 @@ const css = {
     fontSize: "11px",
   },
 };
-const Invoice = ({ transaction, customer, total, grandTotal, discount, totalQty, idTransaction }) => {
+const Invoice = ({ transaction, customer, total, grandTotal, discount, totalQty, idTransaction, adminName }) => {
   const printRef = useRef();
   const Print = async () => {
     const element = printRef.current;
@@ -110,7 +110,7 @@ const Invoice = ({ transaction, customer, total, grandTotal, discount, totalQty,
           <div style={{ display: "flex", justifyContent: "space-between" }}>
             <div>
               <p style={css.smallHeader}>No Invoice: {idTransaction}</p>
-              <p style={css.smallHeader}>Admin: Cun Song</p>
+              <p style={css.smallHeader}>Admin: {adminName}</p>
               <p style={css.smallHeader}>Dicetak: {formatDate(today)}</p>
             </div>
 

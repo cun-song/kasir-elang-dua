@@ -4,7 +4,7 @@ import html2canvas from "html2canvas";
 import elangVector from "../img/ElangVector.png";
 import { formattedNumber } from "./stingFormatted";
 import { renderToStaticMarkup } from "react-dom/server";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setLoading } from "../redux/sidenavReducer";
 
 const css = {
@@ -56,7 +56,7 @@ function formatDate(date) {
   return `${day} ${month} ${year}`;
 }
 
-const Table = ({ data }) => {
+const Table = ({ data, adminName }) => {
   const today = new Date();
   const minimumRows = 13;
   const rowsToAdd = minimumRows - data?.product?.length;
@@ -75,7 +75,7 @@ const Table = ({ data }) => {
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <div>
             <p style={css.smallHeader}>No Invoice: {data?.id}</p>
-            <p style={css.smallHeader}>Admin: Cun Song</p>
+            <p style={css.smallHeader}>Admin: {adminName}</p>
             <p style={css.smallHeader}>Dicetak: {formatDate(today)}</p>
           </div>
 
@@ -205,7 +205,7 @@ const Table = ({ data }) => {
   );
 };
 
-export const BulkPrinting = async (data) => {
+export const BulkPrinting = async (data, adminName) => {
   const pdf = new jsPDF({
     orientation: "landscape",
     unit: "in",
@@ -213,7 +213,7 @@ export const BulkPrinting = async (data) => {
   });
 
   for (let i = 0; i < data.length; i++) {
-    const htmlString = renderToStaticMarkup(<Table data={data[i]} />);
+    const htmlString = renderToStaticMarkup(<Table data={data[i]} adminName={adminName} />);
     const element = document.createElement("div");
     element.style.width = "9.5in";
     element.style.height = "5.5in";

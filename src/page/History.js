@@ -33,6 +33,7 @@ export default function History() {
   const [time, setTime] = useState(null);
   const transaction = useSelector((state) => state.transaction.transactionHistory);
   const customer = useSelector((state) => state?.customer?.allCustomer);
+  const adminName = useSelector((state) => state.sidenav.name);
 
   useEffect(() => {
     dispatch(click(3));
@@ -167,7 +168,8 @@ export default function History() {
           grandTotal: formattedGrandTotal,
         };
       });
-    BulkPrinting(temp).then(() => {
+    console.log(adminName);
+    BulkPrinting(temp, adminName).then(() => {
       dispatch(setLoading());
     });
   }
@@ -217,7 +219,7 @@ export default function History() {
           </Box>
         </Box>
       </Box>
-      <DialogTable data={transactionDetail} open={openTd} handleToggle={() => setOpenTd((prev) => !prev)} customer={customerArr} time={time} idTransaction={idTransaction} />
+      <DialogTable data={transactionDetail} open={openTd} handleToggle={() => setOpenTd((prev) => !prev)} customer={customerArr} time={time} idTransaction={idTransaction} adminName={adminName} />
     </Box>
   );
 }

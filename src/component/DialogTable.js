@@ -76,7 +76,7 @@ const style = {
   grandTotal: { fontFamily: "poppins", fontSize: "20px", fontWeight: "bold", color: "#12141E" },
 };
 
-export default function DialogTable({ open = false, handleToggle, data, customer, time, idTransaction }) {
+export default function DialogTable({ open = false, handleToggle, data, customer, time, idTransaction, adminName }) {
   const [page, setPage] = useState(0);
   const [currRowsPerPage, setCurrRowsPerPage] = useState(5);
   const totalQty = Object.values(data).reduce((acc, item) => acc + (item?.type === "Dus" ? 2 : 1) * item?.productQty, 0);
@@ -130,7 +130,7 @@ export default function DialogTable({ open = false, handleToggle, data, customer
           </Grid>
         </Grid>
         <Grid sx={{ mt: 4 }}>
-          <Invoice transaction={data} customer={customer} total={formattedTotal} grandTotal={formattedGrandTotal} discount={formattedDiscount} totalQty={totalQty} idTransaction={idTransaction} />
+          <Invoice transaction={data} customer={customer} total={formattedTotal} grandTotal={formattedGrandTotal} discount={formattedDiscount} totalQty={totalQty} idTransaction={idTransaction} adminName={adminName} />
         </Grid>
       </DialogContent>
       <DialogActions></DialogActions>

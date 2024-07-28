@@ -50,8 +50,8 @@ const styles = {
       outline: "none",
     },
     ".MuiDataGrid-columnHeaders": {
-      backgroundColor: useGrayTheme ? "#E0E0E0" : "#FFAC7B",
-      opacity: useGrayTheme ? "0.7" : "none",
+      backgroundColor: "#FFAC7B",
+      opacity: "none",
       fontSize: "14px",
       fontWeight: 900,
       border: "none",
@@ -107,7 +107,7 @@ const styles = {
     },
     ".MuiDataGrid-columnHeaderTitle": {
       fontSize: "14px",
-      color: useGrayTheme ? "#333333" : "black",
+      color: "black",
       fontWeight: 600,
       overflow: "visible",
       lineHeight: "1.43rem",
