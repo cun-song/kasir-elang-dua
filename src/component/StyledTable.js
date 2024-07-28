@@ -18,7 +18,7 @@ const styles = {
     textAlign: "center",
     border: "none",
     overflow: "hidden",
-    ".css-y2qhgf": {
+    ".MuiDataGrid-container--top [role='row']": {
       background: "none !important",
     },
     ".MuiDataGrid-root": {
