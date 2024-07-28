@@ -1,24 +1,25 @@
-import logo from './logo.svg';
-import './App.css';
+import "./App.css";
+import Main from "./page/Main";
+import Login from "./component/auth/Login";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
+import { Box } from "@mui/material";
+import ProtectedRouteLogin from "./component/ProtectedRouteLogin";
+import { AuthProvider } from "./utils/useAuth";
 
 function App() {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <BrowserRouter>
+      <AuthProvider>
+        <Box sx={{ backgroundColor: "#F4F4F4", width: "100vw", height: "100vh" }} display={"flex"}>
+          <Routes>
+            <Route path="*" element={<Main />} />
+            <Route element={<ProtectedRouteLogin />}>
+              <Route path="/login" element={<Login />} />
+            </Route>
+          </Routes>
+        </Box>
+      </AuthProvider>
+    </BrowserRouter>
   );
 }
 
