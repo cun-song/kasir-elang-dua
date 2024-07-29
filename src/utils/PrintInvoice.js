@@ -2,7 +2,7 @@ import React from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import elangVector from "../img/ElangVector.png";
-import { formattedNumber } from "./stingFormatted";
+import { decimalToFraction, formattedNumber } from "./stingFormatted";
 import { renderToStaticMarkup } from "react-dom/server";
 import { useDispatch, useSelector } from "react-redux";
 import { setLoading } from "../redux/sidenavReducer";
@@ -60,6 +60,9 @@ const Table = ({ data }) => {
   const today = new Date();
   const minimumRows = 13;
   const rowsToAdd = minimumRows - data?.product?.length;
+  const nonBonusData = data?.product?.filter((product) => product?.price !== 0);
+  const bonusData = data?.product?.filter((product) => product?.price === 0);
+  const nbl = nonBonusData?.length;
   return (
     <div style={{ padding: "20px", width: "9.5in", height: "5.5in", boxSizing: "border-box", border: "1px solid black", position: "relative" }}>
       <div style={{ position: "absolute", top: 25, left: 20 }}>
@@ -102,26 +105,16 @@ const Table = ({ data }) => {
             </tr>
           </thead>
           <tbody>
-            {data?.product?.map((product, index) => (
+            {nonBonusData.map((product, index) => (
               <tr key={product.id}>
                 <td style={css.tableBorder}>{index + 1}</td>
                 <td style={{ ...css.tableBorder, textAlign: "left", paddingLeft: "5px" }}>{product?.label}</td>
                 <td style={css.tableBorder}>{product?.size}</td>
-                <td style={css.tableBorder}>{product?.productQty}</td>
+                <td style={css.tableBorder}>{decimalToFraction(product?.productQty)}</td>
                 <td style={css.tableBorder}>{product?.type}</td>
-                {product?.price === 0 ? (
-                  <>
-                    <td style={{ ...css.tableBorder, fontWeight: "600" }}>Bonus</td>
-                    <td style={{ ...css.tableBorder, fontWeight: "600" }}>Bonus</td>
-                    <td style={{ ...css.tableBorder, fontWeight: "600" }}>Bonus</td>
-                  </>
-                ) : (
-                  <>
-                    <td style={css.tableBorder}>{formattedNumber(product?.price)}</td>
-                    <td style={css.tableBorder}>{formattedNumber(product?.discount)}</td>
-                    <td style={css.tableBorder}>{formattedNumber(product?.subtotal)}</td>
-                  </>
-                )}
+                <td style={css.tableBorder}>{formattedNumber(product?.price)}</td>
+                <td style={css.tableBorder}>{formattedNumber(product?.discount)}</td>
+                <td style={css.tableBorder}>{formattedNumber(product?.subtotal)}</td>
               </tr>
             ))}
             {Array.from({ length: rowsToAdd }, (_, index) => (
@@ -134,6 +127,18 @@ const Table = ({ data }) => {
                 <td style={css.tableBorder}></td>
                 <td style={css.tableBorder}></td>
                 <td style={css.tableBorder}></td>
+              </tr>
+            ))}
+            {bonusData.map((product, index) => (
+              <tr key={product.id}>
+                <td style={{ ...css.tableBorder, borderTop: data?.product[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>{nbl + index + 1}</td>
+                <td style={{ ...css.tableBorder, textAlign: "left", paddingLeft: "5px", borderTop: data?.product[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>{product?.label}</td>
+                <td style={{ ...css.tableBorder, borderTop: data?.product[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>{product?.size}</td>
+                <td style={{ ...css.tableBorder, borderTop: data?.product[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>{decimalToFraction(product?.productQty)}</td>
+                <td style={{ ...css.tableBorder, borderTop: data?.product[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>{product?.type}</td>
+                <td style={{ ...css.tableBorder, fontWeight: "600", borderTop: data?.product[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>Bonus</td>
+                <td style={{ ...css.tableBorder, fontWeight: "600", borderTop: data?.product[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>Bonus</td>
+                <td style={{ ...css.tableBorder, fontWeight: "600", borderTop: data?.product[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>Bonus</td>
               </tr>
             ))}
             <tr key={13} style={{ height: "17px" }}>
@@ -194,7 +199,7 @@ const Table = ({ data }) => {
               <td style={css.tableBorderTotal} colSpan={2}>
                 Total Lusin
               </td>
-              <td style={{ ...css.tableBorderLast, textAlign: "right", paddingRight: "8px" }}>{data?.totalQty}</td>
+              <td style={{ ...css.tableBorderLast, textAlign: "right", paddingRight: "8px" }}>{decimalToFraction(data?.totalQty)}</td>
             </tr>
             <tr key={18} style={{ height: "17px" }}></tr>
           </tbody>

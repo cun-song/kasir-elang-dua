@@ -1,4 +1,5 @@
-import { convertTimestamp, formattedNumber } from "../utils/stingFormatted";
+import { convertTimestamp, decimalToFraction, formattedNumber } from "../utils/stingFormatted";
+import React from "react";
 
 const center = {
   headerAlign: "center",
@@ -25,6 +26,9 @@ export const HISTORY_HEADER = [
   {
     field: "lusin",
     headerName: "Lusin",
+    renderCell: (num) => {
+      return `${decimalToFraction(num?.value)}`;
+    },
     ...center,
   },
   {

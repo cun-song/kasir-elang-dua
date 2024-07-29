@@ -3,7 +3,7 @@ import { Box, DialogActions, DialogContent, Divider, Grid, Typography } from "@m
 import StyledDialog from "./StyledDialog";
 import { useState } from "react";
 import StyledTable from "./StyledTable";
-import { convertTimestamp, formattedNumber } from "../utils/stingFormatted";
+import { convertTimestamp, decimalToFraction, formattedNumber } from "../utils/stingFormatted";
 import Invoice from "./Invoice";
 const center = {
   headerAlign: "center",
@@ -35,6 +35,9 @@ const HEADER = [
     field: "productQty",
     headerName: "Jumlah",
     ...center,
+    renderCell: (num) => {
+      return `${decimalToFraction(num?.value)}`;
+    },
     flex: 2,
   },
   {
@@ -85,7 +88,6 @@ export default function DialogTable({ open = false, handleToggle, data, customer
   const formattedTotal = formattedNumber(total);
   const formattedDiscount = formattedNumber(disc);
   const formattedGrandTotal = formattedNumber(total - disc);
-
   return (
     <StyledDialog isOpen={open} handleToggle={handleToggle} useCloseBtn width="80%" title="Detail Transaksi">
       <DialogContent sx={{ mt: 2 }}>

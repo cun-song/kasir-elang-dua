@@ -2,8 +2,10 @@ import React, { useRef, useState } from "react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import elangVector from "../img/ElangVector.png";
-import { formattedNumber } from "../utils/stingFormatted";
+import { decimalToFraction, formattedNumber } from "../utils/stingFormatted";
 import { Button } from "@mui/material";
+import { setLoading } from "../redux/sidenavReducer";
+import { useDispatch } from "react-redux";
 const css = {
   titleHeader: {
     fontSize: "20px",
@@ -23,6 +25,7 @@ const css = {
     textAlign: "center",
     fontSize: "11px",
   },
+
   tableBorderTotal: {
     // border: "1px solid black",
     paddingRight: "8px",
@@ -45,8 +48,11 @@ const css = {
   },
 };
 const Invoice = ({ transaction, customer, total, grandTotal, discount, totalQty, idTransaction, adminName }) => {
+  const dispatch = useDispatch();
   const printRef = useRef();
   const Print = async () => {
+    dispatch(setLoading());
+
     const element = printRef.current;
     const canvas = await html2canvas(element);
     const data = canvas.toDataURL("image/png");
@@ -78,6 +84,7 @@ const Invoice = ({ transaction, customer, total, grandTotal, discount, totalQty,
     iframe.onload = () => {
       iframe.contentWindow.focus();
       iframe.contentWindow.print();
+      dispatch(setLoading());
     };
 
     document.body.appendChild(iframe);
@@ -94,6 +101,9 @@ const Invoice = ({ transaction, customer, total, grandTotal, discount, totalQty,
   const today = new Date();
   const minimumRows = 13;
   const rowsToAdd = minimumRows - transaction.length;
+  const nonBonusData = transaction.filter((product) => product?.price !== 0);
+  const bonusData = transaction.filter((product) => product?.price === 0);
+  const nbl = nonBonusData?.length;
   //product length paling banyak 13
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
@@ -138,28 +148,19 @@ const Invoice = ({ transaction, customer, total, grandTotal, discount, totalQty,
               </tr>
             </thead>
             <tbody>
-              {transaction.map((product, index) => (
+              {nonBonusData.map((product, index) => (
                 <tr key={product.id}>
                   <td style={css.tableBorder}>{index + 1}</td>
                   <td style={{ ...css.tableBorder, textAlign: "left", paddingLeft: "5px" }}>{product?.label}</td>
                   <td style={css.tableBorder}>{product?.size}</td>
-                  <td style={css.tableBorder}>{product?.productQty}</td>
+                  <td style={css.tableBorder}>{decimalToFraction(product?.productQty)}</td>
                   <td style={css.tableBorder}>{product?.type}</td>
-                  {product?.price === 0 ? (
-                    <>
-                      <td style={{ ...css.tableBorder, fontWeight: "600" }}>Bonus</td>
-                      <td style={{ ...css.tableBorder, fontWeight: "600" }}>Bonus</td>
-                      <td style={{ ...css.tableBorder, fontWeight: "600" }}>Bonus</td>
-                    </>
-                  ) : (
-                    <>
-                      <td style={css.tableBorder}>{formattedNumber(product?.price)}</td>
-                      <td style={css.tableBorder}>{formattedNumber(product?.discount)}</td>
-                      <td style={css.tableBorder}>{formattedNumber(product?.subtotal)}</td>
-                    </>
-                  )}
+                  <td style={css.tableBorder}>{formattedNumber(product?.price)}</td>
+                  <td style={css.tableBorder}>{formattedNumber(product?.discount)}</td>
+                  <td style={css.tableBorder}>{formattedNumber(product?.subtotal)}</td>
                 </tr>
               ))}
+
               {Array.from({ length: rowsToAdd }, (_, index) => (
                 <tr key={`blank-${index}`} style={{ height: "17px" }}>
                   <td style={css.tableBorder}></td>
@@ -170,6 +171,18 @@ const Invoice = ({ transaction, customer, total, grandTotal, discount, totalQty,
                   <td style={css.tableBorder}></td>
                   <td style={css.tableBorder}></td>
                   <td style={css.tableBorder}></td>
+                </tr>
+              ))}
+              {bonusData.map((product, index) => (
+                <tr key={product.id}>
+                  <td style={{ ...css.tableBorder, borderTop: transaction[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>{nbl + index + 1}</td>
+                  <td style={{ ...css.tableBorder, textAlign: "left", paddingLeft: "5px", borderTop: transaction[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>{product?.label}</td>
+                  <td style={{ ...css.tableBorder, borderTop: transaction[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>{product?.size}</td>
+                  <td style={{ ...css.tableBorder, borderTop: transaction[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>{decimalToFraction(product?.productQty)}</td>
+                  <td style={{ ...css.tableBorder, borderTop: transaction[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>{product?.type}</td>
+                  <td style={{ ...css.tableBorder, fontWeight: "600", borderTop: transaction[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>Bonus</td>
+                  <td style={{ ...css.tableBorder, fontWeight: "600", borderTop: transaction[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>Bonus</td>
+                  <td style={{ ...css.tableBorder, fontWeight: "600", borderTop: transaction[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>Bonus</td>
                 </tr>
               ))}
               <tr key={13} style={{ height: "17px" }}>
@@ -230,7 +243,7 @@ const Invoice = ({ transaction, customer, total, grandTotal, discount, totalQty,
                 <td style={css.tableBorderTotal} colSpan={2}>
                   Total Lusin
                 </td>
-                <td style={{ ...css.tableBorderLast, textAlign: "right", paddingRight: "8px" }}>{totalQty}</td>
+                <td style={{ ...css.tableBorderLast, textAlign: "right", paddingRight: "8px" }}>{decimalToFraction(totalQty)}</td>
               </tr>
               <tr key={18} style={{ height: "17px" }}></tr>
             </tbody>

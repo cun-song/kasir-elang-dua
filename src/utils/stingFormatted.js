@@ -17,3 +17,12 @@ export function convertTimestamp(timestamp) {
   let formattedDate = `${day} ${monthName} ${year} ${hours}:${minutes}`;
   return formattedDate;
 }
+
+export function decimalToFraction(dec) {
+  const modulo = dec % 1;
+  const integer = dec - modulo;
+  const convertedInteger = integer === 0 ? "" : integer;
+  const convertedModulo = modulo === 0.5 ? "1/2" : "";
+  const separator = integer !== 0 && modulo === 0.5 ? " " : "";
+  return `${convertedInteger}${separator}${convertedModulo}`;
+}

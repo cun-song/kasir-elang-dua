@@ -178,7 +178,6 @@ export default function History() {
       dispatch(setLoading());
     });
   }
-
   return (
     <Box sx={{ width: "100%", height: "100%", display: "flex", justifyContent: "space-between" }}>
       <Box sx={{ width: "100%", pr: 5 }}>
