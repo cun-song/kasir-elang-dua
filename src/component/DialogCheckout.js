@@ -44,6 +44,8 @@ export default function DialogCheckout({ open = false, handleToggle }) {
   const dispatch = useDispatch();
   const customer = useSelector((state) => state?.customer?.allCustomer);
   const transaction = useSelector((state) => state?.transaction?.transactionData);
+  const adminName = useSelector((state) => state.sidenav.name);
+
   function save() {
     const ownerName = ownerList.find((owner) => owner.value === customerID)?.label;
     const merchantName = merchantList.find((merchant) => merchant.value === customerID)?.label;
@@ -53,6 +55,7 @@ export default function DialogCheckout({ open = false, handleToggle }) {
         customerID: customerID,
         ownerName: ownerName,
         merchantName: merchantName,
+        adminName: adminName,
         isPrinted: 0,
         ...transaction,
       };
@@ -84,7 +87,6 @@ export default function DialogCheckout({ open = false, handleToggle }) {
     }));
     setMerchantList(merchantList);
   }, [customer]);
-
   return (
     <StyledDialog isOpen={open} handleToggle={handleToggle} useCloseBtn width="30%" title="Checkout">
       <DialogContent>

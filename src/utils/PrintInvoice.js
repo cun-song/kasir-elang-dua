@@ -56,11 +56,10 @@ function formatDate(date) {
   return `${day} ${month} ${year}`;
 }
 
-const Table = ({ data, adminName }) => {
+const Table = ({ data }) => {
   const today = new Date();
   const minimumRows = 13;
   const rowsToAdd = minimumRows - data?.product?.length;
-
   return (
     <div style={{ padding: "20px", width: "9.5in", height: "5.5in", boxSizing: "border-box", border: "1px solid black", position: "relative" }}>
       <div style={{ position: "absolute", top: 25, left: 20 }}>
@@ -75,7 +74,7 @@ const Table = ({ data, adminName }) => {
         <div style={{ display: "flex", justifyContent: "space-between" }}>
           <div>
             <p style={css.smallHeader}>No Invoice: {data?.id}</p>
-            <p style={css.smallHeader}>Admin: {adminName}</p>
+            <p style={css.smallHeader}>Admin: {data?.adminName}</p>
             <p style={css.smallHeader}>Dicetak: {formatDate(today)}</p>
           </div>
 
@@ -205,7 +204,7 @@ const Table = ({ data, adminName }) => {
   );
 };
 
-export const BulkPrinting = async (data, adminName) => {
+export const BulkPrinting = async (data) => {
   const pdf = new jsPDF({
     orientation: "landscape",
     unit: "in",
@@ -213,7 +212,7 @@ export const BulkPrinting = async (data, adminName) => {
   });
 
   for (let i = 0; i < data.length; i++) {
-    const htmlString = renderToStaticMarkup(<Table data={data[i]} adminName={adminName} />);
+    const htmlString = renderToStaticMarkup(<Table data={data[i]} />);
     const element = document.createElement("div");
     element.style.width = "9.5in";
     element.style.height = "5.5in";

@@ -89,7 +89,13 @@ export default function DialogTable({ open = false, handleToggle, data, customer
   return (
     <StyledDialog isOpen={open} handleToggle={handleToggle} useCloseBtn width="80%" title="Detail Transaksi">
       <DialogContent sx={{ mt: 2 }}>
-        <Typography sx={{ mb: 2, ...style.textCheckout, textAlign: "right" }}>Waktu : {convertTimestamp(time)}</Typography>
+        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+          <Box>
+            <Typography sx={style.textCheckout}>No Invoice : {idTransaction}</Typography>
+            <Typography sx={style.textCheckout}>Admin : {adminName}</Typography>
+          </Box>
+          <Typography sx={style.textCheckout}>Waktu : {convertTimestamp(time)}</Typography>
+        </Box>
         <StyledTable headers={HEADER} rows={data} page={page} setPage={(e) => setPage(e)} pageSize={currRowsPerPage} setPageSizeChange={(e) => setCurrRowsPerPage(e)} rowCount={data?.length} paginationMode="client" />
         <Grid sx={{ display: "flex", width: "100%", mt: 4, px: 2, alignItems: "flex-end" }}>
           <Grid item width={"75%"} sx={{ display: "flex" }}>

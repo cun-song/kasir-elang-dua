@@ -45,6 +45,11 @@ export const HISTORY_HEADER = [
     },
   },
   {
+    field: "adminName",
+    headerName: "Admin",
+    ...center,
+  },
+  {
     field: "timestamp",
     headerName: "Waktu",
     ...center,

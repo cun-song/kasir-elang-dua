@@ -3,12 +3,14 @@ import { Box, Button, FormControl, IconButton, Input, InputAdornment, InputLabel
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { getAuth, signInWithEmailAndPassword } from "firebase/auth";
+import { setLoading, setOpenFailedLogin } from "../../redux/sidenavReducer";
+import { useDispatch } from "react-redux";
 
 export default function Login() {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-
+  const dispatch = useDispatch();
   const handleClickShowPassword = () => setShowPassword((show) => !show);
 
   const handleMouseDownPassword = (event: React.MouseEvent<HTMLButtonElement>) => {
@@ -18,13 +20,17 @@ export default function Login() {
 
   function login() {
     if ((email !== "") & (password !== "")) {
+      dispatch(setLoading());
       const auth = getAuth();
       signInWithEmailAndPassword(auth, email, password)
         .then((userCredential) => {
           // Signed in
+          dispatch(setLoading());
           Navigate("/");
         })
         .catch((error) => {
+          dispatch(setLoading());
+          dispatch(setOpenFailedLogin({ isOpen: true, message: "Email atau password salah !!" }));
           console.log(error);
         });
     }

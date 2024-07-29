@@ -29,11 +29,12 @@ export default function History() {
   const [selectionData, setSelectionData] = useState([]);
   const [customerArr, setCustomerArr] = useState(null);
   const [idTransaction, setIdTransaction] = useState(null);
+  const [adminName, setAdminName] = useState(null);
   const [lastDate, setLastDate] = useState(7);
   const [time, setTime] = useState(null);
   const transaction = useSelector((state) => state.transaction.transactionHistory);
   const customer = useSelector((state) => state?.customer?.allCustomer);
-  const adminName = useSelector((state) => state.sidenav.name);
+  // const adminName = useSelector((state) => state.sidenav.name);
 
   useEffect(() => {
     dispatch(click(3));
@@ -120,9 +121,12 @@ export default function History() {
   function findCustomer(id) {
     return Object.values(customer).find((customer) => customer.id === id);
   }
-  function findProduct(id) {
-    return Object.values(historyData).find((product) => product.id === id);
+  function findTransaction(id) {
+    return Object.values(historyData).find((transaction) => transaction.id === id);
   }
+  // function findAdminName(id) {
+  //   return Object.values(historyData).find((product) => product.id === id);
+  // }
 
   function handleRowClick(data, e) {
     if (data?.field === "__check__") {
@@ -130,6 +134,7 @@ export default function History() {
     } else {
       const arr = sortProduct(data?.row);
       const custArr = findCustomer(data?.row?.customerID);
+      setAdminName(data?.row?.adminName);
       setIdTransaction(data?.row?.id);
       setTime(data?.row?.timestamp);
       setCustomerArr(custArr);
@@ -150,8 +155,8 @@ export default function History() {
         return numB - numA;
       })
       .map((key) => {
-        const product = findProduct(key);
-        const sortedProduct = sortProduct(findProduct(key));
+        const transaction1 = findTransaction(key);
+        const sortedProduct = sortProduct(transaction1);
         const totalQty = Object.values(sortedProduct).reduce((acc, item) => acc + (item?.type === "Dus" ? 2 : 1) * item?.productQty, 0);
         const total = Object.values(sortedProduct).reduce((acc, item) => acc + item?.productQty * item?.price, 0);
         const disc = Object.values(sortedProduct).reduce((acc, item) => acc + item?.productQty * item?.discount, 0);
@@ -161,15 +166,15 @@ export default function History() {
         return {
           id: key,
           product: sortedProduct,
-          customer: findCustomer(product?.customerID),
+          customer: findCustomer(transaction1?.customerID),
           totalQty: totalQty,
           total: formattedTotal,
           discount: formattedDiscount,
           grandTotal: formattedGrandTotal,
+          adminName: transaction1?.adminName,
         };
       });
-    console.log(adminName);
-    BulkPrinting(temp, adminName).then(() => {
+    BulkPrinting(temp).then(() => {
       dispatch(setLoading());
     });
   }

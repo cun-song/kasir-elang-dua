@@ -8,6 +8,7 @@ export const sidenavSlice = createSlice({
     name: "",
     role: "",
     loading: false,
+    openFailedLogin: { isOpen: false, message: "" },
   },
   reducers: {
     click: (state, action) => {
@@ -25,9 +26,12 @@ export const sidenavSlice = createSlice({
     setLoading: (state) => {
       state.loading = !state.loading;
     },
+    setOpenFailedLogin: (state, action) => {
+      state.openFailedLogin = action.payload;
+    },
   },
 });
 
-export const { click, setTitle, setName, setRole, setLoading } = sidenavSlice.actions;
+export const { click, setTitle, setName, setRole, setLoading, setOpenFailedLogin } = sidenavSlice.actions;
 
 export default sidenavSlice.reducer;
