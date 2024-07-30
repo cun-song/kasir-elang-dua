@@ -15,6 +15,7 @@ import DialogTable from "../component/DialogTable";
 import { fetchCustomerData } from "../redux/action/customerAction";
 import { formattedNumber } from "../utils/stingFormatted";
 import { BulkPrinting } from "../utils/PrintInvoice";
+import DialogTotalProduct from "../component/DialogTotalProduct";
 
 export default function History() {
   const dispatch = useDispatch();
@@ -32,6 +33,9 @@ export default function History() {
   const [adminName, setAdminName] = useState(null);
   const [lastDate, setLastDate] = useState(7);
   const [time, setTime] = useState(null);
+  const [openRangkuman, setOpenRangkuman] = useState(false);
+  const [dataRangkuman, setDataRangkuman] = useState({});
+
   const transaction = useSelector((state) => state.transaction.transactionHistory);
   const customer = useSelector((state) => state?.customer?.allCustomer);
   // const adminName = useSelector((state) => state.sidenav.name);
@@ -124,9 +128,6 @@ export default function History() {
   function findTransaction(id) {
     return Object.values(historyData).find((transaction) => transaction.id === id);
   }
-  // function findAdminName(id) {
-  //   return Object.values(historyData).find((product) => product.id === id);
-  // }
 
   function handleRowClick(data, e) {
     if (data?.field === "__check__") {
@@ -178,6 +179,44 @@ export default function History() {
       dispatch(setLoading());
     });
   }
+
+  function rangkuman() {
+    let temp = {};
+    let totalLusin = 0;
+    let totalDus = 0;
+    selectionData.forEach((key) => {
+      const sortedProduct = sortProduct(findTransaction(key));
+      sortedProduct.forEach((p) => {
+        const newId = p?.id[0] === "P" ? p?.id : p?.id?.slice(1);
+        if (temp[newId]) {
+          temp = { ...temp, [newId]: { ...temp[newId], total: temp[newId]?.total + p?.productQty } };
+        } else {
+          temp = { ...temp, [newId]: { label: p?.label, index: p?.index, total: p?.productQty, type: p?.type } };
+        }
+        if (p?.type === "Lusin") {
+          totalLusin += p?.productQty;
+        } else {
+          totalDus += p?.productQty;
+        }
+      });
+    });
+
+    temp = Object.keys(temp)
+      .sort((a, b) => {
+        const numA = temp[a]?.index;
+        const numB = temp[b]?.index;
+        if (numA !== null && numB !== null && numA !== numB) {
+          return numA - numB;
+        }
+        return a.localeCompare(b);
+      })
+      .map((key) => ({
+        id: key,
+        ...temp[key],
+      }));
+    setDataRangkuman({ data: temp, totalLusin: totalLusin, totalDus: totalDus });
+    setOpenRangkuman(true);
+  }
   return (
     <Box sx={{ width: "100%", height: "100%", display: "flex", justifyContent: "space-between" }}>
       <Box sx={{ width: "100%", pr: 5 }}>
@@ -192,6 +231,22 @@ export default function History() {
                 variant="contained"
               >
                 Print
+              </Button>
+              <Button
+                onClick={() => rangkuman()}
+                sx={{
+                  display: selectionData.length === 0 ? "none" : "block",
+                  backgroundColor: "#E06F2C",
+                  ":hover": { backgroundColor: "#E06F2C" },
+                  width: "150px",
+                  height: "48px",
+                  borderRadius: "10px",
+                  textTransform: "none",
+                  marginLeft: -1,
+                }}
+                variant="contained"
+              >
+                Total
               </Button>
             </Box>
             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
@@ -223,6 +278,7 @@ export default function History() {
           </Box>
         </Box>
       </Box>
+      <DialogTotalProduct open={openRangkuman} data={dataRangkuman} handleToggle={() => setOpenRangkuman((p) => !p)} />
       <DialogTable data={transactionDetail} open={openTd} handleToggle={() => setOpenTd((prev) => !prev)} customer={customerArr} time={time} idTransaction={idTransaction} adminName={adminName} />
     </Box>
   );

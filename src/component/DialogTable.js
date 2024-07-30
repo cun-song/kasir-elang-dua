@@ -18,7 +18,7 @@ const HEADER = [
   },
   {
     field: "label",
-    headerName: "Label",
+    headerName: "Produk",
     ...center,
     flex: 3,
   },
