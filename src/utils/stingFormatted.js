@@ -19,6 +19,7 @@ export function convertTimestamp(timestamp) {
 }
 
 export function decimalToFraction(dec) {
+  if (dec === 0) return dec;
   const modulo = dec % 1;
   const integer = dec - modulo;
   const convertedInteger = integer === 0 ? "" : integer;
