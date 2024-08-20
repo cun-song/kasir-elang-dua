@@ -56,7 +56,8 @@ export default function DialogCheckout({ open = false, handleToggle }) {
         ownerName: ownerName,
         merchantName: merchantName,
         adminName: adminName,
-        isPrinted: 0,
+        isDelivered: 0,
+        isPaid: 0,
         ...transaction,
       };
       dispatch(setLoading());

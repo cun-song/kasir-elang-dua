@@ -6,6 +6,8 @@ export const transactionSlice = createSlice({
     transactionData: {},
     openSuccess: false,
     openFailed: { isOpen: false, message: "" },
+    openSuccessUpdate: false,
+    openFailedUpdate: { isOpen: false, message: "" },
     transactionHistory: [],
     reset: false,
   },
@@ -19,6 +21,12 @@ export const transactionSlice = createSlice({
     setOpenFailed: (state, action) => {
       state.openFailed = action.payload;
     },
+    setOpenSuccessUpdate: (state, action) => {
+      state.openSuccessUpdate = action.payload;
+    },
+    setOpenFailedUpdate: (state, action) => {
+      state.openFailedUpdate = action.payload;
+    },
     setTransactionHistory: (state, action) => {
       state.transactionHistory = action.payload;
     },
@@ -28,6 +36,6 @@ export const transactionSlice = createSlice({
   },
 });
 
-export const { setTransactionData, setOpenFailed, setOpenSuccess, setTransactionHistory, setReset } = transactionSlice.actions;
+export const { setTransactionData, setOpenFailed, setOpenSuccess, setTransactionHistory, setReset, setOpenFailedUpdate, setOpenSuccessUpdate } = transactionSlice.actions;
 
 export default transactionSlice.reducer;

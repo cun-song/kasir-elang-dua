@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, TextField, MenuItem, Button } from "@mui/material";
+import { Box, Typography, TextField, MenuItem, Button, ButtonGroup } from "@mui/material";
 import NavBar from "../component/NavBar";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
@@ -7,7 +7,7 @@ import { click, setLoading } from "../redux/sidenavReducer";
 import { setTitle } from "../redux/sidenavReducer";
 import StyledSearch from "../component/StyledSearch";
 import StyledTable from "../component/StyledTable";
-import { fetchTransactionHistory } from "../redux/action/transactionAction";
+import { fetchTransactionHistory, updatePaid, updateShipped } from "../redux/action/transactionAction";
 import { useSelector } from "react-redux";
 import { HISTORY_HEADER, LAST_DATE_LIST, TRANSACTION_SEARCH_ITEM } from "../constant/History";
 import { useState } from "react";
@@ -16,6 +16,12 @@ import { fetchCustomerData } from "../redux/action/customerAction";
 import { formattedNumber } from "../utils/stingFormatted";
 import { BulkPrinting } from "../utils/PrintInvoice";
 import DialogTotalProduct from "../component/DialogTotalProduct";
+import StyledTableTransaction from "../component/StyledTableTransaction";
+import DialogSuccess from "../component/DialogSuccess";
+import DialogFailed from "../component/DialogFailed";
+import { setOpenFailed, setOpenFailedUpdate, setOpenSuccess, setOpenSuccessUpdate } from "../redux/transactionReducer";
+import DialogConfirmation from "../component/DialogConfirmation";
+import { loadBundle } from "firebase/firestore";
 
 export default function History() {
   const dispatch = useDispatch();
@@ -35,10 +41,14 @@ export default function History() {
   const [time, setTime] = useState(null);
   const [openRangkuman, setOpenRangkuman] = useState(false);
   const [dataRangkuman, setDataRangkuman] = useState({});
+  const [openConfirmation, setOpenConfirmation] = useState(false);
+  const [labelConfirmation, setLabelConfirmation] = useState("");
 
   const transaction = useSelector((state) => state.transaction.transactionHistory);
   const customer = useSelector((state) => state?.customer?.allCustomer);
-  // const adminName = useSelector((state) => state.sidenav.name);
+  const transactionSuccess = useSelector((state) => state.transaction.openSuccessUpdate);
+  const transactionFailed = useSelector((state) => state.transaction.openFailedUpdate);
+  const refresh = useSelector((state) => state?.transaction?.reset);
 
   useEffect(() => {
     dispatch(click(3));
@@ -46,6 +56,12 @@ export default function History() {
     dispatch(fetchTransactionHistory(lastDate));
     dispatch(fetchCustomerData());
   }, []);
+  useEffect(() => {
+    if (transactionSuccess) {
+      dispatch(fetchTransactionHistory(lastDate));
+      setSelectionData([]);
+    }
+  }, [refresh]);
 
   useEffect(() => {
     let tempData = Object.values(transaction);
@@ -200,7 +216,7 @@ export default function History() {
         }
       });
     });
-
+    console.log(temp);
     temp = Object.keys(temp)
       .sort((a, b) => {
         const numA = temp[a]?.index;
@@ -217,6 +233,38 @@ export default function History() {
     setDataRangkuman({ data: temp, totalLusin: totalLusin, totalDus: totalDus });
     setOpenRangkuman(true);
   }
+  function ship() {
+    setOpenConfirmation(true);
+    setLabelConfirmation("Yakin ingin mengubah Data Pesanan sudah dikirim ?");
+  }
+  function paid() {
+    setOpenConfirmation(true);
+    setLabelConfirmation("Yakin ingin mengubah Data Transaksi Menjadi Lunas ?");
+  }
+  function updatePaidShip() {
+    dispatch(setLoading());
+    if (labelConfirmation === "Yakin ingin mengubah Data Pesanan sudah dikirim ?") {
+      dispatch(updateShipped(selectionData));
+    } else {
+      dispatch(updatePaid(selectionData));
+    }
+    setOpenConfirmation(false);
+    setLabelConfirmation("");
+  }
+  const buttons = [
+    <Button onClick={() => bulkPrint()} variant="contained" sx={{ backgroundColor: "#E06F2C", ":hover": { backgroundColor: "#E06F2C" }, height: "48px", borderRadius: "10px", textTransform: "none" }}>
+      Print
+    </Button>,
+    <Button sx={{ backgroundColor: "#E06F2C", ":hover": { backgroundColor: "#E06F2C" }, height: "48px", borderRadius: "10px", textTransform: "none" }} onClick={() => rangkuman()} variant="contained">
+      Total
+    </Button>,
+    <Button onClick={() => ship()} variant="contained" sx={{ backgroundColor: "#E06F2C", ":hover": { backgroundColor: "#E06F2C" }, height: "48px", borderRadius: "10px", textTransform: "none" }}>
+      Kirim
+    </Button>,
+    <Button onClick={() => paid()} variant="contained" sx={{ backgroundColor: "#E06F2C", ":hover": { backgroundColor: "#E06F2C" }, height: "48px", borderRadius: "10px", textTransform: "none" }}>
+      Lunas
+    </Button>,
+  ];
   return (
     <Box sx={{ width: "100%", height: "100%", display: "flex", justifyContent: "space-between" }}>
       <Box sx={{ width: "100%", pr: 5 }}>
@@ -225,29 +273,9 @@ export default function History() {
           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
             <Box sx={{ display: "flex", gap: 5 }}>
               <StyledSearch selectMenuItems={TRANSACTION_SEARCH_ITEM} handleSearchClick={(e) => handleSearchClick(e)} isResetSearch={isResetSearch} setIsResetSearch={setIsResetSearch} />
-              <Button
-                onClick={() => bulkPrint()}
-                sx={{ display: selectionData.length === 0 ? "none" : "block", backgroundColor: "#E06F2C", ":hover": { backgroundColor: "#E06F2C" }, width: "150px", height: "48px", borderRadius: "10px", textTransform: "none" }}
-                variant="contained"
-              >
-                Print
-              </Button>
-              <Button
-                onClick={() => rangkuman()}
-                sx={{
-                  display: selectionData.length === 0 ? "none" : "block",
-                  backgroundColor: "#E06F2C",
-                  ":hover": { backgroundColor: "#E06F2C" },
-                  width: "150px",
-                  height: "48px",
-                  borderRadius: "10px",
-                  textTransform: "none",
-                  marginLeft: -1,
-                }}
-                variant="contained"
-              >
-                Total
-              </Button>
+              <ButtonGroup size="large" sx={{ display: selectionData.length === 0 ? "none" : "block" }}>
+                {buttons}
+              </ButtonGroup>
             </Box>
             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <Typography sx={{ mr: 2 }}>Data Transaksi dari: </Typography>
@@ -261,7 +289,7 @@ export default function History() {
             </Box>
           </Box>
           <Box sx={{ mt: 3 }}>
-            <StyledTable
+            <StyledTableTransaction
               headers={HISTORY_HEADER}
               rows={historyData}
               page={page}
@@ -274,12 +302,16 @@ export default function History() {
               onSortModelChange={(data) => handleSortChange(data)}
               checkboxSelection={true}
               selectModelChange={handleSelectionChange}
+              rowSelectionModel={selectionData}
             />
           </Box>
         </Box>
       </Box>
       <DialogTotalProduct open={openRangkuman} data={dataRangkuman} handleToggle={() => setOpenRangkuman((p) => !p)} />
       <DialogTable data={transactionDetail} open={openTd} handleToggle={() => setOpenTd((prev) => !prev)} customer={customerArr} time={time} idTransaction={idTransaction} adminName={adminName} />
+      <DialogSuccess message="Data Berhasil diSunting !!" open={transactionSuccess} handleToggle={() => dispatch(setOpenSuccessUpdate(false))} />
+      <DialogFailed open={transactionFailed?.isOpen} message={transactionFailed?.message} handleToggle={() => dispatch(setOpenFailedUpdate({ isOpen: false, message: "" }))} />
+      <DialogConfirmation open={openConfirmation} handleToggle={() => setOpenConfirmation((prev) => !prev)} label={labelConfirmation} save={() => updatePaidShip()} />
     </Box>
   );
 }

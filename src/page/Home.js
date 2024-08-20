@@ -286,7 +286,7 @@ export default function Home() {
       <DialogTambahan open={openTambahan} handleToggle={() => setOpenTambahan((prev) => !prev)} />
       <DialogCheckout open={openCheckout} handleToggle={() => setOpenCheckout((prev) => !prev)} />
       <DialogSuccess open={transactionSuccess} handleToggle={() => dispatch(setOpenSuccess(false))} />
-      <DialogFailed open={transactionFailed?.isOpen} message={transactionFailed?.message} handleToggle={() => dispatch(setOpenFailed(false))} />
+      <DialogFailed open={transactionFailed?.isOpen} message={transactionFailed?.message} handleToggle={() => dispatch(setOpenFailed({ isOpen: false, message: "" }))} />
     </Grid>
   );
 }
