@@ -21,7 +21,6 @@ import DialogSuccess from "../component/DialogSuccess";
 import DialogFailed from "../component/DialogFailed";
 import { setOpenFailed, setOpenFailedUpdate, setOpenSuccess, setOpenSuccessUpdate } from "../redux/transactionReducer";
 import DialogConfirmation from "../component/DialogConfirmation";
-import { loadBundle } from "firebase/firestore";
 
 export default function History() {
   const dispatch = useDispatch();
@@ -43,6 +42,8 @@ export default function History() {
   const [dataRangkuman, setDataRangkuman] = useState({});
   const [openConfirmation, setOpenConfirmation] = useState(false);
   const [labelConfirmation, setLabelConfirmation] = useState("");
+  const [printData, setPrintData] = useState(null);
+  const [printDialog, setPrintDialog] = useState(false);
 
   const transaction = useSelector((state) => state.transaction.transactionHistory);
   const customer = useSelector((state) => state?.customer?.allCustomer);
@@ -163,7 +164,6 @@ export default function History() {
     setSelectionData(newSelection);
   };
   function bulkPrint() {
-    dispatch(setLoading());
     const arr = [...selectionData];
     const temp = arr
       .sort((a, b) => {
@@ -191,9 +191,8 @@ export default function History() {
           adminName: transaction1?.adminName,
         };
       });
-    BulkPrinting(temp).then(() => {
-      dispatch(setLoading());
-    });
+    setPrintData(temp);
+    setPrintDialog(true);
   }
 
   function rangkuman() {
@@ -216,7 +215,6 @@ export default function History() {
         }
       });
     });
-    console.log(temp);
     temp = Object.keys(temp)
       .sort((a, b) => {
         const numA = temp[a]?.index;
@@ -232,6 +230,7 @@ export default function History() {
       }));
     setDataRangkuman({ data: temp, totalLusin: totalLusin, totalDus: totalDus });
     setOpenRangkuman(true);
+    bulkPrint();
   }
   function ship() {
     setOpenConfirmation(true);
@@ -252,16 +251,16 @@ export default function History() {
     setLabelConfirmation("");
   }
   const buttons = [
-    <Button onClick={() => bulkPrint()} variant="contained" sx={{ backgroundColor: "#E06F2C", ":hover": { backgroundColor: "#E06F2C" }, height: "48px", borderRadius: "10px", textTransform: "none" }}>
-      Print
-    </Button>,
-    <Button sx={{ backgroundColor: "#E06F2C", ":hover": { backgroundColor: "#E06F2C" }, height: "48px", borderRadius: "10px", textTransform: "none" }} onClick={() => rangkuman()} variant="contained">
+    // <Button onClick={() => bulkPrint()} variant="contained" sx={{ backgroundColor: "#E06F2C", ":hover": { backgroundColor: "#E06F2C" }, height: "48px", borderRadius: "10px", textTransform: "none" }}>
+    //   Print
+    // </Button>,
+    <Button sx={{ backgroundColor: "#E06F2C", ":hover": { backgroundColor: "#E06F2C" }, height: "48px", width: "110px", borderRadius: "10px", textTransform: "none" }} onClick={() => rangkuman()} variant="contained">
       Total
     </Button>,
-    <Button onClick={() => ship()} variant="contained" sx={{ backgroundColor: "#E06F2C", ":hover": { backgroundColor: "#E06F2C" }, height: "48px", borderRadius: "10px", textTransform: "none" }}>
+    <Button onClick={() => ship()} variant="contained" sx={{ backgroundColor: "#E06F2C", ":hover": { backgroundColor: "#E06F2C" }, height: "48px", width: "110px", borderRadius: "10px", textTransform: "none" }}>
       Kirim
     </Button>,
-    <Button onClick={() => paid()} variant="contained" sx={{ backgroundColor: "#E06F2C", ":hover": { backgroundColor: "#E06F2C" }, height: "48px", borderRadius: "10px", textTransform: "none" }}>
+    <Button onClick={() => paid()} variant="contained" sx={{ backgroundColor: "#E06F2C", ":hover": { backgroundColor: "#E06F2C" }, height: "48px", width: "110px", borderRadius: "10px", textTransform: "none" }}>
       Lunas
     </Button>,
   ];
@@ -307,7 +306,9 @@ export default function History() {
           </Box>
         </Box>
       </Box>
-      <DialogTotalProduct open={openRangkuman} data={dataRangkuman} handleToggle={() => setOpenRangkuman((p) => !p)} />
+      <DialogTotalProduct open={openRangkuman} data={dataRangkuman} handleToggle={() => setOpenRangkuman((p) => !p)}>
+        <BulkPrinting data={printData} />
+      </DialogTotalProduct>
       <DialogTable data={transactionDetail} open={openTd} handleToggle={() => setOpenTd((prev) => !prev)} customer={customerArr} time={time} idTransaction={idTransaction} adminName={adminName} />
       <DialogSuccess message="Data Berhasil diSunting !!" open={transactionSuccess} handleToggle={() => dispatch(setOpenSuccessUpdate(false))} />
       <DialogFailed open={transactionFailed?.isOpen} message={transactionFailed?.message} handleToggle={() => dispatch(setOpenFailedUpdate({ isOpen: false, message: "" }))} />

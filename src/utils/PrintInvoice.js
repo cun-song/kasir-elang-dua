@@ -1,11 +1,13 @@
-import React from "react";
+import React, { useRef, useState } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import elangVector from "../img/ElangVector.png";
 import { decimalToFraction, formattedNumber } from "./stingFormatted";
 import { renderToStaticMarkup } from "react-dom/server";
+import { useReactToPrint } from "react-to-print";
 import { useDispatch, useSelector } from "react-redux";
 import { setLoading } from "../redux/sidenavReducer";
+import { Button } from "@mui/material";
 
 const css = {
   titleHeader: {
@@ -64,7 +66,7 @@ const Table = ({ data }) => {
   const bonusData = data?.product?.filter((product) => product?.price === 0);
   const nbl = nonBonusData?.length;
   return (
-    <div style={{ padding: "20px", width: "9.5in", height: "5.5in", boxSizing: "border-box", border: "1px solid black", position: "relative" }}>
+    <div style={{ padding: "20px", width: "8in", height: "5.5in", boxSizing: "border-box", border: "1px solid black", position: "relative" }}>
       <div style={{ position: "absolute", top: 25, left: 20 }}>
         <img src={elangVector} style={{ height: "40px", width: "auto" }} />
       </div>
@@ -209,47 +211,27 @@ const Table = ({ data }) => {
   );
 };
 
-export const BulkPrinting = async (data) => {
-  const pdf = new jsPDF({
-    orientation: "landscape",
-    unit: "in",
-    format: [5.5, 9.5],
+export const BulkPrinting = ({ data }) => {
+  const dispatch = useDispatch();
+  const printRef = useRef();
+  const Print = useReactToPrint({
+    onBeforePrint: () => dispatch(setLoading()),
+    content: () => printRef.current,
+    documentTitle: "Invoice",
+    onAfterPrint: () => dispatch(setLoading()),
   });
-
-  for (let i = 0; i < data.length; i++) {
-    const htmlString = renderToStaticMarkup(<Table data={data[i]} />);
-    const element = document.createElement("div");
-    element.style.width = "9.5in";
-    element.style.height = "5.5in";
-    element.innerHTML = htmlString;
-    document.body.appendChild(element);
-
-    const canvas = await html2canvas(element);
-    const imgData = canvas.toDataURL("image/png");
-
-    const imgProperties = pdf.getImageProperties(imgData);
-    const pdfWidth = 9.5; // inches
-    const pdfHeight = (imgProperties.height * pdfWidth) / imgProperties.width;
-
-    if (i > 0) {
-      pdf.addPage();
-    }
-    pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
-    document.body.removeChild(element);
-  }
-
-  const pdfBlob = pdf.output("blob");
-  const blobUrl = URL.createObjectURL(pdfBlob);
-  const iframe = document.createElement("iframe");
-  iframe.style.position = "fixed";
-  iframe.style.width = "0px";
-  iframe.style.height = "0px";
-  iframe.style.border = "none";
-  iframe.src = blobUrl;
-
-  iframe.onload = () => {
-    iframe.contentWindow.focus();
-    iframe.contentWindow.print();
-  };
-  document.body.appendChild(iframe);
+  return (
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+      <div ref={printRef} className="hide-on-screen">
+        {data.map((item, index) => (
+          <div key={index} style={{ pageBreakAfter: "always" }}>
+            <Table data={item} />
+          </div>
+        ))}
+      </div>
+      <Button onClick={Print} sx={{ backgroundColor: "#E06F2C", ":hover": { backgroundColor: "#E06F2C" }, width: "150px", height: "48px", borderRadius: "28px", textTransform: "none" }} variant="contained">
+        Print
+      </Button>
+    </div>
+  );
 };

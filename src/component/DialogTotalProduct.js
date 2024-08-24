@@ -37,7 +37,7 @@ const style = {
   grandTotal: { fontFamily: "poppins", fontSize: "20px", fontWeight: "bold", color: "#12141E" },
 };
 
-export default function DialogTotalProduct({ open = false, handleToggle, data }) {
+export default function DialogTotalProduct({ open = false, handleToggle, data, children }) {
   const [page, setPage] = useState(0);
   const [currRowsPerPage, setCurrRowsPerPage] = useState(20);
   return (
@@ -55,7 +55,7 @@ export default function DialogTotalProduct({ open = false, handleToggle, data })
           </Grid>
         </Grid>
       </DialogContent>
-      <DialogActions></DialogActions>
+      <DialogActions sx={{ display: "flex", justifyContent: "center", mb: 2 }}>{children}</DialogActions>
     </StyledDialog>
   );
 }

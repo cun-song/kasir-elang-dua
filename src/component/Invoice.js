@@ -1,6 +1,7 @@
 import React, { useRef, useState } from "react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { useReactToPrint } from "react-to-print";
 import elangVector from "../img/ElangVector.png";
 import { decimalToFraction, formattedNumber } from "../utils/stingFormatted";
 import { Button } from "@mui/material";
@@ -50,45 +51,13 @@ const css = {
 const Invoice = ({ transaction, customer, total, grandTotal, discount, totalQty, idTransaction, adminName }) => {
   const dispatch = useDispatch();
   const printRef = useRef();
-  const Print = async () => {
-    dispatch(setLoading());
+  const Print = useReactToPrint({
+    onBeforePrint: () => dispatch(setLoading()),
+    content: () => printRef.current,
+    documentTitle: "Invoice",
+    onAfterPrint: () => dispatch(setLoading()),
+  });
 
-    const element = printRef.current;
-    const canvas = await html2canvas(element);
-    const data = canvas.toDataURL("image/png");
-
-    // Set custom size in inches (width: 9.5, height: 5.5)
-    const pdf = new jsPDF({
-      orientation: "landscape",
-      unit: "in",
-      format: [5.5, 9.5],
-    });
-
-    const imgProperties = pdf.getImageProperties(data);
-    const pdfWidth = 9.5; // inches
-    const pdfHeight = (imgProperties.height * pdfWidth) / imgProperties.width;
-
-    pdf.addImage(data, "PNG", 0, 0, pdfWidth, pdfHeight);
-    const pdfBlob = pdf.output("blob");
-
-    // Create a URL for the PDF blob
-    const pdfUrl = URL.createObjectURL(pdfBlob);
-
-    const iframe = document.createElement("iframe");
-    iframe.style.position = "fixed";
-    iframe.style.width = "0px";
-    iframe.style.height = "0px";
-    iframe.style.border = "none";
-    iframe.src = pdfUrl;
-
-    iframe.onload = () => {
-      iframe.contentWindow.focus();
-      iframe.contentWindow.print();
-      dispatch(setLoading());
-    };
-
-    document.body.appendChild(iframe);
-  };
   function formatDate(date) {
     const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
@@ -107,7 +76,7 @@ const Invoice = ({ transaction, customer, total, grandTotal, discount, totalQty,
   //product length paling banyak 13
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-      <div ref={printRef} style={{ padding: "20px", width: "9.5in", height: "5.5in", boxSizing: "border-box", border: "1px solid black", position: "absolute", left: "-9999px" }}>
+      <div ref={printRef} style={{ padding: "20px", width: "8in", height: "5.5in", boxSizing: "border-box", border: "1px solid black", position: "relative" }} className="hide-on-screen">
         <div style={{ position: "absolute", top: 25, left: 20 }}>
           <img src={elangVector} style={{ height: "40px", width: "auto" }} />
         </div>
