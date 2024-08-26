@@ -373,7 +373,9 @@ export default function Home() {
       <DialogConfirmation open={openCheckout} handleToggle={() => setOpenCheckout((prev) => !prev)} label={"Yakin Ingin Memproses Pesanan"} save={() => checkOut()}>
         <Grid sx={{ display: "flex", alignItems: "center", flexDirection: "column", marginTop: -2, marginBottom: 2 }}>
           <Typography sx={{ fontFamily: "poppins", fontSize: 22, fontWeight: "medium", color: "#12141E" }}>
-            {defaultCustomer?.ownerName}, {defaultCustomer?.merchantName}
+            {defaultCustomer?.ownerName !== "-" ? defaultCustomer?.ownerName : ""}
+            {defaultCustomer?.ownerName !== "-" && defaultCustomer?.merchantName !== "-" ? ", " : ""}
+            {defaultCustomer?.merchantName !== "-" ? defaultCustomer?.merchantName : ""}
           </Typography>
           <Typography sx={{ fontFamily: "poppins", fontSize: 20, color: "#12141E" }}>
             Diskon Besar: {discount?.besar} Diskon Kecil: {discount?.kecil}

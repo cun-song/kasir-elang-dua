@@ -84,11 +84,13 @@ const Table = ({ data }) => {
           </div>
 
           <div>
-            <p style={{ ...css.smallHeader, fontWeight: "600" }}>Kepada Yth</p>
-            <p style={css.smallHeader}>
-              {data?.customer?.ownerName}, {data?.customer?.merchantName}
+            <p style={{ ...css.smallHeader, fontWeight: "600", textAlign: "right" }}>Kepada Yth</p>
+            <p style={{ ...css.smallHeader, textAlign: "right" }}>
+              {data?.customer?.ownerName !== "-" ? data?.customer?.ownerName : ""}
+              {data?.customer?.ownerName !== "-" && data?.customer?.merchantName !== "-" ? ", " : ""}
+              {data?.customer?.merchantName !== "-" ? data?.customer?.merchantName : ""}
             </p>
-            <p style={css.smallHeader}>
+            <p style={{ ...css.smallHeader, textAlign: "right" }}>
               {data?.customer?.address}, {data?.customer?.area}
             </p>
           </div>

@@ -34,8 +34,8 @@ const getNextCustomerIdANDCheckName = async (db, ownerName, merchantName) => {
     const snapshot = await get(child(dbRef, "customer"));
     if (snapshot.exists()) {
       const customer = snapshot.val();
-      if (checkName(customer, "ownerName", ownerName)) return "Error Nama Pelanggan Telah Terdaftar";
-      if (checkName(customer, "merchantName", merchantName)) return "Error Nama Toko Telah Terdaftar";
+      if (checkName(customer, "ownerName", ownerName) && ownerName !== "-") return "Error Nama Pelanggan Telah Terdaftar";
+      if (checkName(customer, "merchantName", merchantName) && merchantName !== "-") return "Error Nama Toko Telah Terdaftar";
 
       const ids = Object.values(customer).map((cust) => cust?.id);
       const lastId = ids

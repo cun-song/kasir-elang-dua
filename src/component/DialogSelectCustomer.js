@@ -1,11 +1,9 @@
 import React, { useEffect } from "react";
-import { Box, Button, DialogActions, DialogContent, Grid, Typography, TextField, MenuItem, IconButton } from "@mui/material";
+import { Button, DialogActions, DialogContent, Grid, Typography, TextField, MenuItem, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import StyledDialog from "./StyledDialog";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { pushTransaction } from "../redux/action/transactionAction";
-import { setLoading } from "../redux/sidenavReducer";
 import { setTransactionCustomer } from "../redux/customerReducer";
 const style = {
   scroll: {
@@ -44,13 +42,11 @@ export default function DialogSelectCustomer({ open = false, handleToggle }) {
 
   const dispatch = useDispatch();
   const customer = useSelector((state) => state?.customer?.allCustomer);
-  const transaction = useSelector((state) => state?.transaction?.transactionData);
-  const adminName = useSelector((state) => state?.sidenav?.name);
   const defaultData = useSelector((state) => state?.customer?.transactionCustomer);
 
   function save() {
-    const ownerName = ownerList.find((owner) => owner.value === customerID)?.label;
-    const merchantName = merchantList.find((merchant) => merchant.value === customerID)?.label;
+    const ownerName = customer?.find((owner) => owner?.id === customerID)?.ownerName;
+    const merchantName = customer?.find((merchant) => merchant?.id === customerID)?.merchantName;
     dispatch(setTransactionCustomer({ customerID: customerID, ownerName: ownerName, merchantName: merchantName }));
     handleToggle();
   }
@@ -66,16 +62,20 @@ export default function DialogSelectCustomer({ open = false, handleToggle }) {
   }, [open]);
 
   useEffect(() => {
-    const ownerList = customer.map((c) => ({
-      value: c.id,
-      label: c.ownerName,
-    }));
+    const ownerList = customer
+      .filter((c) => c?.ownerName !== "-")
+      .map((c) => ({
+        value: c.id,
+        label: `${c?.ownerName !== "-" ? c?.ownerName : ""}${c?.ownerName !== "-" && c?.merchantName !== "-" ? ", " : ""}${c?.merchantName !== "-" ? c?.merchantName : ""}`,
+      }));
     setOwnerList(ownerList);
 
-    const merchantList = customer.map((c) => ({
-      value: c.id,
-      label: c.merchantName,
-    }));
+    const merchantList = customer
+      .filter((c) => c?.merchantName !== "-")
+      .map((c) => ({
+        value: c.id,
+        label: c.merchantName,
+      }));
     setMerchantList(merchantList);
   }, [customer]);
   return (
