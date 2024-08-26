@@ -33,6 +33,14 @@ export const CUSTOMER_HEADER = [
     ...center,
   },
   {
+    field: "discount",
+    headerName: "Diskon",
+    ...center,
+    renderCell: (diskon) => {
+      return `Besar: ${diskon?.value?.besar ?? 0}, Kecil: ${diskon?.value?.kecil ?? 0}`;
+    },
+  },
+  {
     field: "timestamp",
     headerName: "Waktu",
     ...center,

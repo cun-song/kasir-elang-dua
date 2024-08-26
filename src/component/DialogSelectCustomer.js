@@ -6,6 +6,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { pushTransaction } from "../redux/action/transactionAction";
 import { setLoading } from "../redux/sidenavReducer";
+import { setTransactionCustomer } from "../redux/customerReducer";
 const style = {
   scroll: {
     "&::-webkit-scrollbar": {
@@ -36,7 +37,7 @@ const style = {
   title: { fontFamily: "poppins", fontSize: "28px", fontWeight: "bold", color: "#12141E" },
   labelBotol: { fontFamily: "nunito", fontSize: "16px", fontWeight: "medium", color: "#828282" },
 };
-export default function DialogCheckout({ open = false, handleToggle }) {
+export default function DialogSelectCustomer({ open = false, handleToggle }) {
   const [customerID, setCustomerID] = useState(null);
   const [ownerList, setOwnerList] = useState([]);
   const [merchantList, setMerchantList] = useState([]);
@@ -44,25 +45,14 @@ export default function DialogCheckout({ open = false, handleToggle }) {
   const dispatch = useDispatch();
   const customer = useSelector((state) => state?.customer?.allCustomer);
   const transaction = useSelector((state) => state?.transaction?.transactionData);
-  const adminName = useSelector((state) => state.sidenav.name);
+  const adminName = useSelector((state) => state?.sidenav?.name);
+  const defaultData = useSelector((state) => state?.customer?.transactionCustomer);
 
   function save() {
     const ownerName = ownerList.find((owner) => owner.value === customerID)?.label;
     const merchantName = merchantList.find((merchant) => merchant.value === customerID)?.label;
-
-    if (Object.keys(transaction)?.length !== 0 && ownerName && merchantName) {
-      const temp = {
-        customerID: customerID,
-        ownerName: ownerName,
-        merchantName: merchantName,
-        adminName: adminName,
-        isDelivered: 0,
-        isPaid: 0,
-        ...transaction,
-      };
-      dispatch(setLoading());
-      dispatch(pushTransaction(temp));
-    }
+    dispatch(setTransactionCustomer({ customerID: customerID, ownerName: ownerName, merchantName: merchantName }));
+    handleToggle();
   }
 
   function removeCustomer() {
@@ -70,8 +60,8 @@ export default function DialogCheckout({ open = false, handleToggle }) {
   }
 
   useEffect(() => {
-    if (!open) {
-      removeCustomer();
+    if (open) {
+      setCustomerID(defaultData?.customerID);
     }
   }, [open]);
 
@@ -89,7 +79,7 @@ export default function DialogCheckout({ open = false, handleToggle }) {
     setMerchantList(merchantList);
   }, [customer]);
   return (
-    <StyledDialog isOpen={open} handleToggle={handleToggle} useCloseBtn width="30%" title="Checkout">
+    <StyledDialog isOpen={open} handleToggle={handleToggle} useCloseBtn width="30%" title="Pilih Pelanggan">
       <DialogContent>
         <Grid>
           <Grid item mt={2}>

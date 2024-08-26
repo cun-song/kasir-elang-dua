@@ -2,11 +2,12 @@ import React from "react";
 import StyledDialog from "./StyledDialog";
 import { Button, DialogActions, DialogContent, Grid, Typography } from "@mui/material";
 
-export default function DialogConfirmation({ open = false, handleToggle, save, label = "" }) {
+export default function DialogConfirmation({ open = false, handleToggle, save, label = "", children }) {
   return (
     <StyledDialog isOpen={open} handleToggle={handleToggle} useCloseBtn title="" width="30%">
       <DialogContent>
         <Typography sx={{ fontSize: "28px", fontWeight: "600", textAlign: "center", my: 2 }}>{label}</Typography>
+        {children}
       </DialogContent>
       <DialogActions>
         <Grid container gap={4} sx={{ justifyContent: "center" }}>

@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, Grid, Typography } from "@mui/material";
+import { Box, Button, Grid, IconButton, Typography } from "@mui/material";
 import NavBar from "../component/NavBar";
 import { useDispatch, useSelector } from "react-redux";
-import { click, setTitle } from "../redux/sidenavReducer";
+import { click, setLoading, setTitle } from "../redux/sidenavReducer";
+import CloseIcon from "@mui/icons-material/Close";
+
 import semuaProduk from "../img/semuaProduk.png";
 import kecapAsin from "../img/kecapAsin.png";
 import kecapManis from "../img/kecapManis.png";
@@ -18,12 +20,15 @@ import DialogTambahan from "../component/DialogTambahan";
 import { setCartData, setDiskon } from "../redux/cartReducer";
 import { fetchProductData } from "../redux/action/productAction";
 import { setBonusData } from "../redux/cartReducer";
-import DialogCheckout from "../component/DialogCheckout";
+import DialogSelectCustomer from "../component/DialogSelectCustomer";
 import { fetchCustomerData } from "../redux/action/customerAction";
-import { setOpenFailed, setOpenSuccess, setTransactionData } from "../redux/transactionReducer";
+import { setOpenFailed, setOpenSuccess } from "../redux/transactionReducer";
 import DialogSuccess from "../component/DialogSuccess";
 import DialogFailed from "../component/DialogFailed";
 import { formattedNumber } from "../utils/stingFormatted";
+import { setTransactionCustomer } from "../redux/customerReducer";
+import DialogConfirmation from "../component/DialogConfirmation";
+import { pushTransaction } from "../redux/action/transactionAction";
 
 const style = {
   scroll: {
@@ -51,7 +56,8 @@ const style = {
     },
   },
   rowCheckout: { display: "flex", justifyContent: "space-between" },
-  textCheckout: { fontFamily: "poppins", fontSize: "16px", fontWeight: "medium", color: "#12141E" },
+  textCheckout: { fontFamily: "poppins", fontSize: "16px", fontWeight: "bold", color: "#12141E" },
+  textCustomer: { fontFamily: "poppins", fontSize: "18px", fontWeight: "bold", color: "#12141E" },
   title: { fontFamily: "poppins", fontSize: "28px", fontWeight: "bold", color: "#12141E" },
   labelBotol: { fontFamily: "nunito", fontSize: "16px", fontWeight: "medium", color: "#828282" },
 };
@@ -66,11 +72,14 @@ export default function Home() {
   const [lusin, setLusin] = useState(0);
   const [openTambahan, setOpenTambahan] = useState(false);
   const [openCheckout, setOpenCheckout] = useState(false);
+  const [openCustomer, setOpenCustomer] = useState(false);
   const [listCart, setListCart] = useState({});
+  const [transactionData, setTransactionData] = useState({});
 
   const formattedSubtotal = formattedNumber(subtotal);
   const formattedDiscount = formattedNumber(discount?.total);
   const formattedTotal = formattedNumber(subtotal - discount?.total);
+
   const cart = useSelector((state) => state.cart.cartData);
   const bonusData = useSelector((state) => state.cart.bonusData);
   const diskon = useSelector((state) => state.cart.diskon);
@@ -78,6 +87,9 @@ export default function Home() {
   const transactionSuccess = useSelector((state) => state.transaction.openSuccess);
   const transactionFailed = useSelector((state) => state.transaction.openFailed);
   const refresh = useSelector((state) => state.transaction.reset);
+  const defaultCustomer = useSelector((state) => state?.customer?.transactionCustomer);
+  const customerData = useSelector((state) => state?.customer?.allCustomer);
+  const adminName = useSelector((state) => state?.sidenav?.name);
 
   function add(index, productId) {
     if (cart.hasOwnProperty(productId)) {
@@ -105,7 +117,6 @@ export default function Home() {
       removeCart(productId);
     }
   }
-
   function removeCart(productId) {
     if (productId[0] === "B") {
       const realId = productId?.substring(1);
@@ -117,9 +128,8 @@ export default function Home() {
       dispatch(setCartData(newData));
     }
   }
-
   function openDialogCheckout() {
-    if (lusin !== 0) {
+    if (lusin !== 0 && defaultCustomer?.ownerName && defaultCustomer?.merchantName) {
       if (Object.values(listCart).length > 13) {
         dispatch(setOpenFailed({ isOpen: true, message: "Pesanan melebihi 13 jenis produk, Mohon untuk membagi pesanan menjadi 2 invoice !!" }));
       } else {
@@ -128,7 +138,7 @@ export default function Home() {
           acc[key] = rest;
           return acc;
         }, {});
-        const transactionData = {
+        const tempData = {
           total: subtotal - discount?.total,
           subtotal: subtotal,
           discount: discount,
@@ -136,9 +146,25 @@ export default function Home() {
           product: tempCart,
         };
 
-        dispatch(setTransactionData(transactionData));
+        setTransactionData(tempData);
         setOpenCheckout(true);
       }
+    }
+  }
+
+  function checkOut() {
+    if (Object.keys(transactionData)?.length !== 0) {
+      const temp = {
+        customerID: defaultCustomer?.customerID,
+        ownerName: defaultCustomer?.ownerName,
+        merchantName: defaultCustomer?.merchantName,
+        adminName: adminName,
+        isDelivered: 0,
+        isPaid: 0,
+        ...transactionData,
+      };
+      dispatch(setLoading());
+      dispatch(pushTransaction(temp));
     }
   }
 
@@ -148,6 +174,7 @@ export default function Home() {
     dispatch(fetchProductData());
     dispatch(fetchCustomerData());
   }, []);
+
   useEffect(() => {
     setProduct(allProduct);
     setTotal(allProduct?.length);
@@ -163,8 +190,14 @@ export default function Home() {
       dispatch(setCartData({}));
       dispatch(setBonusData([{ productID: null, label: null, qty: null }]));
       dispatch(setDiskon({ besar: 0, kecil: 0 }));
+      dispatch(setTransactionCustomer({ customerID: "", ownerName: "", merchantName: "" }));
     }
   }, [refresh]);
+
+  useEffect(() => {
+    const defaultDiskon = customerData.filter((cust) => cust?.id === defaultCustomer?.customerID)[0]?.discount ?? { besar: 0, kecil: 0 };
+    dispatch(setDiskon(defaultDiskon));
+  }, [defaultCustomer]);
 
   useEffect(() => {
     let filteredProducts;
@@ -239,10 +272,60 @@ export default function Home() {
       </Grid>
       <Grid item sx={{ backgroundColor: "#FFFFFF", height: "100%" }} xs={3}>
         <Grid p={3}>
-          <Grid item>
+          {/* <Grid item>
             <Typography sx={{ fontFamily: "poppins", fontSize: 28, fontWeight: "bold", color: "#12141E" }}>Pesanan</Typography>
+          </Grid> */}
+          <Grid item container gap={2} mt={1}>
+            <Typography sx={{ ...style.textCustomer, fontWeight: "medium" }}>Nama Pemesan: </Typography>
+            <Grid item sx={style.rowCheckout}>
+              {defaultCustomer?.ownerName === "" ? (
+                <Button
+                  disableElevation
+                  disableRipple
+                  onClick={() => setOpenCustomer(true)}
+                  sx={{ color: "#707278", textTransform: "none", fontSize: "16px", fontFamily: "poppins", ":hover": { backgroundColor: "transparent", color: "#12141E" }, padding: 0, textAlign: "start" }}
+                >
+                  Pilih data
+                </Button>
+              ) : (
+                <Grid item container gap={2}>
+                  <Typography sx={style.textCustomer}>{defaultCustomer?.ownerName}</Typography>
+                  <IconButton
+                    onClick={() => dispatch(setTransactionCustomer({ customerID: "", ownerName: "", merchantName: "" }))}
+                    sx={{ width: "30px", height: "30px", ":hover": { backgroundColor: "transparent" }, ":active": { backgroundColor: "transparent" } }}
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                </Grid>
+              )}
+            </Grid>
           </Grid>
-          <Grid item mt={3} sx={{ display: "flex", flexDirection: "column", height: "480px", overflow: "auto", ...style.scroll }} gap={3}>
+          <Grid item container gap={2}>
+            <Typography sx={{ ...style.textCustomer, fontWeight: "medium" }}>Nama Toko: </Typography>
+            <Grid item sx={style.rowCheckout}>
+              {defaultCustomer?.merchantName === "" ? (
+                <Button
+                  disableElevation
+                  disableRipple
+                  onClick={() => setOpenCustomer(true)}
+                  sx={{ color: "#707278", textTransform: "none", fontSize: "16px", fontFamily: "poppins", ":hover": { backgroundColor: "transparent", color: "#12141E" }, padding: 0, textAlign: "start" }}
+                >
+                  Pilih data
+                </Button>
+              ) : (
+                <Grid item container gap={2}>
+                  <Typography sx={style.textCustomer}>{defaultCustomer?.merchantName}</Typography>
+                  <IconButton
+                    onClick={() => dispatch(setTransactionCustomer({ customerID: "", ownerName: "", merchantName: "" }))}
+                    sx={{ width: "30px", height: "30px", ":hover": { backgroundColor: "transparent" }, ":active": { backgroundColor: "transparent" } }}
+                  >
+                    <CloseIcon />
+                  </IconButton>
+                </Grid>
+              )}
+            </Grid>
+          </Grid>
+          <Grid item mt={2} sx={{ display: "flex", flexDirection: "column", height: "480px", overflow: "auto", ...style.scroll }} gap={3}>
             {Object.entries(listCart).map(([key, value]) => (
               <CartList img={value?.img} label={value?.label} size={value?.size} qty={value?.productQty} price={value?.price} remove={() => removeCart(key)} />
             ))}
@@ -284,9 +367,19 @@ export default function Home() {
         </Grid>
       </Grid>
       <DialogTambahan open={openTambahan} handleToggle={() => setOpenTambahan((prev) => !prev)} />
-      <DialogCheckout open={openCheckout} handleToggle={() => setOpenCheckout((prev) => !prev)} />
+      <DialogSelectCustomer open={openCustomer} handleToggle={() => setOpenCustomer((prev) => !prev)} />
       <DialogSuccess open={transactionSuccess} handleToggle={() => dispatch(setOpenSuccess(false))} />
       <DialogFailed open={transactionFailed?.isOpen} message={transactionFailed?.message} handleToggle={() => dispatch(setOpenFailed({ isOpen: false, message: "" }))} />
+      <DialogConfirmation open={openCheckout} handleToggle={() => setOpenCheckout((prev) => !prev)} label={"Yakin Ingin Memproses Pesanan"} save={() => checkOut()}>
+        <Grid sx={{ display: "flex", alignItems: "center", flexDirection: "column", marginTop: -2, marginBottom: 2 }}>
+          <Typography sx={{ fontFamily: "poppins", fontSize: 22, fontWeight: "medium", color: "#12141E" }}>
+            {defaultCustomer?.ownerName}, {defaultCustomer?.merchantName}
+          </Typography>
+          <Typography sx={{ fontFamily: "poppins", fontSize: 20, color: "#12141E" }}>
+            Diskon Besar: {discount?.besar} Diskon Kecil: {discount?.kecil}
+          </Typography>
+        </Grid>
+      </DialogConfirmation>
     </Grid>
   );
 }

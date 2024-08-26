@@ -8,6 +8,7 @@ import { pushTransaction } from "../redux/action/transactionAction";
 import { AREA_SELECT } from "../constant/Customer";
 import { pushCustomer } from "../redux/action/customerAction";
 import { setLoading } from "../redux/sidenavReducer";
+import { DISCOUNT_LIST } from "../constant/Home";
 const style = {
   scroll: {
     "&::-webkit-scrollbar": {
@@ -44,6 +45,7 @@ export default function DialogCustomer({ open = false, handleToggle }) {
   const [merchantName, setMerchantName] = useState("");
   const [address, setAddress] = useState("");
   const [gmaps, setGmaps] = useState("");
+  const [diskon, setDiskon] = useState({ besar: 0, kecil: 0 });
 
   const dispatch = useDispatch();
   function save() {
@@ -54,12 +56,20 @@ export default function DialogCustomer({ open = false, handleToggle }) {
         area: area,
         address: address,
         gmapsPoint: gmaps,
+        discount: diskon,
       };
       dispatch(setLoading());
       dispatch(pushCustomer(temp));
     }
   }
-
+  function onChangeBesar(data) {
+    const temp = { ...diskon, besar: data };
+    setDiskon(temp);
+  }
+  function onChangeKecil(data) {
+    const temp = { ...diskon, kecil: data };
+    setDiskon(temp);
+  }
   useEffect(() => {
     if (!open) {
       setOwnerName("");
@@ -67,6 +77,7 @@ export default function DialogCustomer({ open = false, handleToggle }) {
       setArea("");
       setAddress("");
       setGmaps("");
+      setDiskon({ besar: 0, kecil: 0 });
     }
   }, [open]);
 
@@ -133,6 +144,33 @@ export default function DialogCustomer({ open = false, handleToggle }) {
               <IconButton onClick={() => setGmaps("")} sx={{ width: "50px", height: "50px", ":hover": { backgroundColor: "transparent" }, ":active": { backgroundColor: "transparent" } }}>
                 <CloseIcon />
               </IconButton>
+            </Grid>
+          </Grid>
+          <Grid item mt={2} display={"flex"} gap={3}>
+            <Grid item>
+              <Typography sx={style.labelBotol} mb={1}>
+                Botol Besar
+              </Typography>
+
+              <TextField id="select-besar" select sx={{ width: "180px" }} onChange={(e) => onChangeBesar(e.target.value)}>
+                {DISCOUNT_LIST.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+            <Grid item>
+              <Typography sx={style.labelBotol} mb={1}>
+                Botol Kecil
+              </Typography>
+              <TextField id="select-kecil" select sx={{ width: "180px" }} onChange={(e) => onChangeKecil(e.target.value)}>
+                {DISCOUNT_LIST.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </TextField>
             </Grid>
           </Grid>
         </Grid>

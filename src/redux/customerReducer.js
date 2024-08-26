@@ -7,6 +7,7 @@ export const customerSlice = createSlice({
     openSuccessCustomer: false,
     openFailedCustomer: { isOpen: false, message: "" },
     resetCustomer: false,
+    transactionCustomer: { customerID: "", ownerName: "", merchantName: "" },
   },
   reducers: {
     setAllCustomer: (state, action) => {
@@ -21,9 +22,12 @@ export const customerSlice = createSlice({
     setResetCustomer: (state) => {
       state.resetCustomer = !state.resetCustomer;
     },
+    setTransactionCustomer: (state, action) => {
+      state.transactionCustomer = action.payload;
+    },
   },
 });
 
-export const { setAllCustomer, setOpenFailedCustomer, setOpenSuccessCustomer, setResetCustomer } = customerSlice.actions;
+export const { setAllCustomer, setOpenFailedCustomer, setOpenSuccessCustomer, setResetCustomer, setTransactionCustomer } = customerSlice.actions;
 
 export default customerSlice.reducer;
