@@ -38,7 +38,6 @@ const style = {
 export default function DialogSelectCustomer({ open = false, handleToggle }) {
   const [customerID, setCustomerID] = useState(null);
   const [ownerList, setOwnerList] = useState([]);
-  const [merchantList, setMerchantList] = useState([]);
 
   const dispatch = useDispatch();
   const customer = useSelector((state) => state?.customer?.allCustomer);
@@ -69,14 +68,6 @@ export default function DialogSelectCustomer({ open = false, handleToggle }) {
         label: `${c?.ownerName !== "-" ? c?.ownerName : ""}${c?.ownerName !== "-" && c?.merchantName !== "-" ? ", " : ""}${c?.merchantName !== "-" ? c?.merchantName : ""}`,
       }));
     setOwnerList(ownerList);
-
-    const merchantList = customer
-      .filter((c) => c?.merchantName !== "-")
-      .map((c) => ({
-        value: c.id,
-        label: c.merchantName,
-      }));
-    setMerchantList(merchantList);
   }, [customer]);
   return (
     <StyledDialog isOpen={open} handleToggle={handleToggle} useCloseBtn width="30%" title="Pilih Pelanggan">
@@ -84,28 +75,11 @@ export default function DialogSelectCustomer({ open = false, handleToggle }) {
         <Grid>
           <Grid item mt={2}>
             <Typography sx={style.labelBotol} mb={1}>
-              Nama Pemesan
+              Nama Pemesan & Toko
             </Typography>
             <Grid item container gap={2}>
               <TextField id="select-costumer" SelectProps={{ MenuProps: { PaperProps: { style: { maxHeight: "400px" } } } }} select sx={{ width: "80%" }} value={customerID} onChange={(e) => setCustomerID(e.target.value)}>
                 {ownerList.map((item, index) => (
-                  <MenuItem value={item?.value} key={index}>
-                    {item.label}
-                  </MenuItem>
-                ))}
-              </TextField>
-              <IconButton onClick={() => removeCustomer()} sx={{ width: "50px", height: "50px", ":hover": { backgroundColor: "transparent" }, ":active": { backgroundColor: "transparent" } }}>
-                <CloseIcon />
-              </IconButton>
-            </Grid>
-          </Grid>
-          <Grid item mt={2}>
-            <Typography sx={style.labelBotol} mb={1}>
-              Nama Toko
-            </Typography>
-            <Grid item container gap={2}>
-              <TextField id="select-merchant" SelectProps={{ MenuProps: { PaperProps: { style: { maxHeight: "400px" } } } }} select sx={{ width: "80%" }} value={customerID} onChange={(e) => setCustomerID(e.target.value)}>
-                {merchantList.map((item, index) => (
                   <MenuItem value={item?.value} key={index}>
                     {item.label}
                   </MenuItem>
