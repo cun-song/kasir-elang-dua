@@ -66,7 +66,7 @@ const Table = ({ data }) => {
   const bonusData = data?.product?.filter((product) => product?.price === 0);
   const nbl = nonBonusData?.length;
   return (
-    <div style={{ padding: "20px", width: "8in", height: "5.5in", boxSizing: "border-box", border: "1px solid black", position: "relative" }}>
+    <div style={{ padding: "20px", width: "8in", height: "5.5in", boxSizing: "border-box", position: "relative" }}>
       <div style={{ position: "absolute", top: 25, left: 20 }}>
         <img src={elangVector} style={{ height: "40px", width: "auto" }} />
       </div>
