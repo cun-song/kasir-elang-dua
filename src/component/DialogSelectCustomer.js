@@ -66,7 +66,10 @@ export default function DialogSelectCustomer({ open = false, handleToggle }) {
       .map((c) => ({
         value: c.id,
         label: `${c?.ownerName !== "-" ? c?.ownerName : ""}${c?.ownerName !== "-" && c?.merchantName !== "-" ? ", " : ""}${c?.merchantName !== "-" ? c?.merchantName : ""}`,
-      }));
+      }))
+      .sort((a, b) => {
+        return a?.label.localeCompare(b?.label);
+      });
     setOwnerList(ownerList);
   }, [customer]);
   return (

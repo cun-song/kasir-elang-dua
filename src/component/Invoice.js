@@ -95,13 +95,15 @@ const Invoice = ({ transaction, customer, total, grandTotal, discount, totalQty,
 
             <div>
               <p style={{ ...css.smallHeader, textAlign: "right" }}>Kepada Yth</p>
-              <p style={{ ...css.smallHeader, textAlign: "right", fontWeight: "600", fontSize: "16px" }}>
+              <p style={{ ...css.smallHeader, textAlign: "right", fontWeight: "600", fontSize: "15px" }}>
                 {customer?.ownerName !== "-" ? customer?.ownerName : ""}
                 {customer?.ownerName !== "-" && customer?.merchantName !== "-" ? ", " : ""}
                 {customer?.merchantName !== "-" ? customer?.merchantName : ""}
               </p>
               <p style={{ ...css.smallHeader, textAlign: "right" }}>
-                {customer?.address}, {customer?.area}
+                {customer?.address !== "-" ? customer?.address : ""}
+                {customer?.address !== "-" && customer?.area !== "-" ? ", " : ""}
+                {customer?.area !== "-" ? customer?.area : ""}
               </p>
             </div>
           </div>
