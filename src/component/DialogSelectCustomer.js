@@ -5,6 +5,7 @@ import StyledDialog from "./StyledDialog";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { setTransactionCustomer } from "../redux/customerReducer";
+import { AREA_SELECT } from "../constant/Customer";
 const style = {
   scroll: {
     "&::-webkit-scrollbar": {
@@ -37,6 +38,7 @@ const style = {
 };
 export default function DialogSelectCustomer({ open = false, handleToggle }) {
   const [customerID, setCustomerID] = useState(null);
+  const [area, setArea] = useState("Singkawang");
   const [ownerList, setOwnerList] = useState([]);
 
   const dispatch = useDispatch();
@@ -57,12 +59,13 @@ export default function DialogSelectCustomer({ open = false, handleToggle }) {
   useEffect(() => {
     if (open) {
       setCustomerID(defaultData?.customerID);
+      setArea("Singkawang");
     }
   }, [open]);
 
   useEffect(() => {
     const ownerList = customer
-      .filter((c) => c?.ownerName !== "-")
+      .filter((c) => c?.ownerName !== "-" && c?.area === area)
       .map((c) => ({
         value: c.id,
         label: `${c?.ownerName !== "-" ? c?.ownerName : ""}${c?.ownerName !== "-" && c?.merchantName !== "-" ? ", " : ""}${c?.merchantName !== "-" ? c?.merchantName : ""}`,
@@ -71,11 +74,28 @@ export default function DialogSelectCustomer({ open = false, handleToggle }) {
         return a?.label.localeCompare(b?.label);
       });
     setOwnerList(ownerList);
-  }, [customer]);
+  }, [customer, area]);
   return (
     <StyledDialog isOpen={open} handleToggle={handleToggle} useCloseBtn width="30%" title="Pilih Pelanggan">
       <DialogContent>
         <Grid>
+          <Grid item mt={2}>
+            <Typography sx={style.labelBotol} mb={1}>
+              Daerah
+            </Typography>
+            <Grid item container gap={2}>
+              <TextField id="select-costumer" SelectProps={{ MenuProps: { PaperProps: { style: { maxHeight: "400px" } } } }} select sx={{ width: "80%" }} value={area} onChange={(e) => setArea(e.target.value)}>
+                {AREA_SELECT.map((item, index) => (
+                  <MenuItem value={item?.value} key={index}>
+                    {item.label}
+                  </MenuItem>
+                ))}
+              </TextField>
+              <IconButton onClick={() => removeCustomer()} sx={{ width: "50px", height: "50px", ":hover": { backgroundColor: "transparent" }, ":active": { backgroundColor: "transparent" } }}>
+                <CloseIcon />
+              </IconButton>
+            </Grid>
+          </Grid>
           <Grid item mt={2}>
             <Typography sx={style.labelBotol} mb={1}>
               Nama Pemesan & Toko

@@ -87,12 +87,24 @@ export const AREA_SELECT = [
     label: "Bengkayang",
   },
   {
-    value: "Sambas",
-    label: "Sambas",
+    value: "Jakarta",
+    label: "Jakarta",
   },
   {
     value: "Pontianak",
     label: "Pontianak",
+  },
+  {
+    value: "Sungai Pinyuh",
+    label: "Sungai Pinyuh",
+  },
+  {
+    value: "Bali",
+    label: "Bali",
+  },
+  {
+    value: "Sambas",
+    label: "Sambas",
   },
   {
     value: "others",

@@ -12,7 +12,11 @@ export default function DialogConfirmation({ open = false, handleToggle, save, l
       <DialogActions>
         <Grid container gap={4} sx={{ justifyContent: "center" }}>
           <Grid item>
-            <Button onClick={handleToggle} sx={{ backgroundColor: "#E06F2C", ":hover": { backgroundColor: "#E06F2C" }, width: "160px", height: "56px", borderRadius: "26px", textTransform: "none" }} variant="contained">
+            <Button
+              onClick={handleToggle}
+              sx={{ border: "1px solid #E06F2C", fontWeight: "600", color: "#E06F2C", ":hover": { border: "1px solid #E06F2C" }, width: "160px", height: "56px", borderRadius: "26px", textTransform: "none" }}
+              variant="outlined"
+            >
               Cancel
             </Button>
           </Grid>

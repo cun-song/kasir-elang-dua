@@ -18,15 +18,15 @@ function generateString(number) {
 
   return result;
 }
-function checkName(customer, key, name) {
+function checkName(customer, key, name, area) {
   for (let id in customer) {
-    if (customer[id][key] && customer[id][key].toLowerCase() === name.toLowerCase()) {
+    if (customer[id][key] && customer[id][key].toLowerCase() === name.toLowerCase() && customer[id]?.area === area) {
       return true;
     }
   }
   return false;
 }
-const getNextCustomerIdANDCheckName = async (db, ownerName, merchantName) => {
+const getNextCustomerIdANDCheckName = async (db, ownerName, merchantName, area) => {
   const dbRef = ref(db);
   let nextId = "CU0000001";
 
@@ -34,8 +34,8 @@ const getNextCustomerIdANDCheckName = async (db, ownerName, merchantName) => {
     const snapshot = await get(child(dbRef, "customer"));
     if (snapshot.exists()) {
       const customer = snapshot.val();
-      if (checkName(customer, "ownerName", ownerName) && ownerName !== "-") return "Error Nama Pelanggan Telah Terdaftar";
-      if (checkName(customer, "merchantName", merchantName) && merchantName !== "-") return "Error Nama Toko Telah Terdaftar";
+      if (checkName(customer, "ownerName", ownerName, area) && ownerName !== "-") return "Error Nama Pelanggan Telah Terdaftar";
+      if (checkName(customer, "merchantName", merchantName, area) && merchantName !== "-") return "Error Nama Toko Telah Terdaftar";
 
       const ids = Object.values(customer).map((cust) => cust?.id);
       const lastId = ids
@@ -58,8 +58,8 @@ const getNextCustomerIdANDCheckName = async (db, ownerName, merchantName) => {
 export const pushCustomer = (data) => async (dispatch) => {
   const db = getDatabase(dbConfig);
   const dbRef = ref(db, "customer");
-
-  const customerID = await getNextCustomerIdANDCheckName(db, data?.ownerName, data?.merchantName);
+  console.log(data?.area);
+  const customerID = await getNextCustomerIdANDCheckName(db, data?.ownerName, data?.merchantName, data?.area);
   if (customerID.substring(0, 5) !== "Error") {
     const snapshot = await push(dbRef);
     set(snapshot, {
