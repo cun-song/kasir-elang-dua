@@ -76,8 +76,8 @@ const Invoice = ({ transaction, customer, total, grandTotal, discount, totalQty,
   //product length paling banyak 13
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-      <div ref={printRef} style={{ padding: "20px",paddingTop:"8px", width: "8in", height: "5.5in", boxSizing: "border-box", position: "relative" }} className="hide-on-screen">
-        <div style={{ position: "absolute", top: 13, left: 20 }}>
+      <div ref={printRef} style={{ padding: "20px", paddingTop: "9px", width: "8in", height: "5.5in", boxSizing: "border-box", position: "relative" }} className="hide-on-screen">
+        <div style={{ position: "absolute", top: 14, left: 20 }}>
           <img src={elangVector} style={{ height: "40px", width: "auto" }} />
         </div>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "10px", paddingBottom: "5px", borderBottom: "2px double black" }}>
@@ -94,8 +94,8 @@ const Invoice = ({ transaction, customer, total, grandTotal, discount, totalQty,
             </div>
 
             <div>
-              <p style={{ ...css.smallHeader, fontWeight: "600", textAlign: "right" }}>Kepada Yth</p>
-              <p style={{ ...css.smallHeader, textAlign: "right" }}>
+              <p style={{ ...css.smallHeader, textAlign: "right" }}>Kepada Yth</p>
+              <p style={{ ...css.smallHeader, textAlign: "right", fontWeight: "600", fontSize: "16px" }}>
                 {customer?.ownerName !== "-" ? customer?.ownerName : ""}
                 {customer?.ownerName !== "-" && customer?.merchantName !== "-" ? ", " : ""}
                 {customer?.merchantName !== "-" ? customer?.merchantName : ""}
