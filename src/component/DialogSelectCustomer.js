@@ -65,7 +65,7 @@ export default function DialogSelectCustomer({ open = false, handleToggle }) {
 
   useEffect(() => {
     const ownerList = customer
-      .filter((c) => c?.ownerName !== "-" && c?.area === area)
+      .filter((c) => !(c?.ownerName === "-" && c?.merchantName === "-") && c?.area === area)
       .map((c) => ({
         value: c.id,
         label: `${c?.ownerName !== "-" ? c?.ownerName : ""}${c?.ownerName !== "-" && c?.merchantName !== "-" ? ", " : ""}${c?.merchantName !== "-" ? c?.merchantName : ""}`,
