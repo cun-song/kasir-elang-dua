@@ -66,8 +66,8 @@ const Table = ({ data }) => {
   const bonusData = data?.product?.filter((product) => product?.price === 0);
   const nbl = nonBonusData?.length;
   return (
-    <div style={{ padding: "20px", paddingLeft:"25px",paddingTop: "15px", width: "8in", height: "5.5in", boxSizing: "border-box", position: "relative" }}>
-      <div style={{ position: "absolute", top: 25, left: 25 }}>
+    <div style={{ padding: "20px", paddingLeft:"25px",paddingTop: "18px", width: "8in", height: "5.5in", boxSizing: "border-box", position: "relative" }}>
+      <div style={{ position: "absolute", top: 28, left: 25 }}>
         <img src={elangVector} style={{ height: "40px", width: "auto" }} />
       </div>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "10px", paddingBottom: "5px", borderBottom: "2px double black" }}>
@@ -159,7 +159,7 @@ const Table = ({ data }) => {
             </tr>
             <tr key={14}>
               <td rowSpan={5} colSpan={5}>
-                <div style={{ display: "flex", justifyContent: "space-around", height: "85px" }}>
+                <div style={{ display: "flex", justifyContent: "space-around", height: "80px" }}>
                   <div style={{ width: "150px", height: "100%" }}>
                     <p style={{ textAlign: "center", marginBottom: "50px", marginTop: "5px", fontWeight: "500", fontFamily: "serif" }}>PEMBELI</p>
                     <div style={{ display: "flex" }}>
