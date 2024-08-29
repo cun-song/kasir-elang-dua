@@ -76,8 +76,8 @@ const Invoice = ({ transaction, customer, total, grandTotal, discount, totalQty,
   //product length paling banyak 13
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-      <div ref={printRef} style={{ padding: "20px", paddingTop: "9px", width: "8in", height: "5.5in", boxSizing: "border-box", position: "relative" }} className="hide-on-screen">
-        <div style={{ position: "absolute", top: 14, left: 20 }}>
+      <div ref={printRef} style={{ padding: "20px",paddingLeft:"25px", paddingTop: "18px", width: "8in", height: "5.5in", boxSizing: "border-box", position: "relative" }} className="hide-on-screen">
+        <div style={{ position: "absolute", top: 28, left: 25 }}>
           <img src={elangVector} style={{ height: "40px", width: "auto" }} />
         </div>
         <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "10px", paddingBottom: "5px", borderBottom: "2px double black" }}>
@@ -170,7 +170,7 @@ const Invoice = ({ transaction, customer, total, grandTotal, discount, totalQty,
               </tr>
               <tr key={14}>
                 <td rowSpan={5} colSpan={5}>
-                  <div style={{ display: "flex", justifyContent: "space-around", height: "85px" }}>
+                  <div style={{ display: "flex", justifyContent: "space-around", height: "80px" }}>
                     <div style={{ width: "150px", height: "100%" }}>
                       <p style={{ textAlign: "center", marginBottom: "50px", marginTop: "5px", fontWeight: "500", fontFamily: "serif" }}>PEMBELI</p>
                       <div style={{ display: "flex" }}>
