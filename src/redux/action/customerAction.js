@@ -58,7 +58,6 @@ const getNextCustomerIdANDCheckName = async (db, ownerName, merchantName, area) 
 export const pushCustomer = (data) => async (dispatch) => {
   const db = getDatabase(dbConfig);
   const dbRef = ref(db, "customer");
-  console.log(data?.area);
   const customerID = await getNextCustomerIdANDCheckName(db, data?.ownerName, data?.merchantName, data?.area);
   if (customerID.substring(0, 5) !== "Error") {
     const snapshot = await push(dbRef);

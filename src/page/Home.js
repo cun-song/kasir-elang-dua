@@ -29,6 +29,7 @@ import { formattedNumber } from "../utils/stingFormatted";
 import { setTransactionCustomer } from "../redux/customerReducer";
 import DialogConfirmation from "../component/DialogConfirmation";
 import { pushTransaction } from "../redux/action/transactionAction";
+import { useRef } from "react";
 
 const style = {
   scroll: {
@@ -107,7 +108,7 @@ export default function Home() {
     }
   }
   function subtract(productId) {
-    if (cart[productId]?.productQty !== 1) {
+    if (cart[productId]?.productQty > 1) {
       const temp = {
         ...cart,
         [productId]: { ...cart[productId], productQty: cart[productId].productQty - 1 },
@@ -126,6 +127,17 @@ export default function Home() {
       const newData = { ...cart };
       delete newData[productId];
       dispatch(setCartData(newData));
+    }
+  }
+  function edit(qty, productId) {
+    if (qty !== 0) {
+      const temp = {
+        ...cart,
+        [productId]: { ...cart[productId], productQty: qty },
+      };
+      dispatch(setCartData(temp));
+    } else {
+      removeCart(productId);
     }
   }
   function openDialogCheckout() {
@@ -266,7 +278,15 @@ export default function Home() {
         </Grid>
         <Grid container justifyContent={"space-between"} alignItems={"center"} mt={3} rowGap={4} overflow={"auto"} maxHeight={"57%"} sx={style.scroll}>
           {product.map((product, idx) => (
-            <ProductCard label={product?.label} img={product?.img} price={product?.price} cartQty={cart[product?.id]?.productQty ?? 0} add={() => add(idx, product?.id)} subtract={() => subtract(product?.id)} />
+            <ProductCard
+              label={product?.label}
+              img={product?.img}
+              price={product?.price}
+              cartQty={cart[product?.id]?.productQty ?? 0}
+              add={() => add(idx, product?.id)}
+              write={(qty) => edit(qty, product?.id)}
+              subtract={() => subtract(product?.id)}
+            />
           ))}
         </Grid>
       </Grid>
