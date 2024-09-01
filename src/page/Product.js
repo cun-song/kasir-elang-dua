@@ -14,7 +14,7 @@ import { PRODUCT_CATEGORY } from "../constant/Home";
 import CloseIcon from "@mui/icons-material/Close";
 import { fetchProductData, pushProduct, updateProduct } from "../redux/action/productAction";
 import ProductCardEdit from "../component/ProductCardEdit";
-import { PRODUCT_CATEGORY_SELECT, PRODUCT_SIZE_SELECT, PRODUCT_TYPE_SELECT } from "../constant/Product";
+import { PRODUCT_CATEGORY_SELECT, PRODUCT_SIZE_SELECT, PRODUCT_TYPE_SELECT, TOTAL_LUSIN_SELECT } from "../constant/Product";
 import DialogSuccess from "../component/DialogSuccess";
 import DialogFailed from "../component/DialogFailed";
 import { setOpenSuccessProduct, setOpenFailedProduct } from "../redux/productReducer";
@@ -63,6 +63,7 @@ export default function Product() {
   const [productType, setProductType] = useState(null);
   const [productQty, setProductQty] = useState(0);
   const [productPrice, setProductPrice] = useState(0);
+  const [productTotalLusin, setProductTotalLusin] = useState(0);
   const [productId, setProductId] = useState(null);
 
   const allProduct = useSelector((state) => state.product.allProduct);
@@ -78,6 +79,7 @@ export default function Product() {
     setProductQty(product?.qty);
     setProductPrice(product?.price);
     setProductId(product?.id);
+    setProductTotalLusin(product?.totalLusin);
     setSideTitle("Edit Produk");
     setEditing(true);
   }
@@ -96,11 +98,12 @@ export default function Product() {
     setProductSize(null);
     setProductType(null);
     setProductCategory(null);
+    setProductTotalLusin(null);
     setProductPrice(0);
     setProductQty(0);
   }
   function save() {
-    if (productName !== "" && productCategory !== null && productSize !== null && productQty !== 0 && productPrice !== 0 && productType !== null) {
+    if (productName !== "" && productCategory !== null && productSize !== null && productQty !== 0 && productPrice !== 0 && productType !== null && productTotalLusin !== null) {
       const temp = {
         id: productId,
         categoryID: productCategory,
@@ -109,6 +112,7 @@ export default function Product() {
         qty: productQty,
         size: productSize,
         type: productType,
+        totalLusin: productTotalLusin,
       };
       dispatch(setLoading());
 
@@ -245,6 +249,23 @@ export default function Product() {
             </Grid>
             <Grid item mt={2}>
               <Typography sx={style.labelBotol} mb={1}>
+                Jumlah Lusin
+              </Typography>
+              <Grid item container gap={2}>
+                <TextField id="select-total-lusin" select sx={{ width: "80%" }} value={productTotalLusin} onChange={(e) => setProductTotalLusin(e.target.value)}>
+                  {TOTAL_LUSIN_SELECT.map((item, index) => (
+                    <MenuItem value={item?.value} key={index}>
+                      {item.label}
+                    </MenuItem>
+                  ))}
+                </TextField>
+                <IconButton onClick={() => setProductTotalLusin(null)} sx={{ width: "50px", height: "50px", ":hover": { backgroundColor: "transparent" }, ":active": { backgroundColor: "transparent" } }}>
+                  <CloseIcon />
+                </IconButton>
+              </Grid>
+            </Grid>
+            <Grid item mt={2}>
+              <Typography sx={style.labelBotol} mb={1}>
                 Jumlah
               </Typography>
               <Grid item container gap={2}>
@@ -283,7 +304,7 @@ export default function Product() {
                 </IconButton>
               </Grid>
             </Grid>
-            <Grid item container justifyContent={"space-between"} sx={{ mt: 15 }}>
+            <Grid item container justifyContent={"space-between"} sx={{ mt: 8 }}>
               <Button
                 onClick={() => cancel()}
                 sx={{ borderColor: "#E06F2C", color: "#E06F2C", ":hover": { backgroundColor: "#E06F2C", color: "white", borderColor: "white" }, width: "45%", height: "56px", borderRadius: "30px", textTransform: "none" }}

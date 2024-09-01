@@ -30,6 +30,10 @@ export const PRODUCT_SIZE_SELECT = [
     value: "Kecil",
     label: "Kecil",
   },
+  {
+    value: "5000 ml",
+    label: "5000 ml",
+  },
 ];
 
 export const PRODUCT_TYPE_SELECT = [
@@ -40,5 +44,32 @@ export const PRODUCT_TYPE_SELECT = [
   {
     value: "Dus",
     label: "Dus",
+  },
+  {
+    value: "Gen",
+    label: "Gen",
+  },
+];
+
+export const TOTAL_LUSIN_SELECT = [
+  {
+    value: 0,
+    label: 0,
+  },
+  {
+    value: 1,
+    label: 1,
+  },
+  {
+    value: 2,
+    label: 2,
+  },
+  {
+    value: 3,
+    label: 3,
+  },
+  {
+    value: 4,
+    label: 4,
   },
 ];

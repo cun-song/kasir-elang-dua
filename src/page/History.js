@@ -43,7 +43,6 @@ export default function History() {
   const [openConfirmation, setOpenConfirmation] = useState(false);
   const [labelConfirmation, setLabelConfirmation] = useState("");
   const [printData, setPrintData] = useState(null);
-  const [printDialog, setPrintDialog] = useState(false);
 
   const transaction = useSelector((state) => state.transaction.transactionHistory);
   const customer = useSelector((state) => state?.customer?.allCustomer);
@@ -130,13 +129,15 @@ export default function History() {
       .map((key) => ({
         id: key,
         ...td[key],
-        discount: (td[key]?.type === "Dus" ? 2 : 1) * (td[key]?.price === 0 ? 0 : td[key]?.size === "Besar" ? data?.discount?.besar : data?.discount?.kecil),
+        discount: td[key]?.totalLusin * (td[key]?.price === 0 ? 0 : td[key]?.size === "Besar" ? data?.discount?.besar : td[key]?.size === "Kecil" ? data?.discount?.kecil : 0),
         subtotal:
           td[key]?.price === 0
             ? 0
             : td[key]?.size === "Besar"
-            ? td[key]?.productQty * (td[key]?.price - (td[key]?.type === "Dus" ? 2 : 1) * data?.discount?.besar)
-            : td[key]?.productQty * (td[key]?.price - (td[key]?.type === "Dus" ? 2 : 1) * data?.discount?.kecil),
+            ? td[key]?.productQty * (td[key]?.price - td[key]?.totalLusin * data?.discount?.besar)
+            : td[key]?.size === "Kecil"
+            ? td[key]?.productQty * (td[key]?.price - td[key]?.totalLusin * data?.discount?.kecil)
+            : td[key]?.productQty * td[key]?.price,
       }));
   }
   function findCustomer(id) {
@@ -174,7 +175,7 @@ export default function History() {
       .map((key) => {
         const transaction1 = findTransaction(key);
         const sortedProduct = sortProduct(transaction1);
-        const totalQty = Object.values(sortedProduct).reduce((acc, item) => acc + (item?.type === "Dus" ? 2 : 1) * item?.productQty, 0);
+        const totalQty = Object.values(sortedProduct).reduce((acc, item) => acc + item?.totalLusin * item?.productQty, 0);
         const total = Object.values(sortedProduct).reduce((acc, item) => acc + item?.productQty * item?.price, 0);
         const disc = Object.values(sortedProduct).reduce((acc, item) => acc + item?.productQty * item?.discount, 0);
         const formattedTotal = formattedNumber(total);
@@ -192,13 +193,13 @@ export default function History() {
         };
       });
     setPrintData(temp);
-    setPrintDialog(true);
   }
 
   function rangkuman() {
     let temp = {};
     let totalLusin = 0;
     let totalDus = 0;
+    let totalGen = 0;
     selectionData.forEach((key) => {
       const sortedProduct = sortProduct(findTransaction(key));
       sortedProduct.forEach((p) => {
@@ -210,8 +211,10 @@ export default function History() {
         }
         if (p?.type === "Lusin") {
           totalLusin += p?.productQty;
-        } else {
+        } else if (p?.type === "Dus") {
           totalDus += p?.productQty;
+        } else if (p?.type === "Gen") {
+          totalGen += p?.productQty;
         }
       });
     });
@@ -228,7 +231,7 @@ export default function History() {
         id: key,
         ...temp[key],
       }));
-    setDataRangkuman({ data: temp, totalLusin: totalLusin, totalDus: totalDus });
+    setDataRangkuman({ data: temp, totalLusin: totalLusin, totalDus: totalDus, totalGen: totalGen });
     setOpenRangkuman(true);
     bulkPrint();
   }

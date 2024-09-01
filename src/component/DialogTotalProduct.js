@@ -50,6 +50,10 @@ export default function DialogTotalProduct({ open = false, handleToggle, data, c
             <Typography sx={style.textCheckout}>{decimalToFraction(data?.totalLusin)} Lusin</Typography>
           </Grid>
           <Grid sx={{ display: "flex", gap: 2 }}>
+            <Typography sx={style.grandTotal}>Total Gen:</Typography>
+            <Typography sx={style.textCheckout}>{decimalToFraction(data?.totalGen)} Gen</Typography>
+          </Grid>
+          <Grid sx={{ display: "flex", gap: 2 }}>
             <Typography sx={style.grandTotal}>Total Dus:</Typography>
             <Typography sx={style.textCheckout}>{decimalToFraction(data?.totalDus)} Dus</Typography>
           </Grid>

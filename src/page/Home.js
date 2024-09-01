@@ -25,7 +25,7 @@ import { fetchCustomerData } from "../redux/action/customerAction";
 import { setOpenFailed, setOpenSuccess } from "../redux/transactionReducer";
 import DialogSuccess from "../component/DialogSuccess";
 import DialogFailed from "../component/DialogFailed";
-import { formattedNumber } from "../utils/stingFormatted";
+import { decimalToFraction, formattedNumber } from "../utils/stingFormatted";
 import { setTransactionCustomer } from "../redux/customerReducer";
 import DialogConfirmation from "../component/DialogConfirmation";
 import { pushTransaction } from "../redux/action/transactionAction";
@@ -102,7 +102,16 @@ export default function Home() {
     } else {
       const temp = {
         ...cart,
-        [productId]: { img: product[index]?.img, label: product[index]?.label, size: product[index]?.size, type: product[index]?.type, price: product[index]?.price, productQty: 1, index: product[index]?.index },
+        [productId]: {
+          img: product[index]?.img,
+          label: product[index]?.label,
+          size: product[index]?.size,
+          type: product[index]?.type,
+          price: product[index]?.price,
+          productQty: 1,
+          index: product[index]?.index,
+          totalLusin: product[index]?.totalLusin,
+        },
       };
       dispatch(setCartData(temp));
     }
@@ -236,14 +245,15 @@ export default function Home() {
             index: item?.index,
             price: 0,
             productQty: bd?.qty,
+            totalLusin: item?.totalLusin,
           };
         }
       });
 
       const newCart = { ...cart, ...bonusObj };
-      const totalQty = Object.values(newCart).reduce((acc, item) => acc + item?.productQty * (item?.type === "Dus" ? 2 : 1), 0);
+      const totalQty = Object.values(newCart).reduce((acc, item) => acc + item?.productQty * item?.totalLusin, 0);
       const subtotal = Object.values(newCart).reduce((acc, item) => acc + item?.productQty * item?.price, 0);
-      const disc = Object.values(newCart).reduce((acc, item) => acc + item?.productQty * (item?.type === "Dus" ? 2 : 1) * (item?.price === 0 ? 0 : item?.size === "Besar" ? diskon?.besar : diskon?.kecil), 0);
+      const disc = Object.values(newCart).reduce((acc, item) => acc + item?.productQty * item?.totalLusin * (item?.price === 0 ? 0 : item?.size === "Besar" ? diskon?.besar : item?.size === "Kecil" ? diskon?.kecil : 0), 0);
       setLusin(totalQty);
       setSubtotal(subtotal);
       setDiscount({ total: disc, besar: diskon?.besar, kecil: diskon?.kecil });
@@ -376,7 +386,7 @@ export default function Home() {
             </Grid>
             <Grid item sx={style.rowCheckout}>
               <Typography sx={style.textCheckout}>Total Lusin</Typography>
-              <Typography sx={style.textCheckout}>{lusin}</Typography>
+              <Typography sx={style.textCheckout}>{decimalToFraction(lusin)}</Typography>
             </Grid>
           </Grid>
           <Grid item container justifyContent={"center"} mt={4}>

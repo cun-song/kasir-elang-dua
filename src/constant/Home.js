@@ -7,51 +7,6 @@ export const PRODUCT_CATEGORY = {
   C5: "Produk Spritus",
 };
 
-export const OBJ = {
-  P1: {
-    id: "a",
-    label: "Kecap Asin Elang Dua Besar",
-    size: "Besar",
-    qty: 200,
-    price: 210000,
-  },
-  P2: {
-    id: "b",
-    label: "Kecap Asin Elang Dua Kecil",
-    size: "Kecil",
-    qty: 200,
-    price: 120000,
-  },
-  P3: {
-    id: "c",
-    label: "Kecap Manis Elang Dua Besar",
-    size: "Besar",
-    qty: 200,
-    price: 200000,
-  },
-  P4: {
-    id: "d",
-    label: "Kecap Manis Elang Dua Kecil",
-    size: "Kecil",
-    qty: 200,
-    price: 110000,
-  },
-  P5: {
-    id: "e",
-    label: "Kecap Asin Elang Dua Besar",
-    size: "Besar",
-    qty: 200,
-    price: 2000000,
-  },
-  P6: {
-    id: "f",
-    label: "Kecap Asin Elang Dua Kecil",
-    size: "Kecil",
-    qty: 200,
-    price: 120000,
-  },
-};
-
 export const DISCOUNT_LIST = [
   {
     value: 0,

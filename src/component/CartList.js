@@ -22,7 +22,19 @@ export default function CartList({ img, label, size, qty, price, remove = () => 
         <Grid item sx={{ display: "flex", justifyContent: "space-between" }}>
           <Grid item sx={{ display: "flex", width: "50%", justifyContent: "space-between" }}>
             <Typography sx={{ fontFamily: "poppins", fontSize: "18px", fontWeight: "bold", color: "#12141E" }}>x {qty}</Typography>
-            <Box sx={{ width: "67px", height: "26px", borderRadius: "8px", backgroundColor: `#${size === "Besar" ? "F5EFEF" : "FFB3B3"}`, color: "#704332", textAlign: "center", fontSize: "10px", fontFamily: "poppins", lineHeight: "26px" }}>
+            <Box
+              sx={{
+                width: "67px",
+                height: "26px",
+                borderRadius: "8px",
+                backgroundColor: `#${size === "Besar" ? "F5EFEF" : size === "Kecil" ? "FFB3B3" : "bae1ff"}`,
+                color: "#704332",
+                textAlign: "center",
+                fontSize: "10px",
+                fontFamily: "poppins",
+                lineHeight: "26px",
+              }}
+            >
               {size}
             </Box>
           </Grid>

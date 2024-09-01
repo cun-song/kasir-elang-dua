@@ -1,6 +1,5 @@
 import { Grid, Typography } from "@mui/material";
 import React, { useEffect } from "react";
-import profil from "../img/selfie.jpg";
 import { useSelector } from "react-redux";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 

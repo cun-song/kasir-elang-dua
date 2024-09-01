@@ -28,7 +28,9 @@ const HEADER = [
     ...center,
     flex: 2,
     renderCell: (size) => {
-      return <Box sx={{ width: "67px", height: "26px", borderRadius: "8px", backgroundColor: `#${size?.value === "Besar" ? "F5EFEF" : "FFB3B3"}`, textAlign: "center", lineHeight: "26px" }}>{size?.value}</Box>;
+      return (
+        <Box sx={{ width: "67px", height: "26px", borderRadius: "8px", backgroundColor: `#${size?.value === "Besar" ? "F5EFEF" : size?.value === "Kecil" ? "FFB3B3" : "bae1ff"}`, textAlign: "center", lineHeight: "26px" }}>{size?.value}</Box>
+      );
     },
   },
   {
@@ -82,7 +84,7 @@ const style = {
 export default function DialogTable({ open = false, handleToggle, data, customer, time, idTransaction, adminName }) {
   const [page, setPage] = useState(0);
   const [currRowsPerPage, setCurrRowsPerPage] = useState(5);
-  const totalQty = Object.values(data).reduce((acc, item) => acc + (item?.type === "Dus" ? 2 : 1) * item?.productQty, 0);
+  const totalQty = Object.values(data).reduce((acc, item) => acc + item?.totalLusin * item?.productQty, 0);
   const total = Object.values(data).reduce((acc, item) => acc + item?.productQty * item?.price, 0);
   const disc = Object.values(data).reduce((acc, item) => acc + item?.productQty * item?.discount, 0);
   const formattedTotal = formattedNumber(total);
