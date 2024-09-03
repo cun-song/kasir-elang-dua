@@ -44,10 +44,12 @@ export const pushProduct = (data) => async (dispatch) => {
     .then(() => {
       dispatch(setOpenSuccessProduct(true));
       dispatch(setResetProduct());
+      dispatch(setLoading());
     })
     .catch((error) => {
       console.error("Error pushing product: ", error);
       dispatch(setOpenFailedProduct({ isOpen: true, message: "Error pushing product" }));
+      dispatch(setLoading());
     });
 };
 export const updateProduct = (data) => async (dispatch) => {
