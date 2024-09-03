@@ -146,7 +146,7 @@ export default function DialogTambahan({ open = false, handleToggle }) {
           </Grid>
           {bonusData.map((data, index) => (
             <Grid item container gap={2} mt={2}>
-              <TextField id="select-product" select sx={{ width: "60%" }} value={data?.productID} onChange={(e) => onChangeProductBonus(index, e.target.value)}>
+              <TextField id="select-product" SelectProps={{ MenuProps: { PaperProps: { style: { maxHeight: "340px" } } } }} select sx={{ width: "60%" }} value={data?.productID} onChange={(e) => onChangeProductBonus(index, e.target.value)}>
                 {listProduct.map((item, index) => {
                   return bonusData.filter((bd) => bd?.productID === item.value).length < 1 ? (
                     <MenuItem value={item?.value} key={index}>
