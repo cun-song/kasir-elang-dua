@@ -24,6 +24,11 @@ export const HISTORY_HEADER = [
     ...center,
   },
   {
+    field: "area",
+    headerName: "Daerah",
+    ...center,
+  },
+  {
     field: "lusin",
     headerName: "Lusin",
     renderCell: (num) => {
@@ -79,6 +84,10 @@ export const TRANSACTION_SEARCH_ITEM = [
   {
     value: "merchantName",
     label: "Nama Toko",
+  },
+  {
+    value: "area",
+    label: "Daerah",
   },
   {
     value: "lusin",

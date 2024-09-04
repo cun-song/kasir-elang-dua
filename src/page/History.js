@@ -64,7 +64,9 @@ export default function History() {
   }, [refresh]);
 
   useEffect(() => {
-    let tempData = Object.values(transaction);
+    let tempData = Object.values(transaction).map((t) => {
+      return { ...t, area: findCustomer(t?.customerID)?.area };
+    });
     const field = sortData[0]?.field ?? "id";
     const sort = sortData[0]?.sort ?? "desc";
     if (field === "id") {
@@ -73,7 +75,7 @@ export default function History() {
         const numB = parseInt(b.id.substring(1), 10);
         return sort === "asc" ? numA - numB : numB - numA;
       });
-    } else if (field === "ownerName" || field === "merchantName") {
+    } else if (field === "ownerName" || field === "merchantName" || field === "area") {
       tempData.sort((a, b) => {
         return sort === "asc" ? a[field].localeCompare(b[field]) : b[field].localeCompare(a[field]);
       });
