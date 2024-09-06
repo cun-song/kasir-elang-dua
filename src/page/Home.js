@@ -150,7 +150,7 @@ export default function Home() {
     }
   }
   function openDialogCheckout() {
-    if (lusin !== 0 && defaultCustomer?.ownerName && defaultCustomer?.merchantName) {
+    if (Object.values(listCart).length !== 0 && defaultCustomer?.ownerName && defaultCustomer?.merchantName) {
       if (Object.values(listCart).length > 13) {
         dispatch(setOpenFailed({ isOpen: true, message: "Pesanan melebihi 13 jenis produk, Mohon untuk membagi pesanan menjadi 2 invoice !!" }));
       } else {

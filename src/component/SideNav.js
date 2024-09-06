@@ -11,6 +11,9 @@ import ReceiptOutlinedIcon from "@mui/icons-material/ReceiptOutlined";
 import ReceiptRoundedIcon from "@mui/icons-material/ReceiptRounded";
 import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import SettingsRoundedIcon from "@mui/icons-material/SettingsRounded";
+import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
+import InfoRoundedIcon from "@mui/icons-material/InfoRounded";
+
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
 
@@ -68,6 +71,14 @@ export default function SideNav() {
           >
             {value === 3 ? <ReceiptRoundedIcon sx={{ color: "#E06F2C", fontSize: 32 }} /> : <ReceiptOutlinedIcon sx={{ color: "#666666", fontSize: 32, opacity: 0.4 }} />}
           </IconButton>
+          <IconButton
+            sx={{ ":hover": { backgroundColor: "transparent" }, ":active": { backgroundColor: "transparent" } }}
+            onClick={() => {
+              navigate("/information");
+            }}
+          >
+            {value === 4 ? <InfoRoundedIcon sx={{ color: "#E06F2C", fontSize: 32 }} /> : <InfoOutlinedIcon sx={{ color: "#666666", fontSize: 32, opacity: 0.4 }} />}
+          </IconButton>
 
           <IconButton
             sx={{ ":hover": { backgroundColor: "transparent" }, ":active": { backgroundColor: "transparent" } }}
@@ -75,7 +86,7 @@ export default function SideNav() {
               navigate("/settings");
             }}
           >
-            {value === 4 ? <SettingsRoundedIcon sx={{ color: "#E06F2C", fontSize: 32 }} /> : <SettingsOutlinedIcon sx={{ color: "#666666", fontSize: 32, opacity: 0.4 }} />}
+            {value === 5 ? <SettingsRoundedIcon sx={{ color: "#E06F2C", fontSize: 32 }} /> : <SettingsOutlinedIcon sx={{ color: "#666666", fontSize: 32, opacity: 0.4 }} />}
           </IconButton>
         </Grid>
       </Grid>

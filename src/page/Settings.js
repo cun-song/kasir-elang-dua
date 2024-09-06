@@ -10,7 +10,7 @@ export default function Settings() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(click(4));
+    dispatch(click(5));
     dispatch(setTitle("Pengaturan"));
   }, []);
 
@@ -22,7 +22,6 @@ export default function Settings() {
           Log out
         </Button>
       </Box>
-      <Box sx={{ backgroundColor: "#FFFFFF", width: "30%", height: "100%" }}></Box>
     </Box>
   );
 }

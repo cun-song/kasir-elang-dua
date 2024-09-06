@@ -10,6 +10,7 @@ import Settings from "./Settings";
 import ProtectedRoute from "../component/ProtectedRoute";
 import { AuthProvider } from "../utils/useAuth";
 import ProtectedSuperAdmin from "../component/ProtectedSuperAdmin";
+import Information from "./Information";
 
 export default function Main() {
   return (
@@ -25,6 +26,7 @@ export default function Main() {
             <Route path="/customer" element={<Customer />} />
 
             <Route path="/history" element={<History />} />
+            <Route path="/information" element={<Information />} />
             <Route path="/settings" element={<Settings />} />
           </Route>
         </Routes>
