@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import elangVector from "../img/ElangVector.png";
@@ -7,7 +7,12 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { useReactToPrint } from "react-to-print";
 import { useDispatch, useSelector } from "react-redux";
 import { setLoading } from "../redux/sidenavReducer";
-import { Button } from "@mui/material";
+import { Box, Button } from "@mui/material";
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import dayjs from "dayjs";
+import { format } from "date-fns";
+import { id } from "date-fns/locale";
 
 const css = {
   titleHeader: {
@@ -48,25 +53,20 @@ const css = {
     fontSize: "11px",
   },
 };
-function formatDate(date) {
-  const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
 
-  const day = date.getDate();
-  const month = months[date.getMonth()];
-  const year = date.getFullYear();
-
-  return `${day} ${month} ${year}`;
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  return format(date, "dd MMMM yyyy", { locale: id });
 }
 
-const Table = ({ data }) => {
-  const today = new Date();
+const Table = ({ data, date }) => {
   const minimumRows = 13;
   const rowsToAdd = minimumRows - data?.product?.length;
   const nonBonusData = data?.product?.filter((product) => product?.price !== 0);
   const bonusData = data?.product?.filter((product) => product?.price === 0);
   const nbl = nonBonusData?.length;
   return (
-    <div style={{ padding: "20px", paddingLeft:"25px",paddingTop: "18px", width: "8in", height: "5.5in", boxSizing: "border-box", position: "relative" }}>
+    <div style={{ padding: "20px", paddingLeft: "25px", paddingTop: "18px", width: "8in", height: "5.5in", boxSizing: "border-box", position: "relative" }}>
       <div style={{ position: "absolute", top: 28, left: 25 }}>
         <img src={elangVector} style={{ height: "40px", width: "auto" }} />
       </div>
@@ -80,7 +80,7 @@ const Table = ({ data }) => {
           <div>
             <p style={css.smallHeader}>No Invoice: {data?.id}</p>
             <p style={css.smallHeader}>Admin: {data?.adminName}</p>
-            <p style={css.smallHeader}>Dicetak: {formatDate(today)}</p>
+            <p style={css.smallHeader}>Dicetak: {formatDate(date)}</p>
           </div>
 
           <div>
@@ -224,18 +224,27 @@ export const BulkPrinting = ({ data }) => {
     documentTitle: "Invoice",
     onAfterPrint: () => dispatch(setLoading()),
   });
+  const today = dayjs();
+
+  const [date, setDate] = useState(today);
+
   return (
-    <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+    <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
       <div ref={printRef} className="hide-on-screen">
         {data.map((item, index) => (
           <div key={index} style={{ pageBreakAfter: "always" }}>
-            <Table data={item} />
+            <Table data={item} date={date} />
           </div>
         ))}
       </div>
-      <Button onClick={Print} sx={{ backgroundColor: "#E06F2C", ":hover": { backgroundColor: "#E06F2C" }, width: "150px", height: "48px", borderRadius: "28px", textTransform: "none" }} variant="contained">
-        Print
-      </Button>
+      <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
+        <LocalizationProvider dateAdapter={AdapterDayjs}>
+          <DatePicker sx={{ marginLeft: 2, mr: 6 }} defaultValue={today} disablePast views={["year", "month", "day"]} format="DD MMMM YYYY" onChange={(e) => setDate(e)} />
+        </LocalizationProvider>
+        <Button onClick={Print} sx={{ backgroundColor: "#E06F2C", ":hover": { backgroundColor: "#E06F2C" }, width: "150px", height: "48px", borderRadius: "28px", textTransform: "none" }} variant="contained">
+          Print
+        </Button>
+      </Box>
     </div>
   );
 };
