@@ -151,8 +151,8 @@ export default function Home() {
   }
   function openDialogCheckout() {
     if (Object.values(listCart).length !== 0 && defaultCustomer?.ownerName && defaultCustomer?.merchantName) {
-      if (Object.values(listCart).length > 13) {
-        dispatch(setOpenFailed({ isOpen: true, message: "Pesanan melebihi 13 jenis produk, Mohon untuk membagi pesanan menjadi 2 invoice !!" }));
+      if (Object.values(listCart).length > 12) {
+        dispatch(setOpenFailed({ isOpen: true, message: "Pesanan melebihi 12 jenis produk, Mohon untuk membagi pesanan menjadi 2 invoice !!" }));
       } else {
         const tempCart = Object.keys(listCart).reduce((acc, key) => {
           const { img, ...rest } = listCart[key];

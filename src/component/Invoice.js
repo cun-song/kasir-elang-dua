@@ -24,26 +24,38 @@ const css = {
   headerBorder: {
     border: "1px solid black",
     textAlign: "center",
+    fontSize: "14px",
+    paddingRight: "5px",
+    paddingLeft: "5px",
   },
   tableBorder: {
     borderLeft: "1px solid black",
     borderRight: "1px solid black",
     textAlign: "center",
-    fontSize: "11px",
+    fontSize: "14px",
+    letterSpacing: "-2px",
+    wordSpacing: "-3px",
+    fontFamily: "Courier New",
   },
 
   tableBorderTotal: {
     // border: "1px solid black",
     paddingRight: "8px",
     textAlign: "right",
-    fontSize: "11px",
+    fontSize: "14px",
+    letterSpacing: "-2px",
+    wordSpacing: "-3px",
+    fontFamily: "Courier New",
   },
   tableBorderValue: {
     borderLeft: "1px solid black",
     borderRight: "1px solid black",
     paddingRight: "8px",
     textAlign: "right",
-    fontSize: "11px",
+    fontSize: "14px",
+    letterSpacing: "-2px",
+    wordSpacing: "-3px",
+    fontFamily: "Courier New",
   },
   tableBorderLast: {
     borderLeft: "1px solid black",
@@ -70,12 +82,12 @@ const Invoice = ({ transaction, customer, total, grandTotal, discount, totalQty,
   const today = dayjs();
   const [date, setDate] = useState(today);
 
-  const minimumRows = 13;
+  const minimumRows = 12;
   const rowsToAdd = minimumRows - transaction.length;
   const nonBonusData = transaction.filter((product) => product?.price !== 0);
   const bonusData = transaction.filter((product) => product?.price === 0);
   const nbl = nonBonusData?.length;
-  //product length paling banyak 13
+  //product length paling banyak 12
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
       <div ref={printRef} style={{ padding: "20px", paddingLeft: "25px", paddingTop: "18px", width: "8in", height: "5.5in", boxSizing: "border-box", position: "relative" }} className="hide-on-screen">
@@ -115,9 +127,9 @@ const Invoice = ({ transaction, customer, total, grandTotal, discount, totalQty,
                 <th style={css.headerBorder}>No</th>
                 <th style={css.headerBorder}>Produk</th>
                 <th style={css.headerBorder}>Ukuran</th>
-                <th style={css.headerBorder}>Qty</th>
+                <th style={{ ...css.headerBorder, paddingRight: "2px", paddingLeft: "2px" }}>Qty</th>
                 <th style={css.headerBorder}>Jenis</th>
-                <th style={css.headerBorder}>Harga</th>
+                <th style={{ ...css.headerBorder, paddingRight: "10px", paddingLeft: "10px" }}>Harga</th>
                 <th style={css.headerBorder}>Diskon</th>
                 <th style={css.headerBorder}>Subtotal</th>
               </tr>
@@ -155,9 +167,9 @@ const Invoice = ({ transaction, customer, total, grandTotal, discount, totalQty,
                   <td style={{ ...css.tableBorder, borderTop: transaction[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>{product?.size}</td>
                   <td style={{ ...css.tableBorder, borderTop: transaction[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>{decimalToFraction(product?.productQty)}</td>
                   <td style={{ ...css.tableBorder, borderTop: transaction[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>{product?.type}</td>
-                  <td style={{ ...css.tableBorder, fontWeight: "600", borderTop: transaction[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>Bonus</td>
-                  <td style={{ ...css.tableBorder, fontWeight: "600", borderTop: transaction[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>Bonus</td>
-                  <td style={{ ...css.tableBorder, fontWeight: "600", borderTop: transaction[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>Bonus</td>
+                  <td style={{ ...css.tableBorder, borderTop: transaction[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>Bonus</td>
+                  <td style={{ ...css.tableBorder, borderTop: transaction[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>Bonus</td>
+                  <td style={{ ...css.tableBorder, borderTop: transaction[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>Bonus</td>
                 </tr>
               ))}
               <tr key={13} style={{ height: "17px" }}>
@@ -209,10 +221,10 @@ const Invoice = ({ transaction, customer, total, grandTotal, discount, totalQty,
                 <td style={css.tableBorderValue}>{discount}</td>
               </tr>
               <tr key={16}>
-                <td style={{ ...css.tableBorderTotal, fontWeight: "800", fontSize: "14px" }} colSpan={2}>
+                <td style={{ ...css.tableBorderTotal, fontWeight: "800", fontSize: "16px" }} colSpan={2}>
                   Grand Total
                 </td>
-                <td style={{ ...css.tableBorderValue, paddingRight: "8px", textAlign: "right", fontWeight: "800", fontSize: "14px" }}>{grandTotal}</td>
+                <td style={{ ...css.tableBorderValue, paddingRight: "8px", textAlign: "right", fontWeight: "800", fontSize: "16px" }}>{grandTotal}</td>
               </tr>
               <tr key={17}>
                 <td style={css.tableBorderTotal} colSpan={2}>
