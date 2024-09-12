@@ -26,24 +26,36 @@ const css = {
   headerBorder: {
     border: "1px solid black",
     textAlign: "center",
+    fontSize: "14px",
+    paddingRight: "5px",
+    paddingLeft: "5px",
   },
   tableBorder: {
     borderLeft: "1px solid black",
     borderRight: "1px solid black",
     textAlign: "center",
-    fontSize: "11px",
+    fontSize: "14px",
+    letterSpacing: "-2px",
+    wordSpacing: "-3px",
+    fontFamily: "Courier New",
   },
   tableBorderTotal: {
     paddingRight: "8px",
     textAlign: "right",
-    fontSize: "11px",
+    fontSize: "14px",
+    letterSpacing: "-2px",
+    wordSpacing: "-3px",
+    fontFamily: "Courier New",
   },
   tableBorderValue: {
     borderLeft: "1px solid black",
     borderRight: "1px solid black",
     paddingRight: "8px",
     textAlign: "right",
-    fontSize: "11px",
+    fontSize: "14px",
+    letterSpacing: "-2px",
+    wordSpacing: "-3px",
+    fontFamily: "Courier New",
   },
   tableBorderLast: {
     borderLeft: "1px solid black",
@@ -60,7 +72,7 @@ function formatDate(dateString) {
 }
 
 const Table = ({ data, date }) => {
-  const minimumRows = 13;
+  const minimumRows = 12;
   const rowsToAdd = minimumRows - data?.product?.length;
   const nonBonusData = data?.product?.filter((product) => product?.price !== 0);
   const bonusData = data?.product?.filter((product) => product?.price === 0);
@@ -103,9 +115,9 @@ const Table = ({ data, date }) => {
               <th style={css.headerBorder}>No</th>
               <th style={css.headerBorder}>Produk</th>
               <th style={css.headerBorder}>Ukuran</th>
-              <th style={css.headerBorder}>Qty</th>
+              <th style={{ ...css.headerBorder, paddingRight: "2px", paddingLeft: "2px" }}>Qty</th>
               <th style={css.headerBorder}>Jenis</th>
-              <th style={css.headerBorder}>Harga</th>
+              <th style={{ ...css.headerBorder, paddingRight: "10px", paddingLeft: "10px" }}>Harga</th>
               <th style={css.headerBorder}>Diskon</th>
               <th style={css.headerBorder}>Subtotal</th>
             </tr>
@@ -142,9 +154,9 @@ const Table = ({ data, date }) => {
                 <td style={{ ...css.tableBorder, borderTop: data?.product[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>{product?.size}</td>
                 <td style={{ ...css.tableBorder, borderTop: data?.product[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>{decimalToFraction(product?.productQty)}</td>
                 <td style={{ ...css.tableBorder, borderTop: data?.product[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>{product?.type}</td>
-                <td style={{ ...css.tableBorder, fontWeight: "600", borderTop: data?.product[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>Bonus</td>
-                <td style={{ ...css.tableBorder, fontWeight: "600", borderTop: data?.product[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>Bonus</td>
-                <td style={{ ...css.tableBorder, fontWeight: "600", borderTop: data?.product[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>Bonus</td>
+                <td style={{ ...css.tableBorder, borderTop: data?.product[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>Bonus</td>
+                <td style={{ ...css.tableBorder, borderTop: data?.product[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>Bonus</td>
+                <td style={{ ...css.tableBorder, borderTop: data?.product[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>Bonus</td>
               </tr>
             ))}
             <tr key={13} style={{ height: "17px" }}>
@@ -196,10 +208,10 @@ const Table = ({ data, date }) => {
               <td style={css.tableBorderValue}>{data?.discount}</td>
             </tr>
             <tr key={16}>
-              <td style={{ ...css.tableBorderTotal, fontWeight: "800", fontSize: "14px" }} colSpan={2}>
+              <td style={{ ...css.tableBorderTotal, fontWeight: "800", fontSize: "16px" }} colSpan={2}>
                 Grand Total
               </td>
-              <td style={{ ...css.tableBorderValue, paddingRight: "8px", textAlign: "right", fontWeight: "800", fontSize: "14px" }}>{data?.grandTotal}</td>
+              <td style={{ ...css.tableBorderValue, paddingRight: "8px", textAlign: "right", fontWeight: "800", fontSize: "16px" }}>{data?.grandTotal}</td>
             </tr>
             <tr key={17}>
               <td style={css.tableBorderTotal} colSpan={2}>
