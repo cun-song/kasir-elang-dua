@@ -72,7 +72,7 @@ export default function SideNav() {
             {value === 3 ? <ReceiptRoundedIcon sx={{ color: "#E06F2C", fontSize: 32 }} /> : <ReceiptOutlinedIcon sx={{ color: "#666666", fontSize: 32, opacity: 0.4 }} />}
           </IconButton>
           <IconButton
-            sx={{ ":hover": { backgroundColor: "transparent" }, ":active": { backgroundColor: "transparent" } }}
+            sx={{ ":hover": { backgroundColor: "transparent" }, ":active": { backgroundColor: "transparent" }, display: role === "Super Admin" ? "block" : "none" }}
             onClick={() => {
               navigate("/information");
             }}

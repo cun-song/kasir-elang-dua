@@ -148,7 +148,7 @@ export default function Product() {
   }, [category]);
 
   return (
-    <Grid container sx={{ width: "100%", height: "100%", display: "flex", justifyContent: "space-between" }}>
+    <Grid container sx={{ width: "100%", height: "100%", display: "flex", justifyContent: "space-between", height: "100vh" }}>
       <Grid item sx={{ pr: 5, height: "100%" }} xs={9}>
         <NavBar />
         <Grid container mt={5} justifyContent={"space-between"}>

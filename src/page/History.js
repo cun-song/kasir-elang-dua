@@ -300,7 +300,7 @@ export default function History() {
               setPage={(e) => setPage(e)}
               pageSize={currRowsPerPage}
               setPageSizeChange={(e) => setCurrRowsPerPage(e)}
-              rowCount={transaction?.length}
+              rowCount={historyData?.length}
               paginationMode="client"
               onCellClick={(data, e) => handleRowClick(data, e)}
               onSortModelChange={(data) => handleSortChange(data)}

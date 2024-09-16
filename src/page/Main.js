@@ -26,7 +26,9 @@ export default function Main() {
             <Route path="/customer" element={<Customer />} />
 
             <Route path="/history" element={<History />} />
-            <Route path="/information" element={<Information />} />
+            <Route element={<ProtectedSuperAdmin />}>
+              <Route path="/information" element={<Information />} />
+            </Route>
             <Route path="/settings" element={<Settings />} />
           </Route>
         </Routes>

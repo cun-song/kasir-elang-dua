@@ -36,7 +36,7 @@ export default function Login() {
     }
   }
   return (
-    <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", width: "100%", height: "100%" }}>
+    <Box sx={{ display: "flex", justifyContent: "center", alignItems: "center", width: "100%", height: "100vh" }}>
       <Box sx={{ width: "70%", height: "70%", backgroundColor: "#E06F2C", borderRadius: "24px", boxShadow: "0px 0px 48px -32px rgba(0,0,0,0.75)", display: "flex" }}>
         <Box sx={{ width: "65%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center" }}>
           <Typography sx={{ fontSize: "96px", fontWeight: "700", color: "white", fontFamily: "poppins" }}>ELANG DUA</Typography>

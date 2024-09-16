@@ -27,3 +27,23 @@ export function decimalToFraction(dec) {
   const separator = integer !== 0 && modulo === 0.5 ? " " : "";
   return `${convertedInteger}${separator}${convertedModulo}`;
 }
+
+export function decimalToFraction2(dec) {
+  if (dec === 0) return dec;
+  const modulo = dec % 1;
+  const integer = dec - modulo;
+  const convertedInteger = integer === 0 ? "" : integer;
+  const ismodulo = modulo === 0.5 ? true : false;
+  return (
+    <div style={{ display: "flex", alignItems: "center" }}>
+      <p style={{ marginBlockEnd: 0, marginBlockStart: 0 }}>{convertedInteger}</p>
+      {ismodulo ? (
+        <p style={{ marginLeft: "10px", marginBlockEnd: 0, marginBlockStart: 0 }}>
+          <sup>1</sup>&frasl;<sub>2</sub>
+        </p>
+      ) : (
+        <></>
+      )}
+    </div>
+  );
+}
