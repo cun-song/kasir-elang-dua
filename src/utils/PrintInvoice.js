@@ -34,28 +34,31 @@ const css = {
     borderLeft: "1px solid black",
     borderRight: "1px solid black",
     textAlign: "center",
-    fontSize: "14px",
+    fontSize: "16px",
     letterSpacing: "-2px",
     wordSpacing: "-3px",
     fontFamily: "Courier New",
+    opacity: 0.8,
   },
   tableBorderTotal: {
     paddingRight: "8px",
     textAlign: "right",
-    fontSize: "14px",
+    fontSize: "16px",
     letterSpacing: "-2px",
     wordSpacing: "-3px",
     fontFamily: "Courier New",
+    opacity: 0.8,
   },
   tableBorderValue: {
     borderLeft: "1px solid black",
     borderRight: "1px solid black",
     paddingRight: "8px",
     textAlign: "right",
-    fontSize: "14px",
+    fontSize: "16px",
     letterSpacing: "-2px",
     wordSpacing: "-3px",
     fontFamily: "Courier New",
+    opacity: 0.8,
   },
   tableBorderLast: {
     borderLeft: "1px solid black",
@@ -63,6 +66,11 @@ const css = {
     borderBottom: "1px solid black",
     textAlign: "center",
     fontSize: "11px",
+    fontSize: "16px",
+    letterSpacing: "-2px",
+    wordSpacing: "-3px",
+    fontFamily: "Courier New",
+    opacity: 0.8,
   },
 };
 
@@ -72,7 +80,7 @@ function formatDate(dateString) {
 }
 
 const Table = ({ data, date }) => {
-  const minimumRows = 12;
+  const minimumRows = 11;
   const rowsToAdd = minimumRows - data?.product?.length;
   const nonBonusData = data?.product?.filter((product) => product?.price !== 0);
   const bonusData = data?.product?.filter((product) => product?.price === 0);
@@ -136,7 +144,7 @@ const Table = ({ data, date }) => {
               </tr>
             ))}
             {Array.from({ length: rowsToAdd }, (_, index) => (
-              <tr key={`blank-${index}`} style={{ height: "17px" }}>
+              <tr key={`blank-${index}`} style={{ height: "20.5px" }}>
                 <td style={css.tableBorder}></td>
                 <td style={css.tableBorder}></td>
                 <td style={css.tableBorder}></td>
@@ -159,7 +167,7 @@ const Table = ({ data, date }) => {
                 <td style={{ ...css.tableBorder, borderTop: data?.product[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>Bonus</td>
               </tr>
             ))}
-            <tr key={13} style={{ height: "17px" }}>
+            <tr key={13} style={{ height: "2px" }}>
               <td style={css.tableBorderLast}></td>
               <td style={css.tableBorderLast}></td>
               <td style={css.tableBorderLast}></td>
