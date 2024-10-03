@@ -38,7 +38,6 @@ const css = {
     letterSpacing: "-2px",
     wordSpacing: "-3px",
     fontFamily: "Courier New",
-    opacity: 0.8,
   },
   tableBorderTotal: {
     paddingRight: "8px",
@@ -47,7 +46,6 @@ const css = {
     letterSpacing: "-2px",
     wordSpacing: "-3px",
     fontFamily: "Courier New",
-    opacity: 0.8,
   },
   tableBorderValue: {
     borderLeft: "1px solid black",
@@ -58,7 +56,6 @@ const css = {
     letterSpacing: "-2px",
     wordSpacing: "-3px",
     fontFamily: "Courier New",
-    opacity: 0.8,
   },
   tableBorderLast: {
     borderLeft: "1px solid black",
@@ -70,7 +67,6 @@ const css = {
     letterSpacing: "-2px",
     wordSpacing: "-3px",
     fontFamily: "Courier New",
-    opacity: 0.8,
   },
 };
 
