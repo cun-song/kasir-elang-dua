@@ -11,6 +11,7 @@ import { LUSIN_HEADER } from "../constant/Information";
 import { decimalToFraction, decimalToFraction2 } from "../utils/stingFormatted";
 import { fetchCustomerData } from "../redux/action/customerAction";
 import { fetchProductData } from "../redux/action/productAction";
+import { PrintLusin } from "../utils/PrintReport";
 
 export default function Information() {
   const currDate = new Date();
@@ -22,6 +23,7 @@ export default function Information() {
   const [omzet, setOmzet] = useState([0, 0, 0, 0, 0, 0]);
   const [areaOmzet, setAreaOmzet] = useState("All");
   const [lusin, setLusin] = useState([]);
+  const [doc, setDoc] = useState([]);
   const [sumLusin, setSumLusin] = useState(0);
   const [areaLusin, setAreaLusin] = useState("All");
   const [bulanLusin, setBulanLusin] = useState({ month: new Date(currDate).getMonth(), year: new Date(currDate).getFullYear() });
@@ -137,10 +139,18 @@ export default function Information() {
       return { value: tempLusin[tem], label: product?.label, index: product?.index, type: product?.type, totalLusin: product?.totalLusin, id: product?.id };
     });
 
+    const existingIds = new Set(newer.map((item) => item.id));
+    Object.values(product).forEach((newItem) => {
+      if (!existingIds.has(newItem?.id)) {
+        newer.push({ value: 0, label: newItem?.label, index: newItem?.index, type: newItem?.type, totalLusin: newItem?.totalLusin, id: newItem?.id });
+      }
+    });
+
     newer.sort((a, b) => {
       return a?.index - b?.index;
     });
-
+    const doc = newer.filter((item) => item.type !== "Gen");
+    setDoc(doc);
     setSumLusin(tempSumLusin);
     setLusin(newer);
   }, [transaction, bulanLusin, areaLusin]);
@@ -188,9 +198,11 @@ export default function Information() {
                 <Typography sx={{ fontFamily: "poppins", fontSize: 24, fontWeight: "normal", color: "#12141E" }}>{decimalToFraction(sumLusin)}</Typography>
                 <Typography sx={{ fontFamily: "poppins", fontSize: 24, fontWeight: "bold", color: "#12141E" }}>Lusin</Typography>
               </Grid>
+              <PrintLusin doc={doc} sumLusin={sumLusin} date={bulanLusin} />
             </Grid>
           </Grid>
         </Box>
+
         <Box sx={{ backgroundColor: "white", borderRadius: "10px", p: 4, mt: 4 }}>
           <Grid container>
             <Grid item>
