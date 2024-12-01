@@ -11,7 +11,7 @@ import { LUSIN_HEADER } from "../constant/Information";
 import { decimalToFraction, decimalToFraction2 } from "../utils/stingFormatted";
 import { fetchCustomerData } from "../redux/action/customerAction";
 import { fetchProductData } from "../redux/action/productAction";
-import { PrintLusin } from "../utils/PrintReport";
+import { PrintBon, PrintLusin } from "../utils/PrintReport";
 
 export default function Information() {
   const currDate = new Date();
@@ -24,6 +24,7 @@ export default function Information() {
   const [areaOmzet, setAreaOmzet] = useState("All");
   const [lusin, setLusin] = useState([]);
   const [doc, setDoc] = useState([]);
+  const [bon, setBon] = useState([]);
   const [sumLusin, setSumLusin] = useState(0);
   const [areaLusin, setAreaLusin] = useState("All");
   const [bulanLusin, setBulanLusin] = useState({ month: new Date(currDate).getMonth(), year: new Date(currDate).getFullYear() });
@@ -107,14 +108,39 @@ export default function Information() {
   useEffect(() => {
     let tempLusin = {};
     let trans = Object.values(transaction);
-
     let tempDateYear = new Date(currDate).setFullYear(bulanLusin?.year);
     let before = new Date(tempDateYear).setMonth(bulanLusin?.month);
     let after = new Date(before).setMonth(bulanLusin?.month + 1);
-
+    let newtrans = [];
+    let tempBon = {};
     if (areaLusin !== "All") trans = trans.filter((t) => findCustomer(t?.customerID)?.area === areaLusin);
     trans.forEach((t) => {
-      if (before < t?.timestamp && t?.timestamp < after) {
+      if (before < t?.timestamp && t?.timestamp < after && t?.isDelivered === 1) {
+        newtrans = [...newtrans, t];
+
+        if (tempBon?.hasOwnProperty(t?.customerID)) {
+          tempBon = {
+            ...tempBon,
+            [t?.customerID]: {
+              ...tempBon[t?.customerID],
+              allPaid: tempBon[t?.customerID]?.allPaid === 0 ? 0 : t?.isPaid,
+              invoice: [...tempBon[t?.customerID]?.invoice, { invoice: t?.id, time: t?.timestamp, product: t?.product, discount: t?.discount, total: t?.total, isPaid: t?.isPaid }],
+              rowSpan: tempBon[t?.customerID]?.rowSpan + Object.keys(t?.product)?.length,
+            },
+          };
+        } else {
+          tempBon = {
+            ...tempBon,
+            [t?.customerID]: {
+              id: t?.customerID,
+              name: `${t?.ownerName !== "-" ? t?.ownerName : ""}${t?.ownerName !== "-" && t?.merchantName !== "-" ? ", " : ""}${t?.merchantName !== "-" ? t?.merchantName : ""}`,
+              area: findCustomer(t?.customerID)?.area,
+              allPaid: t?.isPaid,
+              invoice: [{ invoice: t?.id, time: t?.timestamp, product: t?.product, discount: t?.discount, total: t?.total, isPaid: t?.isPaid }],
+              rowSpan: Object.keys(t?.product)?.length,
+            },
+          };
+        }
         const product = t?.product;
         Object.keys(product).forEach((p) => {
           const newId = p[0] === "P" ? p : p?.slice(1);
@@ -132,11 +158,16 @@ export default function Information() {
         });
       }
     });
+
     let tempSumLusin = 0;
     const newer = Object.keys(tempLusin).map((tem) => {
       const product = findProduct(tem);
       tempSumLusin += tempLusin[tem] * product?.totalLusin;
       return { value: tempLusin[tem], label: product?.label, index: product?.index, type: product?.type, totalLusin: product?.totalLusin, id: product?.id };
+    });
+
+    const newerBon = Object.keys(tempBon).map((bon) => {
+      return { ...tempBon[bon] };
     });
 
     const existingIds = new Set(newer.map((item) => item.id));
@@ -149,8 +180,17 @@ export default function Information() {
     newer.sort((a, b) => {
       return a?.index - b?.index;
     });
-    const doc = newer.filter((item) => item.type !== "Gen");
+    newerBon
+      .sort((a, b) => {
+        return a?.name.localeCompare(b?.name);
+      })
+      .sort((a, b) => {
+        return a?.allPaid - b?.allPaid;
+      });
+
+    const doc = newer.filter((item) => !(item?.type === "Gen" && item?.value === 0));
     setDoc(doc);
+    setBon(newerBon);
     setSumLusin(tempSumLusin);
     setLusin(newer);
   }, [transaction, bulanLusin, areaLusin]);
@@ -198,7 +238,14 @@ export default function Information() {
                 <Typography sx={{ fontFamily: "poppins", fontSize: 24, fontWeight: "normal", color: "#12141E" }}>{decimalToFraction(sumLusin)}</Typography>
                 <Typography sx={{ fontFamily: "poppins", fontSize: 24, fontWeight: "bold", color: "#12141E" }}>Lusin</Typography>
               </Grid>
-              <PrintLusin doc={doc} sumLusin={sumLusin} date={bulanLusin} />
+              <Grid item container alignItems={"center"} gap={2}>
+                <Typography sx={{ fontFamily: "poppins", fontSize: 24, fontWeight: "bold", color: "#12141E" }}>Laporan Penjualan:</Typography>
+                <PrintLusin doc={doc} sumLusin={sumLusin} date={bulanLusin} area={areaLusin} />
+              </Grid>
+              <Grid item container alignItems={"center"} gap={2}>
+                <Typography sx={{ fontFamily: "poppins", fontSize: 24, fontWeight: "bold", color: "#12141E" }}>Laporan Nota Bon:</Typography>
+                <PrintBon doc={bon} date={bulanLusin} area={areaLusin} />
+              </Grid>
             </Grid>
           </Grid>
         </Box>

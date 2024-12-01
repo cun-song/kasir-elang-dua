@@ -17,6 +17,18 @@ export function convertTimestamp(timestamp) {
   let formattedDate = `${day} ${monthName} ${year} ${hours}:${minutes}`;
   return formattedDate;
 }
+export function convertTimestampDate(timestamp) {
+  const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+  let date = new Date(timestamp);
+
+  let day = String(date.getDate()).padStart(2, "0");
+  let monthIndex = date.getMonth(); // Months are zero-indexed
+  let monthName = months[monthIndex];
+  let year = date.getFullYear();
+
+  let formattedDate = `${day} ${monthName} ${year}`;
+  return formattedDate;
+}
 
 export function decimalToFraction(dec) {
   if (dec === 0) return dec;

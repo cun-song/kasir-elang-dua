@@ -17,4 +17,27 @@ code {
   .hide-on-screen {
     display: block; /* Make the hidden elements visible when printing */
   }
+  .tableNota {
+    padding: 1cm;
+    box-sizing: border-box;
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      margin-top: 0; /* Avoid margin conflicts */
+    }
+    thead {
+      display: table-header-group; /* Ensures header repeats on every page */
+    }
+
+    tbody {
+      display: table-row-group;
+    }
+
+    tr,
+    td,
+    th {
+      page-break-inside: avoid; /* Prevents rows from splitting */
+    }
+  }
 }
