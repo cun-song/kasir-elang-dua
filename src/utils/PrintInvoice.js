@@ -11,8 +11,12 @@ import { Box, Button } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
-import { format } from "date-fns";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+import { format, addMinutes } from "date-fns";
 import { id } from "date-fns/locale";
+import { ContinuousColorLegend } from "@mui/x-charts";
+import "dayjs/locale/id"; // Import Indonesian locale
 
 const css = {
   titleHeader: {
@@ -71,8 +75,7 @@ const css = {
 };
 
 function formatDate(dateString) {
-  const date = new Date(dateString);
-  return format(date, "dd MMMM yyyy", { locale: id });
+  return dateString.format("D MMMM YYYY");
 }
 
 const Table = ({ data, date }) => {
@@ -240,8 +243,13 @@ export const BulkPrinting = ({ data }) => {
     documentTitle: "Invoice",
     onAfterPrint: () => dispatch(setLoading()),
   });
-  const today = dayjs();
+  dayjs.extend(utc);
+  dayjs.extend(timezone);
+  dayjs.locale("id");
 
+  // Set zona waktu yang Anda inginkan (contoh: Asia/Jakarta)
+  const myTimezone = "Asia/Jakarta";
+  const today = dayjs().tz(myTimezone);
   const [date, setDate] = useState(today);
 
   return (

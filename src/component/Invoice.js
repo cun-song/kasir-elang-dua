@@ -8,8 +8,10 @@ import { Box, Button } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
-import { format } from "date-fns";
-import { id } from "date-fns/locale";
+import utc from "dayjs/plugin/utc";
+import timezone from "dayjs/plugin/timezone";
+import "dayjs/locale/id"; // Import Indonesian locale
+
 import { setLoading } from "../redux/sidenavReducer";
 import { useDispatch } from "react-redux";
 const css = {
@@ -78,12 +80,16 @@ const Invoice = ({ transaction, customer, total, grandTotal, discount, totalQty,
     documentTitle: "Invoice",
     onAfterPrint: () => dispatch(setLoading()),
   });
+  dayjs.extend(utc);
+  dayjs.extend(timezone);
+  dayjs.locale("id");
 
   function formatDate(dateString) {
-    const date = new Date(dateString);
-    return format(date, "dd MMMM yyyy", { locale: id });
+    return dateString.format("D MMMM YYYY");
   }
-  const today = dayjs();
+
+  const myTimezone = "Asia/Jakarta";
+  const today = dayjs().tz(myTimezone);
   const [date, setDate] = useState(today);
 
   const minimumRows = 11;
