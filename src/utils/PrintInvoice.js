@@ -13,9 +13,6 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
-import { format, addMinutes } from "date-fns";
-import { id } from "date-fns/locale";
-import { ContinuousColorLegend } from "@mui/x-charts";
 import "dayjs/locale/id"; // Import Indonesian locale
 
 const css = {

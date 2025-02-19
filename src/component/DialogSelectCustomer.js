@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Button, DialogActions, DialogContent, Grid, Typography, TextField, MenuItem, IconButton } from "@mui/material";
+import { Button, DialogActions, DialogContent, Grid, Typography, TextField, MenuItem, IconButton, Autocomplete } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import StyledDialog from "./StyledDialog";
 import { useState } from "react";
@@ -101,13 +101,17 @@ export default function DialogSelectCustomer({ open = false, handleToggle }) {
               Nama Pemesan & Toko
             </Typography>
             <Grid item container gap={2}>
-              <TextField id="select-costumer" SelectProps={{ MenuProps: { PaperProps: { style: { maxHeight: "400px" } } } }} select sx={{ width: "80%" }} value={customerID} onChange={(e) => setCustomerID(e.target.value)}>
-                {ownerList.map((item, index) => (
-                  <MenuItem value={item?.value} key={index}>
-                    {item.label}
-                  </MenuItem>
-                ))}
-              </TextField>
+              <Autocomplete
+                id="select-costumer"
+                options={ownerList}
+                getOptionLabel={(option) => option.label}
+                value={ownerList.find((item) => item.value === customerID) || null}
+                onChange={(event, newValue) => setCustomerID(newValue ? newValue.value : "")}
+                renderInput={(params) => <TextField {...params} sx={{ width: "100%" }} placeholder="Cari Pemesan..." />}
+                isOptionEqualToValue={(option, value) => option.value === value.value}
+                noOptionsText="Tidak ada hasil"
+                sx={{ width: "80%" }}
+              ></Autocomplete>
               <IconButton onClick={() => removeCustomer()} sx={{ width: "50px", height: "50px", ":hover": { backgroundColor: "transparent" }, ":active": { backgroundColor: "transparent" } }}>
                 <CloseIcon />
               </IconButton>
