@@ -259,7 +259,7 @@ export const BulkPrinting = ({ data }) => {
         ))}
       </div>
       <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
-        <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="id">
           <DatePicker sx={{ marginLeft: 2, mr: 6 }} defaultValue={today} disablePast views={["year", "month", "day"]} format="DD MMMM YYYY" onChange={(e) => setDate(e)} />
         </LocalizationProvider>
         <Button onClick={Print} sx={{ backgroundColor: "#E06F2C", ":hover": { backgroundColor: "#E06F2C" }, width: "150px", height: "48px", borderRadius: "28px", textTransform: "none" }} variant="contained">
