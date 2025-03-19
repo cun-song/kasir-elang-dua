@@ -1,4 +1,4 @@
-import { Grid, Typography } from "@mui/material";
+import { Grid, Typography, useMediaQuery } from "@mui/material";
 import React, { useEffect } from "react";
 import { useSelector } from "react-redux";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
@@ -7,10 +7,11 @@ export default function NavBar() {
   const title = useSelector((state) => state.sidenav.title);
   const name = useSelector((state) => state.sidenav.name);
   const role = useSelector((state) => state.sidenav.role);
+  const isMobile = useMediaQuery("(max-width: 600px)");
 
   return (
     <Grid sx={{ width: "100%", mt: 3 }} container justifyContent={"space-between"}>
-      <Grid item>
+      <Grid item sx={{ display: isMobile ? "none" : "" }}>
         <Typography sx={{ fontFamily: "poppins", fontSize: 28, fontWeight: "bold", color: "#12141E" }}>Perusahaan Kecap Elang Dua</Typography>
         <Typography sx={{ fontFamily: "nunito", fontSize: 16, fontWeight: "semibold", color: "#6D6F75" }}>{title}</Typography>
       </Grid>

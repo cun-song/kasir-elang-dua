@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Box, Button, Grid, IconButton, Typography } from "@mui/material";
+import { Box, Button, Drawer, Grid, IconButton, Typography, useMediaQuery } from "@mui/material";
 import NavBar from "../component/NavBar";
 import { useDispatch, useSelector } from "react-redux";
 import { click, setLoading, setTitle } from "../redux/sidenavReducer";
@@ -30,6 +30,8 @@ import { setTransactionCustomer } from "../redux/customerReducer";
 import DialogConfirmation from "../component/DialogConfirmation";
 import { pushTransaction } from "../redux/action/transactionAction";
 import { useRef } from "react";
+import LocalShippingIcon from "@mui/icons-material/LocalShipping";
+import ReplyIcon from "@mui/icons-material/Reply";
 
 const style = {
   scroll: {
@@ -80,6 +82,7 @@ export default function Home() {
   const formattedSubtotal = formattedNumber(subtotal);
   const formattedDiscount = formattedNumber(discount?.total);
   const formattedTotal = formattedNumber(subtotal - discount?.total);
+  const [openDrawer, setOpenDrawer] = useState(false);
 
   const cart = useSelector((state) => state.cart.cartData);
   const bonusData = useSelector((state) => state.cart.bonusData);
@@ -91,6 +94,7 @@ export default function Home() {
   const defaultCustomer = useSelector((state) => state?.customer?.transactionCustomer);
   const customerData = useSelector((state) => state?.customer?.allCustomer);
   const adminName = useSelector((state) => state?.sidenav?.name);
+  const isMobile = useMediaQuery("(max-width: 600px)");
 
   function add(index, productId) {
     if (cart.hasOwnProperty(productId)) {
@@ -203,6 +207,7 @@ export default function Home() {
 
   useEffect(() => {
     if (transactionSuccess) {
+      setOpenDrawer(false);
       setOpenCheckout(false);
       setSubtotal(0);
       setDiscount({ total: 0, besar: 0, kecil: 0 });
@@ -265,12 +270,122 @@ export default function Home() {
       setListCart({});
     }
   }, [cart, diskon, bonusData]);
+  const drawerCheckout = (
+    <Grid item sx={{ backgroundColor: "#FFFFFF", height: "100%", width: isMobile ? "100vw" : "" }} xs={isMobile ? 0 : 3}>
+      {isMobile ? (
+        <IconButton
+          sx={{ ":hover": { backgroundColor: "transparent" }, ":active": { backgroundColor: "transparent" }, mt: 1, ml: 3 }}
+          onClick={() => {
+            setOpenDrawer(false);
+          }}
+        >
+          <ReplyIcon sx={{ color: "#E06F2C", fontSize: 38 }} />
+        </IconButton>
+      ) : (
+        <></>
+      )}
 
+      <Grid p={3}>
+        {/* <Grid item>
+        <Typography sx={{ fontFamily: "poppins", fontSize: 28, fontWeight: "bold", color: "#12141E" }}>Pesanan</Typography>
+      </Grid> */}
+        <Grid item container gap={2} mt={isMobile ? -3 : 1}>
+          <Typography sx={{ ...style.textCustomer, fontWeight: "medium" }}>Nama Pemesan: </Typography>
+          <Grid item sx={style.rowCheckout}>
+            {defaultCustomer?.ownerName === "" ? (
+              <Button
+                disableElevation
+                disableRipple
+                onClick={() => setOpenCustomer(true)}
+                sx={{ color: "#707278", textTransform: "none", fontSize: "16px", fontFamily: "poppins", ":hover": { backgroundColor: "transparent", color: "#12141E" }, padding: 0, textAlign: "start" }}
+              >
+                Pilih data
+              </Button>
+            ) : (
+              <Grid item container gap={2}>
+                <Typography sx={style.textCustomer}>{defaultCustomer?.ownerName}</Typography>
+                <IconButton
+                  onClick={() => dispatch(setTransactionCustomer({ customerID: "", ownerName: "", merchantName: "" }))}
+                  sx={{ width: "30px", height: "30px", ":hover": { backgroundColor: "transparent" }, ":active": { backgroundColor: "transparent" } }}
+                >
+                  <CloseIcon />
+                </IconButton>
+              </Grid>
+            )}
+          </Grid>
+        </Grid>
+        <Grid item container gap={2}>
+          <Typography sx={{ ...style.textCustomer, fontWeight: "medium" }}>Nama Toko: </Typography>
+          <Grid item sx={style.rowCheckout}>
+            {defaultCustomer?.merchantName === "" ? (
+              <Button
+                disableElevation
+                disableRipple
+                onClick={() => setOpenCustomer(true)}
+                sx={{ color: "#707278", textTransform: "none", fontSize: "16px", fontFamily: "poppins", ":hover": { backgroundColor: "transparent", color: "#12141E" }, padding: 0, textAlign: "start" }}
+              >
+                Pilih data
+              </Button>
+            ) : (
+              <Grid item container gap={2}>
+                <Typography sx={style.textCustomer}>{defaultCustomer?.merchantName}</Typography>
+                <IconButton
+                  onClick={() => dispatch(setTransactionCustomer({ customerID: "", ownerName: "", merchantName: "" }))}
+                  sx={{ width: "30px", height: "30px", ":hover": { backgroundColor: "transparent" }, ":active": { backgroundColor: "transparent" } }}
+                >
+                  <CloseIcon />
+                </IconButton>
+              </Grid>
+            )}
+          </Grid>
+        </Grid>
+        <Grid item mt={2} sx={{ display: "flex", flexDirection: "column", height: isMobile ? "360px" : "480px", overflow: "auto", ...style.scroll }} gap={3}>
+          {Object.entries(listCart).map(([key, value]) => (
+            <CartList img={value?.img} label={value?.label} size={value?.size} qty={value?.productQty} price={value?.price} remove={() => removeCart(key)} />
+          ))}
+        </Grid>
+        <Grid item sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 3 }}>
+          <Grid item sx={style.rowCheckout}>
+            <Button
+              disableElevation
+              disableRipple
+              onClick={() => setOpenTambahan(true)}
+              sx={{ color: "#707278", textTransform: "none", fontSize: "16px", fontFamily: "poppins", ":hover": { backgroundColor: "transparent", color: "#12141E" }, padding: 0, textAlign: "start" }}
+            >
+              + tambahan
+            </Button>
+          </Grid>
+          <Grid item sx={style.rowCheckout}>
+            <Typography sx={style.textCheckout}>Subtotal</Typography>
+            <Typography sx={style.textCheckout}>Rp {formattedSubtotal}</Typography>
+          </Grid>
+          <Grid item sx={style.rowCheckout}>
+            <Typography sx={style.textCheckout}>Discount</Typography>
+            <Typography sx={style.textCheckout}>Rp {formattedDiscount}</Typography>
+          </Grid>
+          <Grid item sx={{ height: "1px", width: "100%", border: "1px dashed #9A9B9F" }}></Grid>
+          <Grid item sx={style.rowCheckout}>
+            <Typography sx={style.textCheckout}>Total</Typography>
+            <Typography sx={style.textCheckout}>Rp {formattedTotal}</Typography>
+          </Grid>
+          <Grid item sx={style.rowCheckout}>
+            <Typography sx={style.textCheckout}>Total Lusin</Typography>
+            <Typography sx={style.textCheckout}>{decimalToFraction(lusin)}</Typography>
+          </Grid>
+        </Grid>
+        <Grid item container justifyContent={"center"} mt={4}>
+          <Button onClick={() => openDialogCheckout()} sx={{ backgroundColor: "#E06F2C", ":hover": { backgroundColor: "#E06F2C" }, width: "100%", height: "66px", borderRadius: "30px", textTransform: "none" }} variant="contained">
+            Checkout
+          </Button>
+        </Grid>
+      </Grid>
+    </Grid>
+  );
   return (
-    <Grid container sx={{ width: "100%", height: "100%", display: "flex", justifyContent: "space-between", height: "100vh" }}>
-      <Grid item sx={{ pr: 5, height: "100%" }} xs={9}>
+    <Grid container sx={{ width: "100%", height: "100%", display: "flex", justifyContent: "space-between", height: isMobile ? "92vh" : "100vh" }}>
+      <Grid item sx={{ pr: isMobile ? 2 : 5, height: "100%" }} xs={isMobile ? 12 : 9}>
         <NavBar />
-        <Grid container mt={5} justifyContent={"space-between"}>
+        <Grid container mt={5} justifyContent={"space-between"} display={isMobile ? "none" : ""}>
           <ButtonCategory id={null} value={category} img={semuaProduk} label={"Semua Produk"} setCategory={setCategory} />
           <ButtonCategory id={"C1"} value={category} img={kecapAsin} label={"Kecap Asin"} setCategory={setCategory} />
           <ButtonCategory id={"C2"} value={category} img={kecapManis} label={"Kecap Manis"} setCategory={setCategory} />
@@ -286,7 +401,7 @@ export default function Home() {
             <Typography sx={{ fontFamily: "nunito", fontSize: 18, fontWeight: "semibold", color: "#6D6F75" }}>{total} jenis produk</Typography>
           </Grid>
         </Grid>
-        <Grid container justifyContent={"space-between"} alignItems={"center"} mt={3} rowGap={4} overflow={"auto"} maxHeight={"57%"} sx={style.scroll}>
+        <Grid container justifyContent={"space-between"} alignItems={"center"} mt={3} rowGap={4} overflow={"auto"} maxHeight={isMobile ? "78%" : "57%"} sx={style.scroll}>
           {product.map((product, idx) => (
             <ProductCard
               label={product?.label}
@@ -300,114 +415,37 @@ export default function Home() {
           ))}
         </Grid>
       </Grid>
-      <Grid item sx={{ backgroundColor: "#FFFFFF", height: "100%" }} xs={3}>
-        <Grid p={3}>
-          {/* <Grid item>
-            <Typography sx={{ fontFamily: "poppins", fontSize: 28, fontWeight: "bold", color: "#12141E" }}>Pesanan</Typography>
-          </Grid> */}
-          <Grid item container gap={2} mt={1}>
-            <Typography sx={{ ...style.textCustomer, fontWeight: "medium" }}>Nama Pemesan: </Typography>
-            <Grid item sx={style.rowCheckout}>
-              {defaultCustomer?.ownerName === "" ? (
-                <Button
-                  disableElevation
-                  disableRipple
-                  onClick={() => setOpenCustomer(true)}
-                  sx={{ color: "#707278", textTransform: "none", fontSize: "16px", fontFamily: "poppins", ":hover": { backgroundColor: "transparent", color: "#12141E" }, padding: 0, textAlign: "start" }}
-                >
-                  Pilih data
-                </Button>
-              ) : (
-                <Grid item container gap={2}>
-                  <Typography sx={style.textCustomer}>{defaultCustomer?.ownerName}</Typography>
-                  <IconButton
-                    onClick={() => dispatch(setTransactionCustomer({ customerID: "", ownerName: "", merchantName: "" }))}
-                    sx={{ width: "30px", height: "30px", ":hover": { backgroundColor: "transparent" }, ":active": { backgroundColor: "transparent" } }}
-                  >
-                    <CloseIcon />
-                  </IconButton>
-                </Grid>
-              )}
-            </Grid>
-          </Grid>
-          <Grid item container gap={2}>
-            <Typography sx={{ ...style.textCustomer, fontWeight: "medium" }}>Nama Toko: </Typography>
-            <Grid item sx={style.rowCheckout}>
-              {defaultCustomer?.merchantName === "" ? (
-                <Button
-                  disableElevation
-                  disableRipple
-                  onClick={() => setOpenCustomer(true)}
-                  sx={{ color: "#707278", textTransform: "none", fontSize: "16px", fontFamily: "poppins", ":hover": { backgroundColor: "transparent", color: "#12141E" }, padding: 0, textAlign: "start" }}
-                >
-                  Pilih data
-                </Button>
-              ) : (
-                <Grid item container gap={2}>
-                  <Typography sx={style.textCustomer}>{defaultCustomer?.merchantName}</Typography>
-                  <IconButton
-                    onClick={() => dispatch(setTransactionCustomer({ customerID: "", ownerName: "", merchantName: "" }))}
-                    sx={{ width: "30px", height: "30px", ":hover": { backgroundColor: "transparent" }, ":active": { backgroundColor: "transparent" } }}
-                  >
-                    <CloseIcon />
-                  </IconButton>
-                </Grid>
-              )}
-            </Grid>
-          </Grid>
-          <Grid item mt={2} sx={{ display: "flex", flexDirection: "column", height: "480px", overflow: "auto", ...style.scroll }} gap={3}>
-            {Object.entries(listCart).map(([key, value]) => (
-              <CartList img={value?.img} label={value?.label} size={value?.size} qty={value?.productQty} price={value?.price} remove={() => removeCart(key)} />
-            ))}
-          </Grid>
-          <Grid item sx={{ display: "flex", flexDirection: "column", gap: 2, mt: 3 }}>
-            <Grid item sx={style.rowCheckout}>
-              <Button
-                disableElevation
-                disableRipple
-                onClick={() => setOpenTambahan(true)}
-                sx={{ color: "#707278", textTransform: "none", fontSize: "16px", fontFamily: "poppins", ":hover": { backgroundColor: "transparent", color: "#12141E" }, padding: 0, textAlign: "start" }}
-              >
-                + tambahan
-              </Button>
-            </Grid>
-            <Grid item sx={style.rowCheckout}>
-              <Typography sx={style.textCheckout}>Subtotal</Typography>
-              <Typography sx={style.textCheckout}>Rp {formattedSubtotal}</Typography>
-            </Grid>
-            <Grid item sx={style.rowCheckout}>
-              <Typography sx={style.textCheckout}>Discount</Typography>
-              <Typography sx={style.textCheckout}>Rp {formattedDiscount}</Typography>
-            </Grid>
-            <Grid item sx={{ height: "1px", width: "100%", border: "1px dashed #9A9B9F" }}></Grid>
-            <Grid item sx={style.rowCheckout}>
-              <Typography sx={style.textCheckout}>Total</Typography>
-              <Typography sx={style.textCheckout}>Rp {formattedTotal}</Typography>
-            </Grid>
-            <Grid item sx={style.rowCheckout}>
-              <Typography sx={style.textCheckout}>Total Lusin</Typography>
-              <Typography sx={style.textCheckout}>{decimalToFraction(lusin)}</Typography>
-            </Grid>
-          </Grid>
-          <Grid item container justifyContent={"center"} mt={4}>
-            <Button onClick={() => openDialogCheckout()} sx={{ backgroundColor: "#E06F2C", ":hover": { backgroundColor: "#E06F2C" }, width: "100%", height: "66px", borderRadius: "30px", textTransform: "none" }} variant="contained">
-              Checkout
-            </Button>
-          </Grid>
-        </Grid>
-      </Grid>
+      {isMobile ? (
+        <>
+          <IconButton
+            sx={{ ":hover": { backgroundColor: "transparent" }, ":active": { backgroundColor: "transparent" }, position: "absolute", top: 15, right: 15 }}
+            onClick={() => {
+              setOpenDrawer(true);
+            }}
+          >
+            <LocalShippingIcon sx={{ color: "#E06F2C", fontSize: 38 }} />
+          </IconButton>
+
+          <Drawer anchor="right" open={openDrawer} onClose={() => setOpenDrawer(false)}>
+            {drawerCheckout}
+          </Drawer>
+        </>
+      ) : (
+        drawerCheckout
+      )}
+
       <DialogTambahan open={openTambahan} handleToggle={() => setOpenTambahan((prev) => !prev)} />
       <DialogSelectCustomer open={openCustomer} handleToggle={() => setOpenCustomer((prev) => !prev)} />
       <DialogSuccess open={transactionSuccess} handleToggle={() => dispatch(setOpenSuccess(false))} />
       <DialogFailed open={transactionFailed?.isOpen} message={transactionFailed?.message} handleToggle={() => dispatch(setOpenFailed({ isOpen: false, message: "" }))} />
       <DialogConfirmation open={openCheckout} handleToggle={() => setOpenCheckout((prev) => !prev)} label={"Yakin Ingin Memproses Pesanan"} save={() => checkOut()}>
         <Grid sx={{ display: "flex", alignItems: "center", flexDirection: "column", marginTop: -2, marginBottom: 2 }}>
-          <Typography sx={{ fontFamily: "poppins", fontSize: 22, fontWeight: "medium", color: "#12141E" }}>
+          <Typography sx={{ fontFamily: "poppins", fontSize: isMobile ? 18 : 22, fontWeight: "medium", color: "#12141E" }}>
             {defaultCustomer?.ownerName !== "-" ? defaultCustomer?.ownerName : ""}
             {defaultCustomer?.ownerName !== "-" && defaultCustomer?.merchantName !== "-" ? ", " : ""}
             {defaultCustomer?.merchantName !== "-" ? defaultCustomer?.merchantName : ""}
           </Typography>
-          <Typography sx={{ fontFamily: "poppins", fontSize: 20, color: "#12141E" }}>
+          <Typography sx={{ fontFamily: "poppins", fontSize: isMobile ? 16 : 20, color: "#12141E" }}>
             Diskon Besar: {discount?.besar} Diskon Kecil: {discount?.kecil}
           </Typography>
         </Grid>

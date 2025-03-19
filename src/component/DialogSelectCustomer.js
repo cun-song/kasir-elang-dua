@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Button, DialogActions, DialogContent, Grid, Typography, TextField, MenuItem, IconButton, Autocomplete } from "@mui/material";
+import { Button, DialogActions, DialogContent, Grid, Typography, TextField, MenuItem, IconButton, Autocomplete, useMediaQuery } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import StyledDialog from "./StyledDialog";
 import { useState } from "react";
@@ -44,6 +44,7 @@ export default function DialogSelectCustomer({ open = false, handleToggle }) {
   const dispatch = useDispatch();
   const customer = useSelector((state) => state?.customer?.allCustomer);
   const defaultData = useSelector((state) => state?.customer?.transactionCustomer);
+  const isMobile = useMediaQuery("(max-width: 600px)");
 
   function save() {
     const ownerName = customer?.find((owner) => owner?.id === customerID)?.ownerName;
@@ -84,7 +85,7 @@ export default function DialogSelectCustomer({ open = false, handleToggle }) {
               Daerah
             </Typography>
             <Grid item container gap={2}>
-              <TextField id="select-costumer" SelectProps={{ MenuProps: { PaperProps: { style: { maxHeight: "400px" } } } }} select sx={{ width: "80%" }} value={area} onChange={(e) => setArea(e.target.value)}>
+              <TextField id="select-costumer" SelectProps={{ MenuProps: { PaperProps: { style: { maxHeight: "400px" } } } }} select sx={{ width: isMobile ? "75%" : "80%" }} value={area} onChange={(e) => setArea(e.target.value)}>
                 {AREA_SELECT.map((item, index) => (
                   <MenuItem value={item?.value} key={index}>
                     {item.label}
@@ -110,7 +111,7 @@ export default function DialogSelectCustomer({ open = false, handleToggle }) {
                 renderInput={(params) => <TextField {...params} sx={{ width: "100%" }} placeholder="Cari Pemesan..." />}
                 isOptionEqualToValue={(option, value) => option.value === value.value}
                 noOptionsText="Tidak ada hasil"
-                sx={{ width: "80%" }}
+                sx={{ width: isMobile ? "75%" : "80%" }}
               ></Autocomplete>
               <IconButton onClick={() => removeCustomer()} sx={{ width: "50px", height: "50px", ":hover": { backgroundColor: "transparent" }, ":active": { backgroundColor: "transparent" } }}>
                 <CloseIcon />

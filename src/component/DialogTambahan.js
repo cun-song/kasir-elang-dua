@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Box, Button, DialogActions, DialogContent, Grid, Typography, TextField, MenuItem, IconButton } from "@mui/material";
+import { Box, Button, DialogActions, DialogContent, Grid, Typography, TextField, MenuItem, IconButton, useMediaQuery } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { DISCOUNT_LIST, QTY_LIST } from "../constant/Home";
 import StyledDialog from "./StyledDialog";
@@ -45,6 +45,7 @@ export default function DialogTambahan({ open = false, handleToggle }) {
   const product = useSelector((state) => state.product.allProduct);
   const savedBonusData = useSelector((state) => state.cart.bonusData);
   const savedDiskon = useSelector((state) => state.cart.diskon);
+  const isMobile = useMediaQuery("(max-width: 600px)");
 
   function addBonus() {
     const updatedBonusData = [...bonusData, { productID: null, label: null, qty: null }];
@@ -120,7 +121,7 @@ export default function DialogTambahan({ open = false, handleToggle }) {
                 Botol Besar
               </Typography>
 
-              <TextField id="select-besar" select sx={{ width: "180px" }} value={diskon?.besar} onChange={(e) => onChangeBesar(e.target.value)}>
+              <TextField id="select-besar" select sx={{ width: isMobile ? "120px" : "180px" }} value={diskon?.besar} onChange={(e) => onChangeBesar(e.target.value)}>
                 {DISCOUNT_LIST.map((option) => (
                   <MenuItem key={option.value} value={option.value}>
                     {option.label}
@@ -132,7 +133,7 @@ export default function DialogTambahan({ open = false, handleToggle }) {
               <Typography sx={style.labelBotol} mb={1}>
                 Botol Kecil
               </Typography>
-              <TextField id="select-kecil" select sx={{ width: "180px" }} value={diskon?.kecil} onChange={(e) => onChangeKecil(e.target.value)}>
+              <TextField id="select-kecil" select sx={{ width: isMobile ? "120px" : "180px" }} value={diskon?.kecil} onChange={(e) => onChangeKecil(e.target.value)}>
                 {DISCOUNT_LIST.map((option) => (
                   <MenuItem key={option.value} value={option.value}>
                     {option.label}
@@ -146,7 +147,14 @@ export default function DialogTambahan({ open = false, handleToggle }) {
           </Grid>
           {bonusData.map((data, index) => (
             <Grid item container gap={2} mt={2}>
-              <TextField id="select-product" SelectProps={{ MenuProps: { PaperProps: { style: { maxHeight: "340px" } } } }} select sx={{ width: "60%" }} value={data?.productID} onChange={(e) => onChangeProductBonus(index, e.target.value)}>
+              <TextField
+                id="select-product"
+                SelectProps={{ MenuProps: { PaperProps: { style: { maxHeight: "340px" } } } }}
+                select
+                sx={{ width: isMobile ? "45%" : "60%" }}
+                value={data?.productID}
+                onChange={(e) => onChangeProductBonus(index, e.target.value)}
+              >
                 {listProduct.map((item, index) => {
                   return bonusData.filter((bd) => bd?.productID === item.value).length < 1 ? (
                     <MenuItem value={item?.value} key={index}>
@@ -161,7 +169,7 @@ export default function DialogTambahan({ open = false, handleToggle }) {
                   );
                 })}
               </TextField>
-              <TextField id="select-qty" select sx={{ width: "13%" }} value={data?.qty} onChange={(e) => onChangeQtyBonus(index, e.target.value)}>
+              <TextField id="select-qty" select sx={{ width: isMobile ? "25%" : "13%" }} value={data?.qty} onChange={(e) => onChangeQtyBonus(index, e.target.value)}>
                 {QTY_LIST.map((option) => (
                   <MenuItem key={option.value} value={option.value}>
                     {option.label}

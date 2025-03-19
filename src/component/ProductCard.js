@@ -1,4 +1,4 @@
-import { Button, Grid, IconButton, TextField, Typography } from "@mui/material";
+import { Button, Grid, IconButton, TextField, Typography, useMediaQuery } from "@mui/material";
 import React, { useEffect, useRef, useState } from "react";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
@@ -10,6 +10,8 @@ export default function ProductCard({ label, img, price, cartQty, add = () => {}
   const [refresh, setRefresh] = useState(true);
   const tempQtyRef = useRef(tempQty);
   const ref = useRef();
+  const isMobile = useMediaQuery("(max-width: 600px)");
+
   useEffect(() => {
     // Update the ref with the latest tempQty whenever it changes
     tempQtyRef.current = tempQty;
@@ -53,13 +55,13 @@ export default function ProductCard({ label, img, price, cartQty, add = () => {}
   }
 
   return (
-    <Grid container alignItems={"center"} sx={{ backgroundColor: "#FFFFFF", p: 3, width: "48%", height: "15%", borderRadius: 4 }} gap={3}>
-      <Grid item width={"40%"} height={"210px"}>
+    <Grid container alignItems={"center"} sx={{ backgroundColor: "#FFFFFF", p: 3, width: "48%", height: isMobile ? "380px" : "15%", borderRadius: 4 }} gap={3}>
+      <Grid item width={isMobile ? "100%" : "40%"} height={isMobile ? "140px" : "210px"}>
         <img src={img} alt={label} width={"100%"} height={"100%"} style={{ objectFit: "contain" }} />
       </Grid>
-      <Grid item width={"55%"} height={"100%"}>
+      <Grid item width={isMobile ? "100%" : "55%"} height={"100%"}>
         <Grid item marginBottom={3}>
-          <Typography sx={{ fontFamily: "poppins", fontSize: 20, fontWeight: "bold", color: "#12141E" }}>{label}</Typography>
+          <Typography sx={{ fontFamily: "poppins", fontSize: isMobile ? 14 : 20, fontWeight: "bold", color: "#12141E" }}>{label}</Typography>
           <Typography sx={{ fontFamily: "nunito", fontSize: 16, fontWeight: "semibold", color: "#6D6F75" }}>Rp {formattedValue}</Typography>
         </Grid>
         {cartQty === 0 ? (

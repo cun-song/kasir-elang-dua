@@ -1,12 +1,14 @@
 import React from "react";
 import StyledDialog from "./StyledDialog";
-import { Button, DialogActions, DialogContent, Grid, Typography } from "@mui/material";
+import { Button, DialogActions, DialogContent, Grid, Typography, useMediaQuery } from "@mui/material";
 
 export default function DialogConfirmation({ open = false, handleToggle, save, label = "", children }) {
+  const isMobile = useMediaQuery("(max-width: 600px)");
+
   return (
     <StyledDialog isOpen={open} handleToggle={handleToggle} useCloseBtn title="" width="30%">
       <DialogContent>
-        <Typography sx={{ fontSize: "28px", fontWeight: "600", textAlign: "center", my: 2 }}>{label}</Typography>
+        <Typography sx={{ fontSize: isMobile ? "18px" : "28px", fontWeight: "600", textAlign: "center", my: 2 }}>{label}</Typography>
         {children}
       </DialogContent>
       <DialogActions>
@@ -14,14 +16,14 @@ export default function DialogConfirmation({ open = false, handleToggle, save, l
           <Grid item>
             <Button
               onClick={handleToggle}
-              sx={{ border: "1px solid #E06F2C", fontWeight: "600", color: "#E06F2C", ":hover": { border: "1px solid #E06F2C" }, width: "160px", height: "56px", borderRadius: "26px", textTransform: "none" }}
+              sx={{ border: "1px solid #E06F2C", fontWeight: "600", color: "#E06F2C", ":hover": { border: "1px solid #E06F2C" }, width: isMobile ? "120px" : "160px", height: "56px", borderRadius: "26px", textTransform: "none" }}
               variant="outlined"
             >
               Cancel
             </Button>
           </Grid>
           <Grid item>
-            <Button onClick={() => save()} sx={{ backgroundColor: "#E06F2C", ":hover": { backgroundColor: "#E06F2C" }, width: "160px", height: "56px", borderRadius: "26px", textTransform: "none" }} variant="contained">
+            <Button onClick={() => save()} sx={{ backgroundColor: "#E06F2C", ":hover": { backgroundColor: "#E06F2C" }, width: isMobile ? "120px" : "160px", height: "56px", borderRadius: "26px", textTransform: "none" }} variant="contained">
               Save
             </Button>
           </Grid>
