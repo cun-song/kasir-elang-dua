@@ -1,4 +1,4 @@
-import { getDatabase, ref, get, push, set, serverTimestamp, child, query, orderByChild, equalTo } from "firebase/database";
+import { getDatabase, ref, get, push, set, serverTimestamp, child, query, orderByChild, equalTo,update } from "firebase/database";
 import dbConfig from "../../config/fbConfig";
 import { setAllCustomer, setOpenFailedCustomer, setOpenSuccessCustomer, setResetCustomer } from "../customerReducer";
 import { setLoading } from "../sidenavReducer";
@@ -98,4 +98,41 @@ export const fetchCustomerData = () => async (dispatch) => {
   } else {
     console.log("Error fetching customer");
   }
+};
+
+export const updateCustomer = (data) => async (dispatch) => {
+  const db = getDatabase(dbConfig);
+  const customerRef = ref(db, "customer");
+  const idQuery = query(customerRef, orderByChild("id"), equalTo(data?.id));
+
+  get(idQuery)
+    .then((snapshot) => {
+      if (snapshot.exists()) {
+        snapshot.forEach((childSnapshot) => {
+          const key = childSnapshot.key;
+          const dbRef = ref(db, "customer/" + key);
+          update(dbRef, {
+            ...data?.data,
+            timestamp: serverTimestamp(),
+          })
+            .then(() => {
+              dispatch(setOpenSuccessCustomer(true));
+              dispatch(setResetCustomer());
+              dispatch(setLoading());
+            })
+            .catch((error) => {
+              console.error("Error updating customer: ", error);
+              dispatch(setOpenFailedCustomer({ isOpen: true, message: "Error updating customer" }));
+              dispatch(setLoading());
+            });
+        });
+      } else {
+        console.log("No data found");
+      }
+    })
+    .catch((error) => {
+      console.error("Error find customer key:", error);
+      dispatch(setOpenFailedCustomer({ isOpen: true, message: "Error find customer key" }));
+      dispatch(setLoading());
+    });
 };

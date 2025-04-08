@@ -21,15 +21,18 @@ export default function Customer() {
   const [page, setPage] = useState(0);
   const [currRowsPerPage, setCurrRowsPerPage] = useState(10);
   const [openAdd, setOpenAdd] = useState(false);
+  const [openEdit, setOpenEdit] = useState(false);
   const [isResetSearch, setIsResetSearch] = useState(false);
   const [searchData, setSearchData] = useState(null);
   const [sortData, setSortData] = useState([]);
   const [customerData, setCustomerData] = useState([]);
+  const [dataEdit,setDataEdit] = useState({});
 
   const customer = useSelector((state) => state?.customer?.allCustomer);
   const customerSuccess = useSelector((state) => state?.customer?.openSuccessCustomer);
   const customerFailed = useSelector((state) => state?.customer?.openFailedCustomer);
   const refresh = useSelector((state) => state?.customer?.resetCustomer);
+  const role = useSelector((state) => state.sidenav.role);
 
   useEffect(() => {
     dispatch(click(2));
@@ -40,8 +43,9 @@ export default function Customer() {
   useEffect(() => {
     if (customerSuccess) {
       setOpenAdd(false);
-
+      setOpenEdit(false)
       dispatch(fetchCustomerData());
+      setDataEdit({})
     }
   }, [refresh]);
 
@@ -80,6 +84,14 @@ export default function Customer() {
   function handleSortChange(data) {
     setSortData(data);
   }
+  function handleRowClick(data, e) {
+    if (data?.field === "__check__") {
+      e.stopPropagation();
+    } else {
+      setDataEdit(data);
+      setOpenEdit(true)
+    }
+  }
 
   return (
     <Box sx={{ width: "100%", height: "100%", display: "flex", justifyContent: "space-between" }}>
@@ -102,14 +114,16 @@ export default function Customer() {
               setPage={(e) => setPage(e)}
               pageSize={currRowsPerPage}
               setPageSizeChange={(e) => setCurrRowsPerPage(e)}
-              rowCount={customer?.length}
+              rowCount={customerData?.length}
               paginationMode="client"
+              onCellClick={role === "Super Admin" ? (data, e) => handleRowClick(data, e):false}
               onSortModelChange={(data) => handleSortChange(data)}
             />
           </Box>
         </Box>
       </Box>
-      <DialogCustomer open={openAdd} handleToggle={() => setOpenAdd((prev) => !prev)} />
+      <DialogCustomer open={openAdd} handleToggle={() => setOpenAdd((prev) => !prev)} mode={"ADD"} />
+      <DialogCustomer open={openEdit} handleToggle={() => setOpenEdit((prev) => !prev)} mode={"EDIT"} data={dataEdit?.row}/>
       <DialogSuccess open={customerSuccess} handleToggle={() => dispatch(setOpenSuccessCustomer(false))} message="Data Pelanggan Berhasil Disimpan!!" />
       <DialogFailed open={customerFailed?.isOpen} handleToggle={() => dispatch(setOpenFailedCustomer({ isOpen: false, message: "" }))} message={customerFailed?.message} />
     </Box>

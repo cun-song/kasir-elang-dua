@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { pushTransaction } from "../redux/action/transactionAction";
 import { AREA_SELECT } from "../constant/Customer";
-import { pushCustomer } from "../redux/action/customerAction";
+import { pushCustomer, updateCustomer } from "../redux/action/customerAction";
 import { setLoading } from "../redux/sidenavReducer";
 import { DISCOUNT_LIST } from "../constant/Home";
 const style = {
@@ -39,12 +39,13 @@ const style = {
   title: { fontFamily: "poppins", fontSize: "28px", fontWeight: "bold", color: "#12141E" },
   labelBotol: { fontFamily: "nunito", fontSize: "16px", fontWeight: "medium", color: "#828282" },
 };
-export default function DialogCustomer({ open = false, handleToggle }) {
+export default function DialogCustomer({ open = false, handleToggle,mode,data }) {
   const [area, setArea] = useState("");
   const [ownerName, setOwnerName] = useState("");
   const [merchantName, setMerchantName] = useState("");
   const [address, setAddress] = useState("");
   const [gmaps, setGmaps] = useState("");
+  const [id, setID] = useState("");
   const [diskon, setDiskon] = useState({ besar: 0, kecil: 0 });
 
   const dispatch = useDispatch();
@@ -59,7 +60,11 @@ export default function DialogCustomer({ open = false, handleToggle }) {
         discount: diskon,
       };
       dispatch(setLoading());
-      dispatch(pushCustomer(temp));
+      if(mode==="ADD"){
+        dispatch(pushCustomer(temp));
+      }else{
+        dispatch(updateCustomer({id:id,data:temp}))
+      }
     }
   }
   function onChangeBesar(data) {
@@ -78,11 +83,20 @@ export default function DialogCustomer({ open = false, handleToggle }) {
       setAddress("");
       setGmaps("");
       setDiskon({ besar: 0, kecil: 0 });
+    }else if(data !== null){
+      setID(data?.id)
+      setOwnerName(data?.ownerName);
+      setMerchantName(data?.merchantName);
+      setArea(data?.area);
+      setAddress(data?.address);
+      setGmaps(data?.gmapsPoint);
+      setDiskon({ besar: data?.discount?.besar?.toString(), kecil: data?.discount?.kecil?.toString() });
     }
+  
   }, [open]);
 
   return (
-    <StyledDialog isOpen={open} handleToggle={handleToggle} useCloseBtn width="30%" title="Tambah Pelanggan">
+    <StyledDialog isOpen={open} handleToggle={handleToggle} useCloseBtn width="30%" title={mode==="ADD"?"Tambah Pelanggan":"Sunting Data Pelanngan"}>
       <DialogContent>
         <Grid>
           <Grid item mt={2}>
@@ -152,7 +166,7 @@ export default function DialogCustomer({ open = false, handleToggle }) {
                 Botol Besar
               </Typography>
 
-              <TextField id="select-besar" select sx={{ width: "180px" }} onChange={(e) => onChangeBesar(e.target.value)}>
+              <TextField id="select-besar" select sx={{ width: "180px" }} value={diskon?.besar}  onChange={(e) => onChangeBesar(e.target.value)}>
                 {DISCOUNT_LIST.map((option) => (
                   <MenuItem key={option.value} value={option.value}>
                     {option.label}
@@ -164,7 +178,7 @@ export default function DialogCustomer({ open = false, handleToggle }) {
               <Typography sx={style.labelBotol} mb={1}>
                 Botol Kecil
               </Typography>
-              <TextField id="select-kecil" select sx={{ width: "180px" }} onChange={(e) => onChangeKecil(e.target.value)}>
+              <TextField id="select-kecil" select sx={{ width: "180px" }} value={diskon?.kecil} onChange={(e) => onChangeKecil(e.target.value)}>
                 {DISCOUNT_LIST.map((option) => (
                   <MenuItem key={option.value} value={option.value}>
                     {option.label}
@@ -178,7 +192,7 @@ export default function DialogCustomer({ open = false, handleToggle }) {
       <DialogActions>
         <Grid item container justifyContent={"center"} my={2}>
           <Button onClick={() => save()} sx={{ backgroundColor: "#E06F2C", ":hover": { backgroundColor: "#E06F2C" }, width: "40%", height: "66px", borderRadius: "30px", textTransform: "none" }} variant="contained">
-            Tambah
+            {mode==="ADD"?"Tambah":"Sunting"}
           </Button>
         </Grid>
       </DialogActions>
