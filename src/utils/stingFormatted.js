@@ -3,30 +3,38 @@ import numeral from "numeral";
 export function formattedNumber(number) {
   return numeral(number).format("0,0").replace(/,/g, ".");
 }
+
 export function convertTimestamp(timestamp) {
   const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-  let date = new Date(timestamp);
 
-  let day = String(date.getDate()).padStart(2, "0");
-  let monthIndex = date.getMonth(); // Months are zero-indexed
-  let monthName = months[monthIndex];
-  let year = date.getFullYear();
-  let hours = String(date.getHours()).padStart(2, "0");
-  let minutes = String(date.getMinutes()).padStart(2, "0");
+  // Tambahkan offset GMT+7 (7 jam dalam milidetik)
+  const gmt7Offset = 7 * 60 * 60 * 1000;
+  const date = new Date(timestamp + gmt7Offset);
 
-  let formattedDate = `${day} ${monthName} ${year} ${hours}:${minutes}`;
+  const day = String(date.getUTCDate()).padStart(2, "0");
+  const monthIndex = date.getUTCMonth(); // UTC-based
+  const monthName = months[monthIndex];
+  const year = date.getUTCFullYear();
+  const hours = String(date.getUTCHours()).padStart(2, "0");
+  const minutes = String(date.getUTCMinutes()).padStart(2, "0");
+
+  const formattedDate = `${day} ${monthName} ${year} ${hours}:${minutes}`;
   return formattedDate;
 }
+
 export function convertTimestampDate(timestamp) {
   const months = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-  let date = new Date(timestamp);
 
-  let day = String(date.getDate()).padStart(2, "0");
-  let monthIndex = date.getMonth(); // Months are zero-indexed
-  let monthName = months[monthIndex];
-  let year = date.getFullYear();
+  // Shift timestamp by +7 hours (7 * 60 * 60 * 1000 ms)
+  const gmt7Offset = 7 * 60 * 60 * 1000;
+  const date = new Date(timestamp + gmt7Offset);
 
-  let formattedDate = `${day} ${monthName} ${year}`;
+  const day = String(date.getUTCDate()).padStart(2, "0");
+  const monthIndex = date.getUTCMonth(); // UTC month
+  const monthName = months[monthIndex];
+  const year = date.getUTCFullYear();
+
+  const formattedDate = `${day} ${monthName} ${year}`;
   return formattedDate;
 }
 
