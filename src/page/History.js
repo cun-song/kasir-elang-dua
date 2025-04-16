@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, TextField, MenuItem, Button, ButtonGroup } from "@mui/material";
+import { Box, Typography, TextField, MenuItem, Button, ButtonGroup, useMediaQuery } from "@mui/material";
 import NavBar from "../component/NavBar";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
@@ -49,6 +49,7 @@ export default function History() {
   const transactionSuccess = useSelector((state) => state.transaction.openSuccessUpdate);
   const transactionFailed = useSelector((state) => state.transaction.openFailedUpdate);
   const refresh = useSelector((state) => state?.transaction?.reset);
+  const isMobile = useMediaQuery("(max-width: 600px)");
 
   useEffect(() => {
     dispatch(click(3));
@@ -60,6 +61,7 @@ export default function History() {
     if (transactionSuccess) {
       dispatch(fetchTransactionHistory(lastDate));
       setSelectionData([]);
+      setOpenTd(false);
     }
   }, [refresh]);
 
@@ -271,11 +273,11 @@ export default function History() {
   ];
   return (
     <Box sx={{ width: "100%", height: "100%", display: "flex", justifyContent: "space-between" }}>
-      <Box sx={{ width: "100%", pr: 5 }}>
+      <Box sx={{ width: "100%", pr: isMobile ? 0 : 5 }}>
         <NavBar />
-        <Box sx={{ backgroundColor: "white", borderRadius: "10px", p: 4, mt: 4 }}>
-          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-            <Box sx={{ display: "flex", gap: 5 }}>
+        <Box sx={{ backgroundColor: isMobile ? "transparent" : "white", borderRadius: "10px", p: isMobile ? 0 : 4, mt: 4, width: isMobile ? "96%" : "auto" }}>
+          <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: isMobile ? "left" : "center", flexDirection: isMobile ? "column-reverse" : "row", gap: isMobile ? 2 : 0 }}>
+            <Box sx={{ display: "flex", gap: isMobile ? 2 : 5, flexDirection: isMobile ? "column" : "row" }}>
               <StyledSearch selectMenuItems={TRANSACTION_SEARCH_ITEM} handleSearchClick={(e) => handleSearchClick(e)} isResetSearch={isResetSearch} setIsResetSearch={setIsResetSearch} />
               <ButtonGroup size="large" sx={{ display: selectionData.length === 0 ? "none" : "block" }}>
                 {buttons}
@@ -283,7 +285,18 @@ export default function History() {
             </Box>
             <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <Typography sx={{ mr: 2 }}>Data Transaksi dari: </Typography>
-              <TextField id="select-date" select sx={{ width: "200px" }} value={lastDate} onChange={(e) => onLastDateChange(e.target.value)}>
+              <TextField
+                id="select-date"
+                select
+                sx={{
+                  width: "200px",
+                  "& .MuiInputBase-root": {
+                    height: isMobile ? 40 : "auto",
+                  },
+                }}
+                value={lastDate}
+                onChange={(e) => onLastDateChange(e.target.value)}
+              >
                 {LAST_DATE_LIST.map((option) => (
                   <MenuItem key={option.value} value={option.value}>
                     {option.label}
@@ -292,7 +305,7 @@ export default function History() {
               </TextField>
             </Box>
           </Box>
-          <Box sx={{ mt: 3 }}>
+          <Box sx={{ mt: 3, mb: isMobile ? 20 : 0 }}>
             <StyledTableTransaction
               headers={HISTORY_HEADER}
               rows={historyData}

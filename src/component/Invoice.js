@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
 import { useReactToPrint } from "react-to-print";
@@ -11,9 +11,11 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import "dayjs/locale/id"; // Import Indonesian locale
-
+import { deleteTransaction } from "../redux/action/transactionAction";
 import { setLoading } from "../redux/sidenavReducer";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
+import DialogConfirmation from "./DialogConfirmation";
+
 const css = {
   titleHeader: {
     fontSize: "20px",
@@ -97,6 +99,16 @@ const Invoice = ({ transaction, customer, total, grandTotal, discount, totalQty,
   const nonBonusData = transaction.filter((product) => product?.price !== 0);
   const bonusData = transaction.filter((product) => product?.price === 0);
   const nbl = nonBonusData?.length;
+  const [openConfirmation, setOpenConfirmation] = useState(false);
+  const refresh = useSelector((state) => state?.transaction?.reset);
+  const transactionSuccess = useSelector((state) => state.transaction.openSuccessUpdate);
+  const role = useSelector((state) => state.sidenav.role);
+
+  useEffect(() => {
+    if (transactionSuccess) {
+      setOpenConfirmation(false);
+    }
+  }, [refresh]);
   //product length paling banyak 11
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
@@ -255,7 +267,25 @@ const Invoice = ({ transaction, customer, total, grandTotal, discount, totalQty,
         <Button onClick={Print} sx={{ backgroundColor: "#E06F2C", ":hover": { backgroundColor: "#E06F2C" }, width: "150px", height: "48px", borderRadius: "28px", textTransform: "none" }} variant="contained">
           Print
         </Button>
+        <Button
+          onClick={() => {
+            setOpenConfirmation(true);
+          }}
+          sx={{ display: role === "Super Admin" ? "block" : "none", ml: 56, backgroundColor: "#FF0E0E", ":hover": { backgroundColor: "#FF0E0E" }, width: "150px", height: "36px", borderRadius: "6px", textTransform: "none" }}
+          variant="contained"
+        >
+          Delete
+        </Button>
       </Box>
+      <DialogConfirmation
+        open={openConfirmation}
+        handleToggle={() => setOpenConfirmation((prev) => !prev)}
+        label={`Yakin Ingin Menghapus Transaksi ${idTransaction} ?`}
+        save={() => {
+          dispatch(setLoading());
+          dispatch(deleteTransaction(idTransaction));
+        }}
+      />
     </div>
   );
 };

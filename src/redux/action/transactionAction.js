@@ -1,9 +1,10 @@
-import { getDatabase, ref, get, push, set, serverTimestamp, child, query, orderByChild, startAt, update, equalTo } from "firebase/database";
-import dbConfig from "../../config/fbConfig";
-import { getDownloadURL, ref as refimage, getStorage } from "firebase/storage";
+import { getDatabase, ref, get, push, set, serverTimestamp, child, query, orderByChild, startAt, update, equalTo, remove } from "firebase/database";
+import dbConfig, { storage, database } from "../../config/fbConfig";
+import { getDownloadURL, ref as storageRef, uploadBytes } from "firebase/storage";
 import { FieldValue } from "firebase/firestore";
 import { setOpenFailed, setOpenFailedUpdate, setOpenSuccess, setOpenSuccessUpdate, setReset, setTransactionHistory, settra } from "../transactionReducer";
 import { setLoading } from "../sidenavReducer";
+import { v4 as uuidv4 } from "uuid";
 
 function generateString(number) {
   // Convert the number to a string
@@ -66,6 +67,42 @@ export const pushTransaction = (data) => async (dispatch) => {
       dispatch(setLoading());
       console.error("Error pushing transaction: ", error);
       dispatch(setOpenFailed({ isOpen: true, message: "Pesanan Gagal Dibuat !!" }));
+    });
+};
+
+export const deleteTransaction = (id) => async (dispatch) => {
+  const db = getDatabase(dbConfig);
+  const transaksiRef = ref(db, "transaction");
+  const idQuery = query(transaksiRef, orderByChild("id"), equalTo(id));
+
+  get(idQuery)
+    .then((snapshot) => {
+      if (snapshot.exists()) {
+        snapshot.forEach((childSnapshot) => {
+          const key = childSnapshot.key;
+          const dbRef = ref(db, `transaction/${key}`);
+          remove(dbRef)
+            .then(() => {
+              dispatch(setOpenSuccessUpdate(true));
+              dispatch(setReset());
+              dispatch(setLoading());
+            })
+            .catch((error) => {
+              console.error("Error deleting transaksi:", error);
+              dispatch(setOpenFailed({ isOpen: true, message: "Gagal menghapus transaksi" }));
+              dispatch(setLoading());
+            });
+        });
+      } else {
+        console.log("Transaksi tidak ditemukan");
+        dispatch(setOpenFailed({ isOpen: true, message: "Transaksi tidak ditemukan" }));
+        dispatch(setLoading());
+      }
+    })
+    .catch((error) => {
+      console.error("Error saat mencari transaksi:", error);
+      dispatch(setOpenFailed({ isOpen: true, message: "Gagal mencari transaksi" }));
+      dispatch(setLoading());
     });
 };
 
@@ -164,4 +201,32 @@ export const updatePaid = (ids) => async (dispatch) => {
       });
   }
   dispatch(setLoading());
+};
+
+export const sendPdfToFirebaseJob = async (pdfBlob) => {
+  try {
+    const jobId = uuidv4();
+    const filePath = `temp-invoice/${jobId}.pdf`;
+    const fileRef = storageRef(storage, filePath);
+
+    // Upload ke Firebase Storage
+    await uploadBytes(fileRef, pdfBlob);
+    const downloadURL = await getDownloadURL(fileRef);
+
+    // Tulis ke Firebase Database
+    const jobData = {
+      id: jobId,
+      pdfUrl: downloadURL,
+      status: "pending",
+      assignedTo: "printerInvoice",
+      createdAt: Date.now(),
+    };
+
+    await set(ref(database, `printQueue/${jobId}`), jobData);
+
+    return { success: true, jobId, url: downloadURL };
+  } catch (error) {
+    console.error("Gagal mengirim ke print server:", error);
+    return { success: false, error };
+  }
 };
