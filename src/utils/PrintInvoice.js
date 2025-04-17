@@ -7,14 +7,14 @@ import { renderToStaticMarkup } from "react-dom/server";
 import { useReactToPrint } from "react-to-print";
 import { useDispatch, useSelector } from "react-redux";
 import { setLoading } from "../redux/sidenavReducer";
-import { Box, Button } from "@mui/material";
+import { Box, Button, useMediaQuery } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import "dayjs/locale/id"; // Import Indonesian locale
-
+import { sendPdfToFirebaseJob } from "../redux/action/transactionAction";
 const css = {
   titleHeader: {
     fontSize: "20px",
@@ -232,14 +232,6 @@ const Table = ({ data, date }) => {
 };
 
 export const BulkPrinting = ({ data }) => {
-  const dispatch = useDispatch();
-  const printRef = useRef();
-  const Print = useReactToPrint({
-    onBeforePrint: () => dispatch(setLoading()),
-    content: () => printRef.current,
-    documentTitle: "Invoice",
-    onAfterPrint: () => dispatch(setLoading()),
-  });
   dayjs.extend(utc);
   dayjs.extend(timezone);
   dayjs.locale("id");
@@ -248,21 +240,67 @@ export const BulkPrinting = ({ data }) => {
   const myTimezone = "Asia/Jakarta";
   const today = dayjs().tz(myTimezone);
   const [date, setDate] = useState(today);
+  const dispatch = useDispatch();
+  const isMobile = useMediaQuery("(max-width: 600px)");
+  const printRef = useRef();
 
+  const Print = useReactToPrint({
+    onBeforePrint: () => dispatch(setLoading()),
+    content: () => printRef.current,
+    documentTitle: "Invoice",
+    onAfterPrint: () => dispatch(setLoading()),
+  });
+
+  const generatePDFAndUpload = async () => {
+    dispatch(setLoading()); // Mulai loading
+
+    const doc = new jsPDF();
+
+    // Menambahkan konten dari ref ke PDF
+    printRef.current.style.display = "block"; // Pastikan elemen terlihat saat diambil
+    doc.html(printRef.current, {
+      callback: async () => {
+        const pdfBlob = doc.output("blob"); // Mengonversi PDF menjadi Blob
+
+        // Upload PDF ke Firebase Storage menggunakan fungsi terpisah
+        const uploadResult = await sendPdfToFirebaseJob(pdfBlob);
+
+        if (uploadResult.success) {
+          console.log("PDF uploaded successfully:", uploadResult.url);
+
+          // Lakukan aksi lain setelah upload berhasil, misalnya update database atau trigger server
+        } else {
+          console.error("Error uploading PDF:", uploadResult.error);
+        }
+        printRef.current.style.display = "none"; // Sembunyikan elemen setelah diambil
+        dispatch(setLoading()); // Menghentikan loading setelah selesai
+      },
+      // margin: [10, 10, 10, 10], // Margin dokumen PDF
+      // x: 10,
+      // y: 10,
+    });
+  };
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
       <div ref={printRef} className="hide-on-screen">
-        {data.map((item, index) => (
-          <div key={index} style={{ pageBreakAfter: "always" }}>
-            <Table data={item} date={date} />
-          </div>
-        ))}
+        {data
+          .slice()
+          .reverse()
+          .map((item, index) => (
+            <div key={index} style={{ pageBreakAfter: "always" }}>
+              <Table data={item} date={date} />
+            </div>
+          ))}
       </div>
       <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="id">
           <DatePicker sx={{ marginLeft: 2, mr: 6 }} defaultValue={today} disablePast views={["year", "month", "day"]} format="DD MMMM YYYY" onChange={(e) => setDate(e)} />
         </LocalizationProvider>
-        <Button onClick={Print} sx={{ backgroundColor: "#E06F2C", ":hover": { backgroundColor: "#E06F2C" }, width: "150px", height: "48px", borderRadius: "28px", textTransform: "none" }} variant="contained">
+        <Button
+          onClick={isMobile ? generatePDFAndUpload : Print}
+          sx={{ backgroundColor: "#E06F2C", ":hover": { backgroundColor: "#E06F2C" }, width: "150px", height: "48px", borderRadius: "28px", textTransform: "none" }}
+          variant="contained"
+        >
           Print
         </Button>
       </Box>
