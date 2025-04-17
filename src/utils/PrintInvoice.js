@@ -243,7 +243,7 @@ const Table = ({ data, date }) => {
 
 const TableTotal = ({ data, date, authName, dataInvoice }) => {
   return (
-    <div style={{ padding: "20px", paddingLeft: "25px", paddingTop: "18px", width: "99mm", height: "210mm", boxSizing: "border-box", position: "relative", backgroundColor: "orange" }}>
+    <div style={{ padding: "20px", paddingLeft: "25px", paddingTop: "18px", width: "99mm", height: "210mm", boxSizing: "border-box", position: "relative" }}>
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <p style={css.smallHeader}>Admin: {authName}</p>
         <p style={css.smallHeader}>Dicetak: {convertTimestamp(date)}</p>
