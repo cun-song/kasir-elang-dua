@@ -3,6 +3,7 @@ import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import firebase from "firebase/compat/app";
 import { getStorage } from "firebase/storage";
+import { getDatabase } from "firebase/database";
 // import "firebase/firestore";
 // import "firebase/auth";
 
@@ -26,6 +27,8 @@ const app = initializeApp(firebaseConfig);
 const analytics = getAnalytics(app);
 
 export default app;
+export const database = getDatabase(app);
+export const storage = getStorage(app);
 
 // firebase.initializeApp(firebaseConfig);
 // firebase.firestore().settings({ timestampsInSnapshots: true });
