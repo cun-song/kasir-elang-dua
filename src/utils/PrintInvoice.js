@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import jsPDF from "jspdf";
 import html2canvas from "html2canvas";
 import elangVector from "../img/ElangVector.png";
-import { decimalToFraction, formattedNumber } from "./stingFormatted";
+import { convertTimestamp, decimalToFraction, formattedNumber } from "./stingFormatted";
 import { renderToStaticMarkup } from "react-dom/server";
 import { useReactToPrint } from "react-to-print";
 import { useDispatch, useSelector } from "react-redux";
@@ -64,6 +64,16 @@ const css = {
     borderBottom: "1px solid black",
     textAlign: "center",
     fontSize: "11px",
+    fontSize: "16px",
+    letterSpacing: "-2px",
+    wordSpacing: "-3px",
+    fontFamily: "Courier New",
+  },
+  tableBorderRangkuman: {
+    borderLeft: "1px solid black",
+    borderRight: "1px solid black",
+    borderBottom: "1px solid black",
+    textAlign: "center",
     fontSize: "16px",
     letterSpacing: "-2px",
     wordSpacing: "-3px",
@@ -231,7 +241,77 @@ const Table = ({ data, date }) => {
   );
 };
 
-export const BulkPrinting = ({ data }) => {
+const TableTotal = ({ data, date, authName, dataInvoice }) => {
+  return (
+    <div style={{ padding: "20px", paddingLeft: "25px", paddingTop: "18px", width: "99mm", height: "210mm", boxSizing: "border-box", position: "relative", backgroundColor: "orange" }}>
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <p style={css.smallHeader}>Admin: {authName}</p>
+        <p style={css.smallHeader}>Dicetak: {convertTimestamp(date)}</p>
+      </div>
+      <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "12px" }}>
+        <thead>
+          <tr>
+            <th style={{ ...css.headerBorder, width: "55%" }}>Label</th>
+            <th style={css.headerBorder}>Jumlah</th>
+            <th style={{ ...css.headerBorder, width: "15%" }}>Jenis</th>
+            <th style={{ ...css.headerBorder, width: "10%" }}>✔</th>
+          </tr>
+        </thead>
+        <tbody>
+          {data?.data.map((product, index) => (
+            <tr key={product.id}>
+              <td style={{ ...css.tableBorderRangkuman, textAlign: "left", paddingLeft: "5px" }}>{product?.label}</td>
+              <td style={css.tableBorderRangkuman}>{decimalToFraction(product?.total)}</td>
+              <td style={css.tableBorderRangkuman}>{product?.type}</td>
+              <td style={css.tableBorderRangkuman}></td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
+      <div style={{ display: "flex", justifyContent: "space-between", mt: 2 }}>
+        <p style={{ marginBlock: "0", fontSize: "16px", fontWeight: "600" }}>Total Lusin: {decimalToFraction(data?.totalLusin)} Lusin</p>
+        <p style={{ marginBlock: "0", fontSize: "16px", fontWeight: "600" }}>Total Dus: {decimalToFraction(data?.totalDus)} Dus</p>
+      </div>
+      <div style={{ display: data?.totalGen === 0 ? "none" : "flex", justifyContent: "space-between", mt: 2 }}>
+        <p style={{ marginBlock: "0", fontSize: "16px", fontWeight: "600" }}>Total Gen: {decimalToFraction(data?.totalGen)} Gen</p>
+      </div>
+      <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "12px" }}>
+        <thead>
+          <tr>
+            <th style={{ ...css.headerBorder, width: "100%" }} colSpan={3}>
+              Daftar Konsumen
+            </th>
+          </tr>
+        </thead>
+        <tbody>
+          {dataInvoice
+            .reduce((rows, item, index) => {
+              if (index % 3 === 0) {
+                // Mulai baris baru
+                rows.push([]);
+              }
+              // Tambahkan item ke baris saat ini
+              rows[rows.length - 1].push(item);
+              return rows;
+            }, [])
+            .map((rowItems, rowIndex) => (
+              <tr key={rowIndex}>
+                {rowItems.map((item, colIndex) => (
+                  <td key={colIndex} style={{ ...css.tableBorderRangkuman, fontSize: "12px", wordSpacing: "0" }}>
+                    {`${item.customer?.ownerName !== "-" ? item.customer?.ownerName : ""}${item.customer?.ownerName !== "-" && item.customer?.merchantName !== "-" ? ", " : ""}${
+                      item.customer?.merchantName !== "-" ? item.customer?.merchantName : ""
+                    }`}
+                  </td>
+                ))}
+              </tr>
+            ))}
+        </tbody>
+      </table>
+    </div>
+  );
+};
+
+export const BulkPrinting = ({ data, dataRangkuman }) => {
   dayjs.extend(utc);
   dayjs.extend(timezone);
   dayjs.locale("id");
@@ -243,10 +323,19 @@ export const BulkPrinting = ({ data }) => {
   const dispatch = useDispatch();
   const isMobile = useMediaQuery("(max-width: 600px)");
   const printRef = useRef();
+  const printTotalRef = useRef();
+  const authName = useSelector((state) => state.sidenav.name);
 
   const Print = useReactToPrint({
     onBeforePrint: () => dispatch(setLoading()),
     content: () => printRef.current,
+    documentTitle: "Invoice",
+    onAfterPrint: () => dispatch(setLoading()),
+  });
+
+  const PrintTotal = useReactToPrint({
+    onBeforePrint: () => dispatch(setLoading()),
+    content: () => printTotalRef.current,
     documentTitle: "Invoice",
     onAfterPrint: () => dispatch(setLoading()),
   });
@@ -292,7 +381,10 @@ export const BulkPrinting = ({ data }) => {
             </div>
           ))}
       </div>
-      <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
+      <div ref={printTotalRef} className="hide-on-screen">
+        <TableTotal data={dataRangkuman} date={date} authName={authName} dataInvoice={data} />
+      </div>
+      <Box sx={{ display: "flex", alignItems: "center", width: "100%", justifyContent: "space-between" }}>
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="id">
           <DatePicker sx={{ marginLeft: 2, mr: 6 }} defaultValue={today} disablePast views={["year", "month", "day"]} format="DD MMMM YYYY" onChange={(e) => setDate(e)} />
         </LocalizationProvider>
@@ -301,7 +393,10 @@ export const BulkPrinting = ({ data }) => {
           sx={{ backgroundColor: "#E06F2C", ":hover": { backgroundColor: "#E06F2C" }, width: "150px", height: "48px", borderRadius: "28px", textTransform: "none" }}
           variant="contained"
         >
-          Print
+          Print Invoice
+        </Button>
+        <Button onClick={PrintTotal} sx={{ mr: 2, width: "150px", height: "36px", borderRadius: "6px", textTransform: "none" }} variant="contained">
+          Print Total
         </Button>
       </Box>
     </div>

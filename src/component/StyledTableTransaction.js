@@ -18,6 +18,10 @@ const styles = {
     textAlign: "center",
     border: "none",
     overflow: "hidden",
+    overflowX: "auto",
+    "@media (max-width:600px)": {
+      maxWidth: "100vw",
+    },
     ".MuiDataGrid-container--top [role='row']": {
       background: "none !important",
     },

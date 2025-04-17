@@ -18,7 +18,7 @@ export default function Main() {
   return (
     <AuthProvider>
       <SideNav />
-      <Box sx={{ backgroundColor: "#F4F4F4", width: "100%", height: "100%", paddingLeft: isMobile ? 2 : 6, display: "flex", flexDirection: "column" }}>
+      <Box sx={{ backgroundColor: "#F4F4F4", width: isMobile ? "96%" : "100%", height: "100%", paddingLeft: isMobile ? "4%" : 6, display: "flex", flexDirection: "column" }}>
         <Routes>
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<Home />} />

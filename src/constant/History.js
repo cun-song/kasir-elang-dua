@@ -5,6 +5,7 @@ const center = {
   headerAlign: "center",
   align: "center",
   flex: 1,
+  minWidth: 120,
 };
 
 export const HISTORY_HEADER = [

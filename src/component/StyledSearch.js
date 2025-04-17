@@ -1,184 +1,12 @@
 import AddBoxIcon from "@mui/icons-material/AddBox";
 import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
 import DeleteIcon from "@mui/icons-material/Delete";
-import { Box, Button, FormControl, IconButton, MenuItem, OutlinedInput, Popover, Select, Typography } from "@mui/material";
+import { Box, Button, FormControl, IconButton, MenuItem, OutlinedInput, Popover, Select, Typography, useMediaQuery } from "@mui/material";
 import React, { createRef, useEffect, useRef, useState } from "react";
 // import DateRangePicker from "../../components/dateTimePicker/DateRangePicker";
 import Search from "../svg/ArrowDropDown";
 // import ButtonCommon from "../buttons/ButtonCommon";
 // import StyledChips from "../chip/StyledChip";
-
-const styles = {
-  labelPeriode: {
-    fontWeight: 600,
-    fontSize: "1rem",
-    color: "#65748B",
-  },
-  labelKategori: {
-    fontWeight: 600,
-    fontSize: "1rem",
-    color: "#65748B",
-    paddingTop: "28px",
-  },
-  hr: {
-    width: "4%",
-    margin: "1.7rem 1rem 0 1rem",
-    height: 0,
-    border: ".5px solid black",
-  },
-  boxAS: {
-    minWidth: 200,
-    marginLeft: 5,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  searchWrapper: {
-    minWidth: 200,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  searchWrapper: {
-    minWidth: 200,
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "center",
-  },
-  select: {
-    height: 48,
-    textAlign: "left",
-    borderRadius: 0,
-    fontSize: 18,
-    fontWeight: 500,
-    width: "100%",
-    "& .MuiSvgIcon-root": {
-      color: "#E06F2C",
-      fontSize: "2.5rem",
-    },
-  },
-  paperSelect: {
-    "& .MuiPaper-root > .MuiList-root > .MuiButtonBase-root-MuiMenuItem-root .Mui-selected ": {
-      display: "none",
-    },
-    "& .MuiPaper-root > .MuiList-root > .MuiMenuItem-root.Mui-selected ": {
-      display: "none",
-    },
-    "& .MuiPaper-root > .MuiList-root > .MuiMenuItem-root.Mui-selected ": {
-      display: "none",
-    },
-    ".MuiList-root > .MuiMenuItem-root.Mui-selected ": {
-      display: "none",
-    },
-  },
-  searchIcon: {
-    borderTopLeftRadius: 0,
-    borderBottomLeftRadius: 0,
-    borderTopRightRadius: 7,
-    borderBottomRightRadius: 7,
-    backgroundColor: "#E06F2C",
-    width: 50,
-    height: 48,
-    "&:hover": {
-      backgroundColor: "#E06F2C",
-    },
-  },
-  parentBox: {
-    width: "full",
-    display: "flex",
-    alignItems: "left",
-    justifyContent: "left",
-    flexDirection: "row",
-  },
-  buttonAS: {
-    fontSize: "16px",
-    fontWeight: 700,
-    width: 208,
-    height: 48,
-    // paddingX: 7,
-    textTransform: "none",
-    borderRadius: 2,
-    backgroundColor: "#E06F2C",
-    color: "white",
-    transition: "transform .2s ease-in-out",
-    "&:hover": {
-      backgroundColor: "#125FA1",
-    },
-    "&:active": {
-      backgroundColor: "#E06F2C",
-    },
-  },
-  popoverBox: {
-    height: "340px",
-    overflow: "auto",
-    width: "100%",
-    borderRadius: "8px",
-    padding: "24px 30px 0 30px",
-    backgroundColor: "white",
-  },
-  selectAS: {
-    fontWeight: 500,
-    minWidth: "230px",
-    height: "100%",
-    background: "#FFF",
-    boxSizing: "border-box",
-    "& .MuiSvgIcon-root": {
-      color: "#156db8",
-      fontSize: "2.5rem",
-    },
-    "&.Mui-selected": {
-      display: "none",
-    },
-    "&.MuiMenuItem-root > .Mui-selected": {
-      display: "none",
-    },
-    "&.MuiButtonBase-root-MuiMenuItem-root .Mui-selected ": {
-      display: "none",
-    },
-    "& .MuiPaper-root > .MuiList-root > .MuiMenuItem-root.Mui-selected ": {
-      display: "none",
-    },
-  },
-  submitAS: {
-    textTransform: "inherit",
-    float: "right",
-    fontWeight: "bold",
-    marginTop: "40px",
-    marginRight: "15px",
-    marginBottom: "40px",
-    width: 120,
-    backgroundColor: "#E06F2C",
-    height: 48,
-    color: "white",
-    borderRadius: 1,
-    fontSize: 16,
-    fontFamily: "Montserrat",
-    textTransform: "inherit",
-    marginLeft: 2,
-    "&:hover": {
-      backgroundColor: "#125fa1",
-    },
-    "&:active": {
-      backgroundColor: "#E06F2C",
-    },
-  },
-  category: {
-    display: "flex",
-    gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
-    marginTop: "12px",
-    width: "100%",
-    gap: 10,
-  },
-  iconAS: (type) => ({
-    "& :hover": {
-      cursor: "pointer",
-    },
-    color: type === "add" ? "#156db8" : "#d63031",
-    marginTop: "0.9%",
-    marginLeft: type === "add" ? "10%" : "1.2%",
-    fontSize: "35px",
-  }),
-};
 
 export default function StyledSearch({ selectMenuItems = [{ value: "all", label: "All" }], useAdvancedSearch = false, handleSearchClick, handleAdvancedSearchSubmit, isResetSearch, setIsResetSearch }) {
   const [value, setValue] = useState(selectMenuItems[0].value);
@@ -204,6 +32,178 @@ export default function StyledSearch({ selectMenuItems = [{ value: "all", label:
   const [selectPlaceholder, setSelectPlaceholder] = useState([]);
 
   const selectMenuItemsLen = selectMenuItems.length;
+  const isMobile = useMediaQuery("(max-width: 600px)");
+  const styles = {
+    labelPeriode: {
+      fontWeight: 600,
+      fontSize: "1rem",
+      color: "#65748B",
+    },
+    labelKategori: {
+      fontWeight: 600,
+      fontSize: "1rem",
+      color: "#65748B",
+      paddingTop: "28px",
+    },
+    hr: {
+      width: "4%",
+      margin: "1.7rem 1rem 0 1rem",
+      height: 0,
+      border: ".5px solid black",
+    },
+    boxAS: {
+      minWidth: 200,
+      marginLeft: 5,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    searchWrapper: {
+      minWidth: isMobile ? 100 : 200,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    searchWrapper: {
+      minWidth: isMobile ? 100 : 200,
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    select: {
+      height: isMobile ? 40 : 48,
+      textAlign: "left",
+      borderRadius: 0,
+      fontSize: isMobile ? 14 : 18,
+      fontWeight: 500,
+      width: "100%",
+      "& .MuiSvgIcon-root": {
+        color: "#E06F2C",
+        fontSize: "2.5rem",
+      },
+    },
+    paperSelect: {
+      "& .MuiPaper-root > .MuiList-root > .MuiButtonBase-root-MuiMenuItem-root .Mui-selected ": {
+        display: "none",
+      },
+      "& .MuiPaper-root > .MuiList-root > .MuiMenuItem-root.Mui-selected ": {
+        display: "none",
+      },
+      "& .MuiPaper-root > .MuiList-root > .MuiMenuItem-root.Mui-selected ": {
+        display: "none",
+      },
+      ".MuiList-root > .MuiMenuItem-root.Mui-selected ": {
+        display: "none",
+      },
+    },
+    searchIcon: {
+      borderTopLeftRadius: 0,
+      borderBottomLeftRadius: 0,
+      borderTopRightRadius: 7,
+      borderBottomRightRadius: 7,
+      backgroundColor: "#E06F2C",
+      width: 50,
+      height: isMobile ? 40 : 48,
+      "&:hover": {
+        backgroundColor: "#E06F2C",
+      },
+    },
+    parentBox: {
+      width: "full",
+      display: "flex",
+      alignItems: "left",
+      justifyContent: "left",
+      flexDirection: "row",
+    },
+    buttonAS: {
+      fontSize: "16px",
+      fontWeight: 700,
+      width: 208,
+      height: 48,
+      // paddingX: 7,
+      textTransform: "none",
+      borderRadius: 2,
+      backgroundColor: "#E06F2C",
+      color: "white",
+      transition: "transform .2s ease-in-out",
+      "&:hover": {
+        backgroundColor: "#125FA1",
+      },
+      "&:active": {
+        backgroundColor: "#E06F2C",
+      },
+    },
+    popoverBox: {
+      height: "340px",
+      overflow: "auto",
+      width: "100%",
+      borderRadius: "8px",
+      padding: "24px 30px 0 30px",
+      backgroundColor: "white",
+    },
+    selectAS: {
+      fontWeight: 500,
+      minWidth: "230px",
+      height: "100%",
+      background: "#FFF",
+      boxSizing: "border-box",
+      "& .MuiSvgIcon-root": {
+        color: "#156db8",
+        fontSize: "2.5rem",
+      },
+      "&.Mui-selected": {
+        display: "none",
+      },
+      "&.MuiMenuItem-root > .Mui-selected": {
+        display: "none",
+      },
+      "&.MuiButtonBase-root-MuiMenuItem-root .Mui-selected ": {
+        display: "none",
+      },
+      "& .MuiPaper-root > .MuiList-root > .MuiMenuItem-root.Mui-selected ": {
+        display: "none",
+      },
+    },
+    submitAS: {
+      textTransform: "inherit",
+      float: "right",
+      fontWeight: "bold",
+      marginTop: "40px",
+      marginRight: "15px",
+      marginBottom: "40px",
+      width: 120,
+      backgroundColor: "#E06F2C",
+      height: 48,
+      color: "white",
+      borderRadius: 1,
+      fontSize: 16,
+      fontFamily: "Montserrat",
+      textTransform: "inherit",
+      marginLeft: 2,
+      "&:hover": {
+        backgroundColor: "#125fa1",
+      },
+      "&:active": {
+        backgroundColor: "#E06F2C",
+      },
+    },
+    category: {
+      display: "flex",
+      gridTemplateColumns: "repeat(3, minmax(0, 1fr))",
+      marginTop: "12px",
+      width: "100%",
+      gap: 10,
+    },
+    iconAS: (type) => ({
+      "& :hover": {
+        cursor: "pointer",
+      },
+      color: type === "add" ? "#156db8" : "#d63031",
+      marginTop: "0.9%",
+      marginLeft: type === "add" ? "10%" : "1.2%",
+      fontSize: "35px",
+    }),
+  };
 
   useEffect(() => {
     setSelectMenuItemsAS(selectMenuItems.slice(1));
@@ -283,13 +283,13 @@ export default function StyledSearch({ selectMenuItems = [{ value: "all", label:
   return (
     <Box sx={styles.parentBox}>
       <Box sx={styles.searchWrapper}>
-        <FormControl sx={{ width: 241 }}>
+        <FormControl sx={{ width: isMobile ? 180 : 241 }}>
           <OutlinedInput
             sx={{
               borderTopRightRadius: 0,
               borderBottomRightRadius: 0,
-              height: 48,
-              fontSize: 18,
+              height: isMobile ? 40 : 48,
+              fontSize: isMobile ? 14 : 18,
               fontWeight: 500,
               "& input::placeholder": {
                 color: "black",
@@ -303,7 +303,7 @@ export default function StyledSearch({ selectMenuItems = [{ value: "all", label:
           />
         </FormControl>
 
-        <FormControl sx={{ width: 210 }}>
+        <FormControl sx={{ width: isMobile ? 170 : 210 }}>
           <Select sx={styles.select} value={value} onChange={(e, obj) => handleSelectMenuSearch(e, obj)} inputProps={{ "aria-label": "Without label" }}>
             {selectMenuItems.map(({ value, label }, idx) => (
               <MenuItem key={idx} value={value}>

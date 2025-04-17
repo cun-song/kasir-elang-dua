@@ -210,14 +210,14 @@ export default function History() {
         const newId = p?.id[0] === "P" ? p?.id : p?.id?.slice(1);
         if (temp[newId]) {
           temp = { ...temp, [newId]: { ...temp[newId], total: temp[newId]?.total + p?.productQty } };
-        } else {
+        } else if (p?.label !== "Gen Kosong") {
           temp = { ...temp, [newId]: { label: p?.label, index: p?.index, total: p?.productQty, type: p?.type } };
         }
         if (p?.type === "Lusin") {
           totalLusin += p?.productQty;
         } else if (p?.type === "Dus") {
           totalDus += p?.productQty;
-        } else if (p?.type === "Gen") {
+        } else if (p?.type === "Gen" && p?.label !== "Gen Kosong") {
           totalGen += p?.productQty;
         }
       });
@@ -325,7 +325,7 @@ export default function History() {
         </Box>
       </Box>
       <DialogTotalProduct open={openRangkuman} data={dataRangkuman} handleToggle={() => setOpenRangkuman((p) => !p)}>
-        <BulkPrinting data={printData} />
+        <BulkPrinting data={printData} dataRangkuman={dataRangkuman} />
       </DialogTotalProduct>
       <DialogTable data={transactionDetail} open={openTd} handleToggle={() => setOpenTd((prev) => !prev)} customer={customerArr} time={time} idTransaction={idTransaction} adminName={adminName} />
       <DialogSuccess message="Data Berhasil diSunting !!" open={transactionSuccess} handleToggle={() => dispatch(setOpenSuccessUpdate(false))} />
