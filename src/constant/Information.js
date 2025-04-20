@@ -35,3 +35,40 @@ export const LUSIN_HEADER = [
     },
   },
 ];
+
+export const LUSIN_PERBULAN_HEADER = (arr, monthNames) => {
+  const temp = [
+    {
+      field: "id",
+      headerName: "ID",
+      ...center,
+    },
+    {
+      field: "label",
+      headerName: "Label",
+      ...center,
+      flex: 2,
+    },
+  ];
+  arr?.forEach((a, index) => {
+    const month = new Date(a).getMonth();
+    const year = new Date(a).getFullYear();
+    const monthName = monthNames[month];
+    const yearName = year;
+    temp.push({
+      field: `M${index}`,
+      headerName: `${monthName} ${yearName}`,
+      ...center,
+      renderCell: (num) => {
+        return `${decimalToFraction(num?.value)}`;
+      },
+    });
+  });
+  temp.push({
+    field: "type",
+    headerName: "Jenis",
+    ...center,
+  });
+
+  return temp;
+};

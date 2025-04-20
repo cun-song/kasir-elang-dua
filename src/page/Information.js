@@ -7,7 +7,7 @@ import { LineChart } from "@mui/x-charts/LineChart";
 import { fetchTransactionHistory } from "../redux/action/transactionAction";
 import { AREA_SELECT } from "../constant/Customer";
 import StyledTable from "../component/StyledTable";
-import { LUSIN_HEADER } from "../constant/Information";
+import { LUSIN_HEADER, LUSIN_PERBULAN_HEADER } from "../constant/Information";
 import { decimalToFraction, decimalToFraction2 } from "../utils/stingFormatted";
 import { fetchCustomerData } from "../redux/action/customerAction";
 import { fetchProductData } from "../redux/action/productAction";
@@ -20,8 +20,12 @@ export default function Information() {
 
   const [page, setPage] = useState(0);
   const [currRowsPerPage, setCurrRowsPerPage] = useState(30);
-  const [omzet, setOmzet] = useState([0, 0, 0, 0, 0, 0]);
+  const [pageTahun, setPageTahun] = useState(0);
+  const [currRowsPerPageTahun, setCurrRowsPerPageTahun] = useState(30);
+  const [omzet, setOmzet] = useState([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]);
+  const [lusinBulanan, setLusinBulanan] = useState([]);
   const [areaOmzet, setAreaOmzet] = useState("All");
+  const [productID, setProductID] = useState("P1");
   const [lusin, setLusin] = useState([]);
   const [doc, setDoc] = useState([]);
   const [bon, setBon] = useState([]);
@@ -35,6 +39,15 @@ export default function Information() {
   const transaction = useSelector((state) => state.transaction.transactionHistory);
   const customer = useSelector((state) => state?.customer?.allCustomer);
   const product = useSelector((state) => state?.product?.allProduct);
+
+  const [totalProductGrafik, setTotalProductGrafik] = useState(() => {
+    const bulanLength = 12;
+    const initial = {};
+    Object.values(product).forEach((p) => {
+      initial[p.id] = new Array(bulanLength).fill(0);
+    });
+    return initial;
+  });
 
   function createXData(length) {
     const array = [];
@@ -58,7 +71,7 @@ export default function Information() {
   useEffect(() => {
     setAreaOmzet("All");
     dispatch(click(4));
-    dispatch(setTitle("Pengaturan"));
+    dispatch(setTitle("Informasi"));
     dispatch(fetchTransactionHistory(99999));
     dispatch(fetchCustomerData());
     dispatch(fetchProductData());
@@ -66,44 +79,56 @@ export default function Information() {
 
   useEffect(() => {
     // Omzet
-    const tempData = [0, 0, 0, 0, 0, 0];
-    let tempLusin = {};
-    let arr = createXData(6);
+    const tempDataOmzet = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    const tempDataLusin = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
+    let arr = createXData(12);
     let trans = Object.values(transaction);
 
     if (areaOmzet !== "All") trans = trans.filter((t) => findCustomer(t?.customerID)?.area === areaOmzet);
     trans.forEach((t) => {
-      if (arr[0].getTime() < t?.timestamp && t?.timestamp < arr[1].getTime()) {
-        tempData[0] = tempData[0] + t?.total;
-      } else if (arr[1].getTime() < t?.timestamp && t?.timestamp < arr[2].getTime()) {
-        tempData[1] = tempData[1] + t?.total;
-      } else if (arr[2].getTime() < t?.timestamp && t?.timestamp < arr[3].getTime()) {
-        tempData[2] = tempData[2] + t?.total;
-      } else if (arr[3].getTime() < t?.timestamp && t?.timestamp < arr[4].getTime()) {
-        tempData[3] = tempData[3] + t?.total;
-      } else if (arr[4].getTime() < t?.timestamp && t?.timestamp < arr[5].getTime()) {
-        tempData[4] = tempData[4] + t?.total;
-      } else if (arr[5].getTime() < t?.timestamp && t?.timestamp < arr[6].getTime()) {
-        tempData[5] = tempData[5] + t?.total;
+      for (let i = 0; i < arr.length - 1; i++) {
+        if (arr[i].getTime() < t?.timestamp && t?.timestamp < arr[i + 1].getTime()) {
+          tempDataOmzet[i] = (tempDataOmzet[i] || 0) + (t?.total || 0);
+          break; // Hentikan loop setelah ketemu rentangnya
+        }
       }
-      //Lusin
-      const product = t?.product;
-      Object.keys(product).forEach((p) => {
-        const newId = p[0] === "P" ? p : p?.slice(1);
-        if (tempLusin?.hasOwnProperty(newId)) {
-          tempLusin = {
-            ...tempLusin,
-            [newId]: tempLusin[newId] + product[p]?.productQty,
-          };
+
+      // tabel produk semua bulan
+      for (let i = 0; i < arr.length - 1; i++) {
+        if (arr[i].getTime() < t?.timestamp && t?.timestamp < arr[i + 1].getTime()) {
+          const product = t?.product;
+          Object.entries(product).forEach(([p, value]) => {
+            const newId = p.startsWith("P") ? p : p.slice(1);
+            tempDataLusin[i] = {
+              ...tempDataLusin[i],
+              [newId]: (tempDataLusin[i]?.[newId] || 0) + (value?.productQty || 0),
+            };
+          });
+          break; // langsung break setelah nemu rentangnya
+        }
+      }
+    });
+    const totalPerBulan = [];
+    const totalPerBulanGrafik = {};
+    Object.values(product).forEach((p) => {
+      if (!totalPerBulanGrafik[p.id]) {
+        totalPerBulanGrafik[p.id] = [];
+      }
+      const tempObject = { label: p.label, index: p.index, type: p.type, id: p.id };
+      Object.keys(tempDataLusin).forEach((m, idx) => {
+        if (tempObject[`M${m}`] === undefined) tempObject[`M${m}`] = tempDataLusin[m][p.id] || 0;
+        else tempObject[`M${m}`] += tempDataLusin[m][p.id];
+        if (totalPerBulanGrafik[p?.id][idx] === undefined) {
+          totalPerBulanGrafik[p?.id][idx] = tempDataLusin[m][p.id] || 0;
         } else {
-          tempLusin = {
-            ...tempLusin,
-            [newId]: product[p]?.productQty,
-          };
+          totalPerBulanGrafik[p?.id][idx] += tempDataLusin[m][p.id] || 0;
         }
       });
+      totalPerBulan.push(tempObject);
     });
-    setOmzet(tempData);
+    setTotalProductGrafik(totalPerBulanGrafik);
+    setLusinBulanan(totalPerBulan);
+    setOmzet(tempDataOmzet);
   }, [transaction, areaOmzet]);
   useEffect(() => {
     let tempLusin = {};
@@ -113,8 +138,12 @@ export default function Information() {
     let after = new Date(before).setMonth(bulanLusin?.month + 1);
     let newtrans = [];
     let tempBon = {};
+    // tabel produk semua bulan
+
     if (areaLusin !== "All") trans = trans.filter((t) => findCustomer(t?.customerID)?.area === areaLusin);
+
     trans.forEach((t) => {
+      //tabel produk per bulan
       if (before < t?.timestamp && t?.timestamp < after && t?.isDelivered === 1) {
         newtrans = [...newtrans, t];
 
@@ -195,9 +224,12 @@ export default function Information() {
     setLusin(newer);
   }, [transaction, bulanLusin, areaLusin]);
 
-  let selectMonth = createXData(6);
+  let selectMonth = createXData(12);
   selectMonth = selectMonth.map((a) => {
     return { value: { month: a?.getMonth(), year: a?.getFullYear() }, label: `${monthNames[a?.getMonth()]} ${a?.getFullYear()}` };
+  });
+  let selectProduct = Object.values(product).map((a) => {
+    return { value: a.id, label: a.label };
   });
   return (
     <Box sx={{ width: "100%", height: "100%", display: "flex", justifyContent: "space-between" }}>
@@ -259,7 +291,7 @@ export default function Information() {
                 xAxis={[
                   {
                     scaleType: "time",
-                    data: createXData(6),
+                    data: createXData(12),
                     valueFormatter: (value) => `${monthNames[value?.getMonth()]} ${value?.getFullYear()}`,
                   },
                 ]}
@@ -270,16 +302,72 @@ export default function Information() {
                 ]}
                 yAxis={[
                   {
+                    tickLabelStyle: {
+                      fontSize: 14,
+                    },
                     valueFormatter: (value) => `${value / 1000000} Jt`,
                   },
                 ]}
-                width={600}
+                width={1000}
                 height={500}
+                margin={{ left: 100 }}
               />
             </Grid>
             <Grid item sx={{ display: "flex", alignItems: "center" }}>
               <TextField id="select-area" select sx={{ width: "200px" }} value={areaOmzet} onChange={(e) => setAreaOmzet(e.target.value)}>
                 {[{ value: "All", label: "Semua" }, ...AREA_SELECT].map((item, index) => (
+                  <MenuItem value={item?.value} key={index}>
+                    {item.label}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+          </Grid>
+          <Grid>
+            <StyledTable
+              headers={LUSIN_PERBULAN_HEADER(createXData(12), monthNames)}
+              rows={lusinBulanan}
+              page={pageTahun}
+              setPage={(e) => setPageTahun(e)}
+              pageSize={currRowsPerPageTahun}
+              setPageSizeChange={(e) => setCurrRowsPerPageTahun(e)}
+              rowCount={lusinBulanan?.length}
+              paginationMode="client"
+            />
+          </Grid>
+          <Grid container mt={4}>
+            <Grid item>
+              <Typography sx={{ fontFamily: "poppins", fontSize: 28, fontWeight: "bold", color: "#12141E" }}>Grafik Produk Terjual</Typography>
+
+              <LineChart
+                xAxis={[
+                  {
+                    scaleType: "time",
+                    data: createXData(12),
+                    valueFormatter: (value) => `${monthNames[value?.getMonth()]} ${value?.getFullYear()}`,
+                  },
+                ]}
+                series={[
+                  {
+                    data: totalProductGrafik[productID],
+                  },
+                ]}
+                yAxis={[
+                  {
+                    tickLabelStyle: {
+                      fontSize: 14,
+                    },
+                    valueFormatter: (value) => `${value} ${findProduct(productID)?.type}`,
+                  },
+                ]}
+                width={1000}
+                height={500}
+                margin={{ left: 100 }}
+              />
+            </Grid>
+            <Grid item sx={{ display: "flex", alignItems: "center" }}>
+              <TextField id="select-area" select sx={{ width: "400px" }} value={productID} onChange={(e) => setProductID(e.target.value)}>
+                {selectProduct.map((item, index) => (
                   <MenuItem value={item?.value} key={index}>
                     {item.label}
                   </MenuItem>
