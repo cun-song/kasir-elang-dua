@@ -49,28 +49,83 @@ const getNextTransactionId = async (db) => {
 };
 
 export const pushTransaction = (data) => async (dispatch) => {
-  const db = getDatabase(dbConfig);
-  const dbRef = ref(db, "transaction");
+  const db = getDatabase();
   const transactionID = await getNextTransactionId(db);
-  const snapshot = await push(dbRef);
-  set(snapshot, {
-    ...data,
-    id: transactionID,
-    timestamp: serverTimestamp(),
-  })
-    .then(() => {
-      dispatch(setOpenSuccess(true));
-      dispatch(setReset());
-      dispatch(setLoading());
-    })
-    .catch((error) => {
-      dispatch(setLoading());
-      console.error("Error pushing transaction: ", error);
-      dispatch(setOpenFailed({ isOpen: true, message: "Pesanan Gagal Dibuat !!" }));
+  const transactionRef = push(ref(db, "transaction"));
+  const productEntries = Object.entries(data?.product);
+
+  const combinedMap = {};
+
+  productEntries.forEach(([id, item]) => {
+    const isBVersion = id?.startsWith("BP");
+    const baseId = isBVersion ? id?.replace(/^B/, "") : id;
+
+    const targetId = productEntries?.some(([otherId]) => otherId === baseId)
+      ? baseId // jika versi non-B ada, pakai itu
+      : id; // kalau tidak ada, pakai ID aslinya
+
+    if (!combinedMap[targetId]) {
+      combinedMap[targetId] = {
+        id: targetId,
+        qty: item?.qty || 0,
+        cartQty: item?.productQty || 0,
+      };
+    } else {
+      combinedMap[targetId].cartQty += item?.productQty || 0;
+    }
+  });
+
+  const products = Object.values(combinedMap);
+
+  try {
+    const productSnapshot = await get(ref(db, "product"));
+    const productData = productSnapshot.val();
+
+    // Siapkan update path untuk stok produk
+    const updates = {};
+
+    for (const item of products) {
+      const normalizedId = item.id.replace(/^B/, "");
+
+      const matchedEntry = Object.entries(productData).find(([, value]) => value?.id?.replace(/^B/, "") === normalizedId);
+
+      if (matchedEntry) {
+        const [productKey, productValue] = matchedEntry;
+        const currentQty = productValue?.qty || 0;
+        const newQty = currentQty - item?.cartQty;
+
+        updates[`product/${productKey}/qty`] = newQty;
+      } else {
+        console.warn(`Produk tidak ditemukan di database untuk ID: ${item.id}`);
+      }
+    }
+
+    // Lakukan update qty semua produk sekaligus
+    await update(ref(db), updates);
+
+    // Simpan transaksi
+    await set(transactionRef, {
+      ...data,
+      id: transactionID,
+      timestamp: serverTimestamp(),
     });
+
+    dispatch(setOpenSuccess(true));
+    dispatch(setReset());
+  } catch (error) {
+    console.error("Transaksi gagal:", error?.message);
+    dispatch(
+      setOpenFailed({
+        isOpen: true,
+        message: error?.message || "Transaksi gagal diproses.",
+      })
+    );
+  } finally {
+    dispatch(setLoading(false));
+  }
 };
 
-export const deleteTransaction = (id) => async (dispatch) => {
+export const deleteTransaction2 = (id) => async (dispatch) => {
   const db = getDatabase(dbConfig);
   const transaksiRef = ref(db, "transaction");
   const idQuery = query(transaksiRef, orderByChild("id"), equalTo(id));
@@ -88,29 +143,77 @@ export const deleteTransaction = (id) => async (dispatch) => {
               dispatch(setLoading());
             })
             .catch((error) => {
-              console.error("Error deleting transaksi:", error);
+              console.error("Error deleting transaction:", error);
               dispatch(setOpenFailed({ isOpen: true, message: "Gagal menghapus transaksi" }));
               dispatch(setLoading());
             });
         });
       } else {
-        console.log("Transaksi tidak ditemukan");
+        console.log("No transaction found");
         dispatch(setOpenFailed({ isOpen: true, message: "Transaksi tidak ditemukan" }));
         dispatch(setLoading());
       }
     })
     .catch((error) => {
-      console.error("Error saat mencari transaksi:", error);
+      console.error("Error finding transaction:", error);
       dispatch(setOpenFailed({ isOpen: true, message: "Gagal mencari transaksi" }));
       dispatch(setLoading());
     });
+};
+
+export const deleteTransaction = (id) => async (dispatch) => {
+  const db = getDatabase(dbConfig);
+  const transaksiRef = ref(db, "transaction");
+  const idQuery = query(transaksiRef, orderByChild("id"), equalTo(id));
+
+  try {
+    const snapshot = await get(idQuery);
+
+    if (!snapshot.exists()) {
+      dispatch(setOpenFailed({ isOpen: true, message: "Transaksi tidak ditemukan" }));
+      dispatch(setLoading());
+      return;
+    }
+
+    snapshot.forEach(async (childSnapshot) => {
+      const key = childSnapshot.key;
+      const transaksiData = childSnapshot.val();
+
+      const produkList = transaksiData?.product || {};
+
+      // Tambah qty kembali ke masing-masing produk
+      for (const [productKey, item] of Object.entries(produkList)) {
+        const productRef = ref(db, `product/${productKey.startsWith("BP") ? productKey.replace(/^B/, "") : productKey}`);
+        const productSnapshot = await get(productRef);
+
+        if (productSnapshot.exists()) {
+          const currentQty = productSnapshot.val().qty || 0;
+          const newQty = currentQty + item?.productQty;
+
+          await update(productRef, { qty: newQty });
+        }
+      }
+
+      // Setelah produk di-update, hapus transaksi
+      const dbRef = ref(db, `transaction/${key}`);
+      await remove(dbRef);
+
+      // Redux
+      dispatch(setOpenSuccessUpdate(true));
+      dispatch(setReset());
+      dispatch(setLoading());
+    });
+  } catch (error) {
+    console.error("Error saat memproses transaksi:", error);
+    dispatch(setOpenFailed({ isOpen: true, message: "Gagal memproses transaksi" }));
+    dispatch(setLoading());
+  }
 };
 
 export const fetchTransactionHistory = (time) => async (dispatch) => {
   const db = getDatabase(dbConfig);
   const dbRef = ref(db, "transaction");
   const now = new Date();
-
   const lastTimestamp = new Date(now.getFullYear(), now.getMonth(), now.getDate() - time).getTime();
   const transactionQuery = query(dbRef, orderByChild("timestamp"), startAt(lastTimestamp));
   try {

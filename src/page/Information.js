@@ -63,10 +63,10 @@ export default function Information() {
     return array;
   }
   function findCustomer(id) {
-    return Object.values(customer).find((customer) => customer.id === id);
+    return Object.values(customer).find((customer) => customer?.id === id);
   }
   function findProduct(id) {
-    return Object.values(product).find((product) => product.id === id);
+    return Object.values(product).find((product) => product?.id === id);
   }
   useEffect(() => {
     setAreaOmzet("All");
@@ -94,7 +94,7 @@ export default function Information() {
       }
 
       // tabel produk semua bulan
-      for (let i = 0; i < arr.length - 1; i++) {
+      for (let i = 0; i < arr?.length - 1; i++) {
         if (arr[i].getTime() < t?.timestamp && t?.timestamp < arr[i + 1].getTime()) {
           const product = t?.product;
           Object.entries(product).forEach(([p, value]) => {
@@ -111,10 +111,10 @@ export default function Information() {
     const totalPerBulan = [];
     const totalPerBulanGrafik = {};
     Object.values(product).forEach((p) => {
-      if (!totalPerBulanGrafik[p.id]) {
-        totalPerBulanGrafik[p.id] = [];
+      if (!totalPerBulanGrafik[p?.id]) {
+        totalPerBulanGrafik[p?.id] = [];
       }
-      const tempObject = { label: p.label, index: p.index, type: p.type, id: p.id };
+      const tempObject = { label: p?.label, index: p?.index, type: p?.type, id: p?.id };
       Object.keys(tempDataLusin).forEach((m, idx) => {
         if (tempObject[`M${m}`] === undefined) tempObject[`M${m}`] = tempDataLusin[m][p.id] || 0;
         else tempObject[`M${m}`] += tempDataLusin[m][p.id];
@@ -229,7 +229,7 @@ export default function Information() {
     return { value: { month: a?.getMonth(), year: a?.getFullYear() }, label: `${monthNames[a?.getMonth()]} ${a?.getFullYear()}` };
   });
   let selectProduct = Object.values(product).map((a) => {
-    return { value: a.id, label: a.label };
+    return { value: a?.id, label: a?.label };
   });
   return (
     <Box sx={{ width: "100%", height: "100%", display: "flex", justifyContent: "space-between" }}>
@@ -258,7 +258,7 @@ export default function Information() {
                 <Typography sx={{ fontFamily: "poppins", fontSize: 18, fontWeight: "bold", color: "#12141E" }}>Input Bulan</Typography>
 
                 <TextField id="select-bulan-lusin" select sx={{ width: "200px" }} value={JSON.stringify(bulanLusin)} onChange={(e) => setBulanLusin(JSON.parse(e.target.value))}>
-                  {selectMonth.map((item, index) => (
+                  {selectMonth?.map((item, index) => (
                     <MenuItem value={JSON.stringify(item?.value)} key={index}>
                       {item?.label}
                     </MenuItem>
@@ -317,7 +317,7 @@ export default function Information() {
               <TextField id="select-area" select sx={{ width: "200px" }} value={areaOmzet} onChange={(e) => setAreaOmzet(e.target.value)}>
                 {[{ value: "All", label: "Semua" }, ...AREA_SELECT].map((item, index) => (
                   <MenuItem value={item?.value} key={index}>
-                    {item.label}
+                    {item?.label}
                   </MenuItem>
                 ))}
               </TextField>
@@ -367,9 +367,9 @@ export default function Information() {
             </Grid>
             <Grid item sx={{ display: "flex", alignItems: "center" }}>
               <TextField id="select-area" select sx={{ width: "400px" }} value={productID} onChange={(e) => setProductID(e.target.value)}>
-                {selectProduct.map((item, index) => (
+                {selectProduct?.map((item, index) => (
                   <MenuItem value={item?.value} key={index}>
-                    {item.label}
+                    {item?.label}
                   </MenuItem>
                 ))}
               </TextField>

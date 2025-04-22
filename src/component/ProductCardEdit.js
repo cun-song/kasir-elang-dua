@@ -12,7 +12,10 @@ export default function ProductCardEdit({ product, disabled = false, edit = () =
       <Grid item width={"55%"} height={"100%"}>
         <Grid item marginBottom={3}>
           <Typography sx={{ fontFamily: "poppins", fontSize: 20, fontWeight: "bold", color: "#12141E" }}>{product?.label}</Typography>
-          <Typography sx={{ fontFamily: "nunito", fontSize: 16, fontWeight: "semibold", color: "#6D6F75" }}>Rp {formattedValue}</Typography>
+          <Grid item container gap={5}>
+            <Typography sx={{ fontFamily: "nunito", fontSize: 16, fontWeight: "semibold", color: "#6D6F75" }}>Rp {formattedValue}</Typography>
+            <Typography sx={{ fontFamily: "nunito", fontSize: 16, fontWeight: "semibold", color: "#6D6F75" }}>Qty: {product?.qty}</Typography>
+          </Grid>
         </Grid>
 
         <Grid item container justifyContent={"center"}>

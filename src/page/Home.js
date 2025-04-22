@@ -113,6 +113,7 @@ export default function Home() {
           type: product[index]?.type,
           price: product[index]?.price,
           productQty: 1,
+          qty: product[index]?.qty,
           index: product[index]?.index,
           totalLusin: product[index]?.totalLusin,
         },
@@ -217,6 +218,7 @@ export default function Home() {
       dispatch(setBonusData([{ productID: null, label: null, qty: null }]));
       dispatch(setDiskon({ besar: 0, kecil: 0 }));
       dispatch(setTransactionCustomer({ customerID: "", ownerName: "", merchantName: "" }));
+      dispatch(fetchProductData());
     }
   }, [refresh]);
 
@@ -248,6 +250,7 @@ export default function Home() {
             size: item?.size,
             type: item?.type,
             index: item?.index,
+            qty: item?.qty,
             price: 0,
             productQty: bd?.qty,
             totalLusin: item?.totalLusin,
@@ -407,7 +410,9 @@ export default function Home() {
               label={product?.label}
               img={product?.img}
               price={product?.price}
+              qty={product?.qty}
               cartQty={cart[product?.id]?.productQty ?? 0}
+              bonusQty={listCart[`B${product?.id}`]?.productQty ?? 0}
               add={() => add(idx, product?.id)}
               write={(qty) => edit(qty, product?.id)}
               subtract={() => subtract(product?.id)}

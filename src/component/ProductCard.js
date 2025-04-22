@@ -4,14 +4,13 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import RemoveCircleIcon from "@mui/icons-material/RemoveCircle";
 import { formattedNumber } from "../utils/stingFormatted";
 
-export default function ProductCard({ label, img, price, cartQty, add = () => {}, subtract = () => {}, write = () => {} }) {
+export default function ProductCard({ label, img, price, qty, cartQty, bonusQty, add = () => {}, subtract = () => {}, write = () => {} }) {
   const formattedValue = formattedNumber(price);
   const [tempQty, setTempQty] = useState(cartQty);
   const [refresh, setRefresh] = useState(true);
   const tempQtyRef = useRef(tempQty);
   const ref = useRef();
   const isMobile = useMediaQuery("(max-width: 600px)");
-
   useEffect(() => {
     // Update the ref with the latest tempQty whenever it changes
     tempQtyRef.current = tempQty;
@@ -39,18 +38,29 @@ export default function ProductCard({ label, img, price, cartQty, add = () => {}
   useEffect(() => {
     write(roundToNearestHalf(tempQtyRef.current));
   }, [refresh]);
+
   function roundToNearestHalf(value) {
     if (value === "") return 0;
     const num = parseFloat(value);
+    if (isNaN(num)) return 0;
 
     const roundedNum = Math.round(num * 2) / 2;
 
-    return roundedNum;
+    return roundedNum > qty ? qty : roundedNum;
   }
-  function writing(qty) {
-    const regex = /^[0-9]*\.?[0-9]*$/; // Regular expression to match 0-9 and a single period
-    if (regex.test(qty)) {
-      setTempQty(qty);
+  function writing(value) {
+    const regex = /^[0-9]*\.?[0-9]*$/; // Angka dan satu titik desimal
+    if (regex.test(value)) {
+      const parsed = parseFloat(value);
+      if (!isNaN(parsed)) {
+        if (parsed + bonusQty > qty) {
+          setTempQty(qty - bonusQty);
+        } else {
+          setTempQty(value);
+        }
+      } else {
+        setTempQty(value); // Untuk menangani kasus "" (empty string)
+      }
     }
   }
 
@@ -62,7 +72,10 @@ export default function ProductCard({ label, img, price, cartQty, add = () => {}
       <Grid item width={isMobile ? "100%" : "55%"} height={"100%"}>
         <Grid item marginBottom={3}>
           <Typography sx={{ fontFamily: "poppins", fontSize: isMobile ? 14 : 20, fontWeight: "bold", color: "#12141E" }}>{label}</Typography>
-          <Typography sx={{ fontFamily: "nunito", fontSize: 16, fontWeight: "semibold", color: "#6D6F75" }}>Rp {formattedValue}</Typography>
+          <Grid item container gap={5}>
+            <Typography sx={{ fontFamily: "nunito", fontSize: 16, fontWeight: "semibold", color: "#6D6F75" }}>Rp {formattedValue}</Typography>
+            <Typography sx={{ fontFamily: "nunito", fontSize: 16, fontWeight: "semibold", color: "#6D6F75" }}>Qty: {qty}</Typography>
+          </Grid>
         </Grid>
         {cartQty === 0 ? (
           <Grid item container justifyContent={"center"}>
@@ -96,7 +109,12 @@ export default function ProductCard({ label, img, price, cartQty, add = () => {}
               size="small"
             />
             {/* <Typography >{cartQty}</Typography> */}
-            <IconButton sx={{ width: "50px", height: "50px" }} onClick={add}>
+            <IconButton
+              sx={{ width: "50px", height: "50px" }}
+              onClick={() => {
+                if (cartQty + bonusQty < qty) add();
+              }}
+            >
               <AddCircleIcon sx={{ color: "#E06F2C", width: "50px", height: "50px" }} />
             </IconButton>
           </Grid>
