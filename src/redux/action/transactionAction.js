@@ -1,10 +1,11 @@
-import { getDatabase, ref, get, push, set, serverTimestamp, child, query, orderByChild, startAt, update, equalTo, remove } from "firebase/database";
+import { getDatabase, ref, get, push, set, serverTimestamp, child, query, orderByChild, startAt, update, equalTo, remove,onValue } from "firebase/database";
 import dbConfig, { storage, database } from "../../config/fbConfig";
 import { getDownloadURL, ref as storageRef, uploadBytes } from "firebase/storage";
 import { FieldValue } from "firebase/firestore";
 import { setOpenFailed, setOpenFailedUpdate, setOpenSuccess, setOpenSuccessUpdate, setReset, setTransactionHistory, settra } from "../transactionReducer";
 import { setLoading } from "../sidenavReducer";
 import { v4 as uuidv4 } from "uuid";
+import dayjs from 'dayjs';
 
 function generateString(number) {
   // Convert the number to a string
@@ -332,4 +333,32 @@ export const sendPdfToFirebaseJob = async (pdfBlob) => {
     console.error("Gagal mengirim ke print server:", error);
     return { success: false, error };
   }
+};
+export const getServerTimeGMT7 = async () => {
+  return new Promise((resolve, reject) => {
+    try {
+      const db = getDatabase();
+      const timeRef = ref(db, 'utils/serverTime');
+
+      // Trigger penulisan waktu server
+      set(timeRef, serverTimestamp());
+
+      // Ambil waktu server setelah tersimpan
+      onValue(timeRef, (snapshot) => {
+        const timestamp = snapshot.val();
+        if (timestamp) {
+          // Konversi dari UNIX timestamp ke objek dayjs
+          const serverTime = dayjs(timestamp);
+          // Tambahkan offset +7 jam
+          const gmt7Time = serverTime.utcOffset(7 * 60); // 7*60 menit
+
+          resolve(gmt7Time);
+        } else {
+          reject(new Error('Server timestamp not available'));
+        }
+      }, { onlyOnce: true });
+    } catch (error) {
+      reject(error);
+    }
+  });
 };

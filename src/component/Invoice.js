@@ -11,7 +11,7 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import "dayjs/locale/id"; // Import Indonesian locale
-import { deleteTransaction } from "../redux/action/transactionAction";
+import { deleteTransaction,getServerTimeGMT7 } from "../redux/action/transactionAction";
 import { setLoading } from "../redux/sidenavReducer";
 import { useDispatch, useSelector } from "react-redux";
 import DialogConfirmation from "./DialogConfirmation";
@@ -87,7 +87,12 @@ const Invoice = ({ transaction, customer, total, grandTotal, discount, totalQty,
   dayjs.locale("id");
 
   function formatDate(dateString) {
-    return dateString.format("D MMMM YYYY");
+    if (!dateString || typeof dateString !== 'object' || typeof dateString.format !== 'function') {
+      return 'nun';
+    }
+  
+    return dateString.format('D MMMM YYYY');
+  
   }
 
   const myTimezone = "Asia/Jakarta";
@@ -109,6 +114,13 @@ const Invoice = ({ transaction, customer, total, grandTotal, discount, totalQty,
       setOpenConfirmation(false);
     }
   }, [refresh]);
+  useEffect(() => {
+    getServerTimeGMT7()
+      .then((gmt7Time) => {
+        setDate(gmt7Time)
+      })
+      .catch(console.error);
+  }, []);
   //product length paling banyak 11
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
@@ -262,7 +274,7 @@ const Invoice = ({ transaction, customer, total, grandTotal, discount, totalQty,
 
       <Box sx={{ display: "flex", alignItems: "center", width: "100%" }}>
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="id">
-          <DatePicker sx={{ marginLeft: 2, mr: 46 }} defaultValue={today} disablePast views={["year", "month", "day"]} format="DD MMMM YYYY" onChange={(e) => setDate(e)} />
+          <DatePicker sx={{ marginLeft: 2, mr: 46 }} value={date} disablePast views={["year", "month", "day"]} format="DD MMMM YYYY" onChange={(e) => setDate(e)} />
         </LocalizationProvider>
         <Button onClick={Print} sx={{ backgroundColor: "#E06F2C", ":hover": { backgroundColor: "#E06F2C" }, width: "150px", height: "48px", borderRadius: "28px", textTransform: "none" }} variant="contained">
           Print

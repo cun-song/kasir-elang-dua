@@ -14,7 +14,7 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import "dayjs/locale/id"; // Import Indonesian locale
-import { sendPdfToFirebaseJob } from "../redux/action/transactionAction";
+import { sendPdfToFirebaseJob,getServerTimeGMT7 } from "../redux/action/transactionAction";
 const css = {
   titleHeader: {
     fontSize: "20px",
@@ -80,9 +80,14 @@ const css = {
     fontFamily: "Courier New",
   },
 };
-
 function formatDate(dateString) {
-  return dateString.format("D MMMM YYYY");
+  // Cek jika falsy atau bukan objek dayjs yang valid
+  if (!dateString || typeof dateString !== 'object' || typeof dateString.format !== 'function') {
+    return 'nun';
+  }
+
+  return dateString.format('D MMMM YYYY');
+
 }
 
 const Table = ({ data, date }) => {
@@ -325,6 +330,7 @@ export const BulkPrinting = ({ data, dataRangkuman }) => {
   const printRef = useRef();
   const printTotalRef = useRef();
   const authName = useSelector((state) => state.sidenav.name);
+  
 
   const Print = useReactToPrint({
     onBeforePrint: () => dispatch(setLoading()),
@@ -369,6 +375,13 @@ export const BulkPrinting = ({ data, dataRangkuman }) => {
       // y: 10,
     });
   };
+  useEffect(() => {
+    getServerTimeGMT7()
+      .then((gmt7Time) => {
+        setDate(gmt7Time)
+      })
+      .catch(console.error);
+  }, []);
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
       <div ref={printRef} className="hide-on-screen">
@@ -386,7 +399,7 @@ export const BulkPrinting = ({ data, dataRangkuman }) => {
       </div>
       <Box sx={{ display: "flex", alignItems: "center", width: "100%", justifyContent: "space-between" }}>
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="id">
-          <DatePicker sx={{ marginLeft: 2, mr: 6 }} defaultValue={today} disablePast views={["year", "month", "day"]} format="DD MMMM YYYY" onChange={(e) => setDate(e)} />
+          <DatePicker sx={{ marginLeft: 2, mr: 6 }} value={date} disablePast views={["year", "month", "day"]} format="DD MMMM YYYY" onChange={(e) => setDate(e)} />
         </LocalizationProvider>
         <Button
           onClick={isMobile ? generatePDFAndUpload : Print}
