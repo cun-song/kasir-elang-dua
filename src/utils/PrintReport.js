@@ -107,7 +107,7 @@ export const PrintLusin = ({ doc, sumLusin, date, area }) => {
             ))}
           </tbody>
         </table>
-        <p style={{ fontSize: "20px",marginTop:-6px }}>Total Lusin : {decimalToFraction(sumLusin)} Lusin</p>
+        <p style={{ fontSize: "20px",marginTop:"-6px" }}>Total Lusin : {decimalToFraction(sumLusin)} Lusin</p>
       </div>
       <Box>
         <Button onClick={Print} sx={{ backgroundColor: "#E06F2C", ":hover": { backgroundColor: "#E06F2C" }, width: "150px", height: "48px", borderRadius: "28px", textTransform: "none" }} variant="contained">
