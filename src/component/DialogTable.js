@@ -1,10 +1,14 @@
 import React, { useEffect } from "react";
-import { Box, DialogActions, DialogContent, Divider, Grid, Typography } from "@mui/material";
+import { Box, DialogActions, DialogContent, Button, Grid, Typography, useMediaQuery } from "@mui/material";
 import StyledDialog from "./StyledDialog";
 import { useState } from "react";
 import StyledTable from "./StyledTable";
 import { convertTimestamp, decimalToFraction, formattedNumber } from "../utils/stingFormatted";
 import Invoice from "./Invoice";
+import { useDispatch } from "react-redux";
+import { pushToPrintQueue } from "../redux/action/transactionAction";
+import { setLoading } from "../redux/sidenavReducer";
+
 const center = {
   headerAlign: "center",
   align: "center",
@@ -76,10 +80,6 @@ const HEADER = [
     },
   },
 ];
-const style = {
-  textCheckout: { fontFamily: "poppins", fontSize: "16px", fontWeight: "medium", color: "#12141E" },
-  grandTotal: { fontFamily: "poppins", fontSize: "20px", fontWeight: "bold", color: "#12141E" },
-};
 
 export default function DialogTable({ open = false, handleToggle, data, customer, time, idTransaction, adminName }) {
   const [page, setPage] = useState(0);
@@ -90,10 +90,32 @@ export default function DialogTable({ open = false, handleToggle, data, customer
   const formattedTotal = formattedNumber(total);
   const formattedDiscount = formattedNumber(disc);
   const formattedGrandTotal = formattedNumber(total - disc);
+  const isMobile = useMediaQuery("(max-width: 600px)");
+  const dispatch = useDispatch();
+
+  const style = {
+    textCheckout: { fontFamily: "poppins", fontSize: isMobile ? "14px" : "16px", fontWeight: "medium", color: "#12141E" },
+    grandTotal: { fontFamily: "poppins", fontSize: isMobile ? "16px" : "20px", fontWeight: "bold", color: "#12141E" },
+  };
+  function printStruk() {
+    const printData = {
+      adminName: adminName,
+      discount: customer?.discount,
+      id: idTransaction,
+      lusin: totalQty,
+      merchantName: customer?.merchantName || "",
+      ownerName: customer?.ownerName || "",
+      product: data,
+      subtotal: total,
+      totalDisc: disc,
+    };
+    dispatch(setLoading());
+    dispatch(pushToPrintQueue(printData));
+  }
   return (
     <StyledDialog isOpen={open} handleToggle={handleToggle} useCloseBtn width="80%" title="Detail Transaksi">
       <DialogContent sx={{ mt: 2 }}>
-        <Box sx={{ display: "flex", justifyContent: "space-between", mb: 2 }}>
+        <Box sx={{ display: isMobile ? "block" : "flex", justifyContent: "space-between", mb: 2 }}>
           <Box>
             <Typography sx={style.textCheckout}>No Invoice : {idTransaction}</Typography>
             <Typography sx={style.textCheckout}>Admin : {adminName}</Typography>
@@ -101,28 +123,28 @@ export default function DialogTable({ open = false, handleToggle, data, customer
           <Typography sx={style.textCheckout}>Waktu : {convertTimestamp(time)}</Typography>
         </Box>
         <StyledTable headers={HEADER} rows={data} page={page} setPage={(e) => setPage(e)} pageSize={currRowsPerPage} setPageSizeChange={(e) => setCurrRowsPerPage(e)} rowCount={data?.length} paginationMode="client" />
-        <Grid sx={{ display: "flex", width: "100%", mt: 4, px: 2, alignItems: "flex-end" }}>
-          <Grid item width={"75%"} sx={{ display: "flex" }}>
+        <Grid sx={{ display: isMobile ? "block" : "flex", width: "100%", mt: 4, px: isMobile ? 0 : 2, alignItems: "flex-end" }}>
+          <Grid item width={isMobile ? "100%" : "75%"} sx={{ display: "flex" }}>
             <Grid item>
               <Typography sx={style.textCheckout}>Nama Pelanggan</Typography>
               <Typography sx={style.textCheckout}>Nama Toko</Typography>
               <Typography sx={style.textCheckout}>Daerah</Typography>
               <Typography sx={style.textCheckout}>Alamat</Typography>
             </Grid>
-            <Grid item sx={{ ml: 2 }}>
+            <Grid item sx={{ ml: isMobile ? 1 : 2 }}>
               <Typography sx={style.textCheckout}>:</Typography>
               <Typography sx={style.textCheckout}>:</Typography>
               <Typography sx={style.textCheckout}>:</Typography>
               <Typography sx={style.textCheckout}>:</Typography>
             </Grid>
-            <Grid item sx={{ ml: 4 }}>
+            <Grid item sx={{ ml: isMobile ? 1 : 4 }}>
               <Typography sx={style.textCheckout}>{customer?.ownerName}</Typography>
               <Typography sx={style.textCheckout}>{customer?.merchantName}</Typography>
               <Typography sx={style.textCheckout}>{customer?.area}</Typography>
               <Typography sx={style.textCheckout}>{customer?.address}</Typography>
             </Grid>
           </Grid>
-          <Grid item xs={6} width={"25%"}>
+          <Grid item xs={6} width={isMobile ? "100%" : "25%"} mt={isMobile ? 2 : 0}>
             <Grid item sx={{ display: "flex", justifyContent: "space-between" }}>
               <Grid item>
                 <Typography sx={style.textCheckout}>Total</Typography>
@@ -139,8 +161,18 @@ export default function DialogTable({ open = false, handleToggle, data, customer
             </Grid>
           </Grid>
         </Grid>
-        <Grid sx={{ mt: 4 }}>
-          <Invoice transaction={data} customer={customer} total={formattedTotal} grandTotal={formattedGrandTotal} discount={formattedDiscount} totalQty={totalQty} idTransaction={idTransaction} adminName={adminName} />
+        <Grid sx={{ mt: 4 }} container justifyContent={isMobile ? "center" : "flex-start"}>
+          {isMobile ? (
+            <Button
+              onClick={() => printStruk()}
+              sx={{ backgroundColor: "#E06F2C", ":hover": { backgroundColor: "#E06F2C" }, width: "120px", height: "36px", borderRadius: "24px", textTransform: "none", fontSize: "14px" }}
+              variant="contained"
+            >
+              Print Struk
+            </Button>
+          ) : (
+            <Invoice transaction={data} customer={customer} total={formattedTotal} grandTotal={formattedGrandTotal} discount={formattedDiscount} totalQty={totalQty} idTransaction={idTransaction} adminName={adminName} />
+          )}
         </Grid>
       </DialogContent>
       <DialogActions></DialogActions>

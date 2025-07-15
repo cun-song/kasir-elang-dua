@@ -65,14 +65,14 @@ export default function ProductCard({ label, img, price, qty, cartQty, bonusQty,
   }
 
   return (
-    <Grid container alignItems={"center"} sx={{ backgroundColor: "#FFFFFF", p: 3, width: "48%", height: isMobile ? "380px" : "15%", borderRadius: 4 }} gap={3}>
+    <Grid container alignItems={"center"} sx={{ backgroundColor: "#FFFFFF", p: 3, width: "48%", height: isMobile ? "450px" : "15%", borderRadius: 4 }} gap={3}>
       <Grid item width={isMobile ? "100%" : "40%"} height={isMobile ? "140px" : "210px"}>
         <img src={img} alt={label} width={"100%"} height={"100%"} style={{ objectFit: "contain" }} />
       </Grid>
       <Grid item width={isMobile ? "100%" : "55%"} height={"100%"}>
         <Grid item marginBottom={3}>
           <Typography sx={{ fontFamily: "poppins", fontSize: isMobile ? 14 : 20, fontWeight: "bold", color: "#12141E" }}>{label}</Typography>
-          <Grid item container gap={5}>
+          <Grid item display={isMobile ? "block" : "flex"} gap={5}>
             <Typography sx={{ fontFamily: "nunito", fontSize: 16, fontWeight: "semibold", color: "#6D6F75" }}>Rp {formattedValue}</Typography>
             <Typography sx={{ fontFamily: "nunito", fontSize: 16, fontWeight: "semibold", color: "#6D6F75" }}>Qty: {qty}</Typography>
           </Grid>

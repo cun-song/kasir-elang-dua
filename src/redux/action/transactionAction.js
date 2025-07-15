@@ -1,11 +1,11 @@
-import { getDatabase, ref, get, push, set, serverTimestamp, child, query, orderByChild, startAt, update, equalTo, remove,onValue } from "firebase/database";
+import { getDatabase, ref, get, push, set, serverTimestamp, child, query, orderByChild, startAt, update, equalTo, remove, onValue } from "firebase/database";
 import dbConfig, { storage, database } from "../../config/fbConfig";
 import { getDownloadURL, ref as storageRef, uploadBytes } from "firebase/storage";
 import { FieldValue } from "firebase/firestore";
 import { setOpenFailed, setOpenFailedUpdate, setOpenSuccess, setOpenSuccessUpdate, setReset, setTransactionHistory, settra } from "../transactionReducer";
 import { setLoading } from "../sidenavReducer";
 import { v4 as uuidv4 } from "uuid";
-import dayjs from 'dayjs';
+import dayjs from "dayjs";
 
 function generateString(number) {
   // Convert the number to a string
@@ -126,41 +126,41 @@ export const pushTransaction = (data) => async (dispatch) => {
   }
 };
 
-export const deleteTransaction2 = (id) => async (dispatch) => {
-  const db = getDatabase(dbConfig);
-  const transaksiRef = ref(db, "transaction");
-  const idQuery = query(transaksiRef, orderByChild("id"), equalTo(id));
+// export const deleteTransaction2 = (id) => async (dispatch) => {
+//   const db = getDatabase(dbConfig);
+//   const transaksiRef = ref(db, "transaction");
+//   const idQuery = query(transaksiRef, orderByChild("id"), equalTo(id));
 
-  get(idQuery)
-    .then((snapshot) => {
-      if (snapshot.exists()) {
-        snapshot.forEach((childSnapshot) => {
-          const key = childSnapshot.key;
-          const dbRef = ref(db, `transaction/${key}`);
-          remove(dbRef)
-            .then(() => {
-              dispatch(setOpenSuccessUpdate(true));
-              dispatch(setReset());
-              dispatch(setLoading());
-            })
-            .catch((error) => {
-              console.error("Error deleting transaction:", error);
-              dispatch(setOpenFailed({ isOpen: true, message: "Gagal menghapus transaksi" }));
-              dispatch(setLoading());
-            });
-        });
-      } else {
-        console.log("No transaction found");
-        dispatch(setOpenFailed({ isOpen: true, message: "Transaksi tidak ditemukan" }));
-        dispatch(setLoading());
-      }
-    })
-    .catch((error) => {
-      console.error("Error finding transaction:", error);
-      dispatch(setOpenFailed({ isOpen: true, message: "Gagal mencari transaksi" }));
-      dispatch(setLoading());
-    });
-};
+//   get(idQuery)
+//     .then((snapshot) => {
+//       if (snapshot.exists()) {
+//         snapshot.forEach((childSnapshot) => {
+//           const key = childSnapshot.key;
+//           const dbRef = ref(db, `transaction/${key}`);
+//           remove(dbRef)
+//             .then(() => {
+//               dispatch(setOpenSuccessUpdate(true));
+//               dispatch(setReset());
+//               dispatch(setLoading());
+//             })
+//             .catch((error) => {
+//               console.error("Error deleting transaction:", error);
+//               dispatch(setOpenFailed({ isOpen: true, message: "Gagal menghapus transaksi" }));
+//               dispatch(setLoading());
+//             });
+//         });
+//       } else {
+//         console.log("No transaction found");
+//         dispatch(setOpenFailed({ isOpen: true, message: "Transaksi tidak ditemukan" }));
+//         dispatch(setLoading());
+//       }
+//     })
+//     .catch((error) => {
+//       console.error("Error finding transaction:", error);
+//       dispatch(setOpenFailed({ isOpen: true, message: "Gagal mencari transaksi" }));
+//       dispatch(setLoading());
+//     });
+// };
 
 export const deleteTransaction = (id) => async (dispatch) => {
   const db = getDatabase(dbConfig);
@@ -338,27 +338,52 @@ export const getServerTimeGMT7 = async () => {
   return new Promise((resolve, reject) => {
     try {
       const db = getDatabase();
-      const timeRef = ref(db, 'utils/serverTime');
+      const timeRef = ref(db, "utils/serverTime");
 
       // Trigger penulisan waktu server
       set(timeRef, serverTimestamp());
 
       // Ambil waktu server setelah tersimpan
-      onValue(timeRef, (snapshot) => {
-        const timestamp = snapshot.val();
-        if (timestamp) {
-          // Konversi dari UNIX timestamp ke objek dayjs
-          const serverTime = dayjs(timestamp);
-          // Tambahkan offset +7 jam
-          const gmt7Time = serverTime.utcOffset(7 * 60); // 7*60 menit
+      onValue(
+        timeRef,
+        (snapshot) => {
+          const timestamp = snapshot.val();
+          if (timestamp) {
+            // Konversi dari UNIX timestamp ke objek dayjs
+            const serverTime = dayjs(timestamp);
+            // Tambahkan offset +7 jam
+            const gmt7Time = serverTime.utcOffset(7 * 60); // 7*60 menit
 
-          resolve(gmt7Time);
-        } else {
-          reject(new Error('Server timestamp not available'));
-        }
-      }, { onlyOnce: true });
+            resolve(gmt7Time);
+          } else {
+            reject(new Error("Server timestamp not available"));
+          }
+        },
+        { onlyOnce: true }
+      );
     } catch (error) {
       reject(error);
     }
   });
+};
+
+export const pushToPrintQueue = (data) => async (dispatch) => {
+  const db = getDatabase();
+  const printRef = push(ref(db, "printQueue"));
+
+  try {
+    // Prepare data untuk Firebase
+    const printJobData = {
+      ...data,
+      status: "pending",
+      createdAt: serverTimestamp(),
+    };
+    await set(printRef, {
+      ...printJobData,
+    });
+  } catch (error) {
+    console.error("❌ Error pushing to print queue:", error);
+  } finally {
+    dispatch(setLoading(false));
+  }
 };

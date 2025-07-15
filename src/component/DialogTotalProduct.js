@@ -4,7 +4,6 @@ import StyledDialog from "./StyledDialog";
 import { useState } from "react";
 import StyledTable from "./StyledTable";
 import { convertTimestamp, decimalToFraction, formattedNumber } from "../utils/stingFormatted";
-import Invoice from "./Invoice";
 const center = {
   headerAlign: "center",
   align: "center",
