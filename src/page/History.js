@@ -44,10 +44,10 @@ export default function History() {
   const [labelConfirmation, setLabelConfirmation] = useState("");
   const [printData, setPrintData] = useState(null);
 
-  const transaction = useSelector((state) => state.transaction.transactionHistory);
+  const transaction = useSelector((state) => state?.transaction?.transactionHistory);
   const customer = useSelector((state) => state?.customer?.allCustomer);
-  const transactionSuccess = useSelector((state) => state.transaction.openSuccessUpdate);
-  const transactionFailed = useSelector((state) => state.transaction.openFailedUpdate);
+  const transactionSuccess = useSelector((state) => state?.transaction?.openSuccessUpdate);
+  const transactionFailed = useSelector((state) => state?.transaction?.openFailedUpdate);
   const refresh = useSelector((state) => state?.transaction?.reset);
   const isMobile = useMediaQuery("(max-width: 600px)");
 
@@ -66,23 +66,23 @@ export default function History() {
   }, [refresh]);
 
   useEffect(() => {
-    let tempData = Object.values(transaction).map((t) => {
+    let tempData = Object.values(transaction)?.map((t) => {
       return { ...t, area: findCustomer(t?.customerID)?.area };
     });
     const field = sortData[0]?.field ?? "id";
     const sort = sortData[0]?.sort ?? "desc";
     if (field === "id") {
       tempData.sort((a, b) => {
-        const numA = parseInt(a.id.substring(1), 10);
-        const numB = parseInt(b.id.substring(1), 10);
+        const numA = parseInt(a?.id.substring(1), 10);
+        const numB = parseInt(b?.id.substring(1), 10);
         return sort === "asc" ? numA - numB : numB - numA;
       });
     } else if (field === "ownerName" || field === "merchantName" || field === "area") {
-      tempData.sort((a, b) => {
-        return sort === "asc" ? a[field].localeCompare(b[field]) : b[field].localeCompare(a[field]);
+      tempData?.sort((a, b) => {
+        return sort === "asc" ? a[field]?.localeCompare(b[field]) : b[field]?.localeCompare(a[field]);
       });
     } else if (field === "discount") {
-      tempData.sort((a, b) => {
+      tempData?.sort((a, b) => {
         const numA = a[field]?.total ?? 0;
         const numB = b[field]?.total ?? 0;
         return sort === "asc" ? numA - numB : numB - numA;
@@ -97,10 +97,10 @@ export default function History() {
 
     if (searchData?.column === "all") {
       tempData = tempData.filter((transaction) => {
-        return Object.keys(transaction).some((key) => key !== "timestamp" && String(transaction[key]).toLowerCase().includes(searchData?.text.toLowerCase()));
+        return Object.keys(transaction).some((key) => key !== "timestamp" && String(transaction[key])?.toLowerCase().includes(searchData?.text?.toLowerCase()));
       });
     } else {
-      tempData = tempData.filter((transaction) => {
+      tempData = tempData?.filter((transaction) => {
         return String(transaction[searchData?.column]).toLowerCase().includes(searchData?.text.toLowerCase());
       });
     }
@@ -123,12 +123,12 @@ export default function History() {
       .sort((a, b) => {
         const numA = td[a]?.index;
         const numB = td[b]?.index;
-        if (a.startsWith("P") && b.startsWith("B")) return -1;
-        if (a.startsWith("B") && b.startsWith("P")) return 1;
+        if (a?.startsWith("P") && b?.startsWith("B")) return -1;
+        if (a?.startsWith("B") && b?.startsWith("P")) return 1;
         if (numA !== null && numB !== null && numA !== numB) {
           return numA - numB;
         }
-        return a.localeCompare(b);
+        return a?.localeCompare(b);
       })
       .map((key) => ({
         id: key,
@@ -145,10 +145,10 @@ export default function History() {
       }));
   }
   function findCustomer(id) {
-    return Object.values(customer).find((customer) => customer.id === id);
+    return Object.values(customer).find((customer) => customer?.id === id);
   }
   function findTransaction(id) {
-    return Object.values(historyData).find((transaction) => transaction.id === id);
+    return Object.values(historyData).find((transaction) => transaction?.id === id);
   }
 
   function handleRowClick(data, e) {
@@ -172,8 +172,8 @@ export default function History() {
     const arr = [...selectionData];
     const temp = arr
       .sort((a, b) => {
-        const numA = parseInt(a.slice(1), 10);
-        const numB = parseInt(b.slice(1), 10);
+        const numA = parseInt(a?.slice(1), 10);
+        const numB = parseInt(b?.slice(1), 10);
         return numB - numA;
       })
       .map((key) => {
@@ -279,7 +279,7 @@ export default function History() {
           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: isMobile ? "left" : "center", flexDirection: isMobile ? "column-reverse" : "row", gap: isMobile ? 2 : 0 }}>
             <Box sx={{ display: "flex", gap: isMobile ? 2 : 5, flexDirection: isMobile ? "column" : "row" }}>
               <StyledSearch selectMenuItems={TRANSACTION_SEARCH_ITEM} handleSearchClick={(e) => handleSearchClick(e)} isResetSearch={isResetSearch} setIsResetSearch={setIsResetSearch} />
-              <ButtonGroup size="large" sx={{ display: selectionData.length === 0 ? "none" : "block" }}>
+              <ButtonGroup size="large" sx={{ display: selectionData?.length === 0 ? "none" : "block" }}>
                 {buttons}
               </ButtonGroup>
             </Box>
@@ -295,11 +295,11 @@ export default function History() {
                   },
                 }}
                 value={lastDate}
-                onChange={(e) => onLastDateChange(e.target.value)}
+                onChange={(e) => onLastDateChange(e?.target?.value)}
               >
                 {LAST_DATE_LIST.map((option) => (
-                  <MenuItem key={option.value} value={option.value}>
-                    {option.label}
+                  <MenuItem key={option?.value} value={option?.value}>
+                    {option?.label}
                   </MenuItem>
                 ))}
               </TextField>
