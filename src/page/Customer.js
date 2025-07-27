@@ -26,7 +26,7 @@ export default function Customer() {
   const [searchData, setSearchData] = useState(null);
   const [sortData, setSortData] = useState([]);
   const [customerData, setCustomerData] = useState([]);
-  const [dataEdit,setDataEdit] = useState({});
+  const [dataEdit, setDataEdit] = useState({});
 
   const customer = useSelector((state) => state?.customer?.allCustomer);
   const customerSuccess = useSelector((state) => state?.customer?.openSuccessCustomer);
@@ -43,9 +43,9 @@ export default function Customer() {
   useEffect(() => {
     if (customerSuccess) {
       setOpenAdd(false);
-      setOpenEdit(false)
+      setOpenEdit(false);
       dispatch(fetchCustomerData());
-      setDataEdit({})
+      setDataEdit({});
     }
   }, [refresh]);
 
@@ -89,7 +89,7 @@ export default function Customer() {
       e.stopPropagation();
     } else {
       setDataEdit(data);
-      setOpenEdit(true)
+      setOpenEdit(true);
     }
   }
 
@@ -116,14 +116,14 @@ export default function Customer() {
               setPageSizeChange={(e) => setCurrRowsPerPage(e)}
               rowCount={customerData?.length}
               paginationMode="client"
-              onCellClick={role === "Super Admin" ? (data, e) => handleRowClick(data, e):false}
+              onCellClick={role === "Super Admin" ? (data, e) => handleRowClick(data, e) : false}
               onSortModelChange={(data) => handleSortChange(data)}
             />
           </Box>
         </Box>
       </Box>
       <DialogCustomer open={openAdd} handleToggle={() => setOpenAdd((prev) => !prev)} mode={"ADD"} />
-      <DialogCustomer open={openEdit} handleToggle={() => setOpenEdit((prev) => !prev)} mode={"EDIT"} data={dataEdit?.row}/>
+      <DialogCustomer open={openEdit} handleToggle={() => setOpenEdit((prev) => !prev)} mode={"EDIT"} data={dataEdit?.row} />
       <DialogSuccess open={customerSuccess} handleToggle={() => dispatch(setOpenSuccessCustomer(false))} message="Data Pelanggan Berhasil Disimpan!!" />
       <DialogFailed open={customerFailed?.isOpen} handleToggle={() => dispatch(setOpenFailedCustomer({ isOpen: false, message: "" }))} message={customerFailed?.message} />
     </Box>

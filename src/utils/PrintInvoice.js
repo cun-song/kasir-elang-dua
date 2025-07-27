@@ -14,7 +14,9 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import "dayjs/locale/id"; // Import Indonesian locale
-import { sendPdfToFirebaseJob,getServerTimeGMT7 } from "../redux/action/transactionAction";
+import { sendPdfToFirebaseJob, getServerTimeGMT7 } from "../redux/action/transactionAction";
+import { fetchProductData } from "../redux/action/productAction";
+
 const css = {
   titleHeader: {
     fontSize: "20px",
@@ -80,14 +82,14 @@ const css = {
     fontFamily: "Courier New",
   },
 };
+
 function formatDate(dateString) {
   // Cek jika falsy atau bukan objek dayjs yang valid
-  if (!dateString || typeof dateString !== 'object' || typeof dateString.format !== 'function') {
-    return 'nun';
+  if (!dateString || typeof dateString !== "object" || typeof dateString.format !== "function") {
+    return "nun";
   }
 
-  return dateString.format('D MMMM YYYY');
-
+  return dateString.format("D MMMM YYYY");
 }
 
 const Table = ({ data, date }) => {
@@ -247,24 +249,38 @@ const Table = ({ data, date }) => {
 };
 
 const TableTotal = ({ data, date, authName, dataInvoice }) => {
+  const dispatch = useDispatch();
+
+  const product = useSelector((state) => state?.product?.allProduct);
+  if (product?.length === 0) {
+    dispatch(fetchProductData());
+  }
+  function findProduct(id) {
+    return Object.values(product).find((product) => product?.id === id);
+  }
   return (
-    <div style={{ padding: "20px", paddingLeft: "40px", paddingTop: "18px", width: "99mm", height: "210mm", boxSizing: "border-box", position: "relative" }}>
-      <div style={{ display: "flex", justifyContent: "space-between",marginTop:"16px" }}>
+    <div style={{ padding: "20px", paddingLeft: "20px", paddingTop: "18px", width: "148mm", height: "210mm", boxSizing: "border-box", position: "relative" }}>
+      <p style={{ textAlign: "center", fontSize: "20px", marginBlock: "0", fontWeight: 700 }}>SURAT JALAN</p>
+      <div style={{ display: "flex", justifyContent: "space-between", marginTop: "0px" }}>
         <p style={css.smallHeader}>Admin: {authName}</p>
         <p style={css.smallHeader}>Dicetak: {convertTimestamp(date)}</p>
       </div>
       <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "12px" }}>
         <thead>
           <tr>
-            <th style={{ ...css.headerBorder, width: "55%" }}>Label</th>
+            <th style={{ ...css.headerBorder, width: "5%" }}>Gambar</th>
+            <th style={{ ...css.headerBorder, width: "80%" }}>Label</th>
             <th style={css.headerBorder}>Jumlah</th>
-            <th style={{ ...css.headerBorder, width: "15%" }}>Jenis</th>
-            <th style={{ ...css.headerBorder, width: "10%" }}>✔</th>
+            <th style={{ ...css.headerBorder, width: "10%" }}>Jenis</th>
+            <th style={{ ...css.headerBorder, width: "5%" }}>✔</th>
           </tr>
         </thead>
         <tbody>
           {data?.data.map((product, index) => (
-            <tr key={product.id}>
+            <tr key={product?.id}>
+              <td style={{ ...css.tableBorderRangkuman, textAlign: "center" }}>
+                <img src={findProduct(product?.id)?.img} alt={product?.label} style={{ width: "25px", height: "25px", objectFit: "contain" }} />
+              </td>
               <td style={{ ...css.tableBorderRangkuman, textAlign: "left", paddingLeft: "5px" }}>{product?.label}</td>
               <td style={css.tableBorderRangkuman}>{decimalToFraction(product?.total)}</td>
               <td style={css.tableBorderRangkuman}>{product?.type}</td>
@@ -280,10 +296,10 @@ const TableTotal = ({ data, date, authName, dataInvoice }) => {
       <div style={{ display: data?.totalGen === 0 ? "none" : "flex", justifyContent: "space-between", mt: 2 }}>
         <p style={{ marginBlock: "0", fontSize: "16px", fontWeight: "600" }}>Total Gen: {decimalToFraction(data?.totalGen)} Gen</p>
       </div>
-      <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "12px" }}>
+      <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "8px" }}>
         <thead>
           <tr>
-            <th style={{ ...css.headerBorder, width: "100%" }} colSpan={3}>
+            <th style={{ ...css.headerBorder, width: "100%" }} colSpan={4}>
               Daftar Konsumen
             </th>
           </tr>
@@ -291,7 +307,7 @@ const TableTotal = ({ data, date, authName, dataInvoice }) => {
         <tbody>
           {dataInvoice
             .reduce((rows, item, index) => {
-              if (index % 3 === 0) {
+              if (index % 4 === 0) {
                 // Mulai baris baru
                 rows.push([]);
               }
@@ -312,6 +328,32 @@ const TableTotal = ({ data, date, authName, dataInvoice }) => {
             ))}
         </tbody>
       </table>
+      <table style={{ width: "100%", borderCollapse: "collapse", marginTop: "12px" }}>
+        <thead>
+          <tr>
+            <th style={{ ...css.headerBorder, width: "50%" }}>TTD SUPIR</th>
+            <th style={{ ...css.headerBorder, width: "50%" }}>TTD ADMIN</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style={{ height: "80px" }}>
+            <td style={css.tableBorderRangkuman}>
+              <div style={{ display: "flex", width: "100%", justifyContent: "center", paddingTop: "40px" }}>
+                <p style={{ marginBlock: "2px" }}>{"("}</p>
+                <div style={{ width: "60%", borderBottom: "1px solid black" }}></div>
+                <p style={{ marginBlock: "2px" }}>{")"}</p>
+              </div>
+            </td>
+            <td style={css.tableBorderRangkuman}>
+              <div style={{ display: "flex", width: "100%", justifyContent: "center", paddingTop: "40px" }}>
+                <p style={{ marginBlock: "2px" }}>{"("}</p>
+                <div style={{ width: "60%", borderBottom: "1px solid black" }}></div>
+                <p style={{ marginBlock: "2px" }}>{")"}</p>
+              </div>
+            </td>{" "}
+          </tr>
+        </tbody>
+      </table>
     </div>
   );
 };
@@ -330,7 +372,6 @@ export const BulkPrinting = ({ data, dataRangkuman }) => {
   const printRef = useRef();
   const printTotalRef = useRef();
   const authName = useSelector((state) => state.sidenav.name);
-  
 
   const Print = useReactToPrint({
     onBeforePrint: () => dispatch(setLoading()),
@@ -378,7 +419,7 @@ export const BulkPrinting = ({ data, dataRangkuman }) => {
   useEffect(() => {
     getServerTimeGMT7()
       .then((gmt7Time) => {
-        setDate(gmt7Time)
+        setDate(gmt7Time);
       })
       .catch(console.error);
   }, []);

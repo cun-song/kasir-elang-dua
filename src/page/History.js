@@ -105,7 +105,7 @@ export default function History() {
       });
     }
     setHistoryData(tempData);
-  }, [transaction, searchData, sortData]);
+  }, [transaction, searchData, sortData, customer]);
 
   function onLastDateChange(time) {
     setLastDate(time);
