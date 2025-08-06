@@ -42,6 +42,7 @@ export const LUSIN_PERBULAN_HEADER = (arr, monthNames) => {
       field: "id",
       headerName: "ID",
       ...center,
+      flex:0.8
     },
     {
       field: "label",

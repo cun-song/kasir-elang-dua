@@ -41,7 +41,7 @@ export default function Information() {
   const product = useSelector((state) => state?.product?.allProduct);
 
   const [totalProductGrafik, setTotalProductGrafik] = useState(() => {
-    const bulanLength = 12;
+    const bulanLength = 14;
     const initial = {};
     Object.values(product).forEach((p) => {
       initial[p?.id] = new Array(bulanLength).fill(0);
@@ -79,9 +79,9 @@ export default function Information() {
 
   useEffect(() => {
     // Omzet
-    const tempDataOmzet = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-    const tempDataLusin = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
-    let arr = createXData(12);
+    const tempDataOmzet = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0,0];
+    const tempDataLusin = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {},{},{}];
+    let arr = createXData(14);
     let trans = Object?.values(transaction);
 
     if (areaOmzet !== "All") trans = trans?.filter((t) => findCustomer(t?.customerID)?.area === areaOmzet);
@@ -224,7 +224,7 @@ export default function Information() {
     setLusin(newer);
   }, [transaction, bulanLusin, areaLusin]);
 
-  let selectMonth = createXData(12);
+  let selectMonth = createXData(14);
   selectMonth = selectMonth.map((a) => {
     return { value: { month: a?.getMonth(), year: a?.getFullYear() }, label: `${monthNames[a?.getMonth()]} ${a?.getFullYear()}` };
   });
@@ -291,7 +291,7 @@ export default function Information() {
                 xAxis={[
                   {
                     scaleType: "time",
-                    data: createXData(12),
+                    data: createXData(14),
                     valueFormatter: (value) => `${monthNames[value?.getMonth()]} ${value?.getFullYear()}`,
                   },
                 ]}
@@ -325,7 +325,7 @@ export default function Information() {
           </Grid>
           <Grid>
             <StyledTable
-              headers={LUSIN_PERBULAN_HEADER(createXData(12), monthNames)}
+              headers={LUSIN_PERBULAN_HEADER(createXData(14), monthNames)}
               rows={lusinBulanan}
               page={pageTahun}
               setPage={(e) => setPageTahun(e)}
@@ -343,7 +343,7 @@ export default function Information() {
                 xAxis={[
                   {
                     scaleType: "time",
-                    data: createXData(12),
+                    data: createXData(14),
                     valueFormatter: (value) => `${monthNames[value?.getMonth()]} ${value?.getFullYear()}`,
                   },
                 ]}
