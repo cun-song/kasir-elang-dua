@@ -126,42 +126,6 @@ export const pushTransaction = (data) => async (dispatch) => {
   }
 };
 
-// export const deleteTransaction2 = (id) => async (dispatch) => {
-//   const db = getDatabase(dbConfig);
-//   const transaksiRef = ref(db, "transaction");
-//   const idQuery = query(transaksiRef, orderByChild("id"), equalTo(id));
-
-//   get(idQuery)
-//     .then((snapshot) => {
-//       if (snapshot.exists()) {
-//         snapshot.forEach((childSnapshot) => {
-//           const key = childSnapshot.key;
-//           const dbRef = ref(db, `transaction/${key}`);
-//           remove(dbRef)
-//             .then(() => {
-//               dispatch(setOpenSuccessUpdate(true));
-//               dispatch(setReset());
-//               dispatch(setLoading());
-//             })
-//             .catch((error) => {
-//               console.error("Error deleting transaction:", error);
-//               dispatch(setOpenFailed({ isOpen: true, message: "Gagal menghapus transaksi" }));
-//               dispatch(setLoading());
-//             });
-//         });
-//       } else {
-//         console.log("No transaction found");
-//         dispatch(setOpenFailed({ isOpen: true, message: "Transaksi tidak ditemukan" }));
-//         dispatch(setLoading());
-//       }
-//     })
-//     .catch((error) => {
-//       console.error("Error finding transaction:", error);
-//       dispatch(setOpenFailed({ isOpen: true, message: "Gagal mencari transaksi" }));
-//       dispatch(setLoading());
-//     });
-// };
-
 export const deleteTransaction = (id) => async (dispatch) => {
   const db = getDatabase(dbConfig);
   const transaksiRef = ref(db, "transaction");
@@ -184,14 +148,23 @@ export const deleteTransaction = (id) => async (dispatch) => {
 
       // Tambah qty kembali ke masing-masing produk
       for (const [productKey, item] of Object.entries(produkList)) {
-        const productRef = ref(db, `product/${productKey.startsWith("BP") ? productKey.replace(/^B/, "") : productKey}`);
-        const productSnapshot = await get(productRef);
+        const productID = productKey.startsWith("BP") ? productKey.replace(/^B/, "") : productKey;
+
+        // cari key asli produk di db
+        const productRefQuery = query(ref(db, "product"), orderByChild("id"), equalTo(productID));
+        const productSnapshot = await get(productRefQuery);
 
         if (productSnapshot.exists()) {
-          const currentQty = productSnapshot.val().qty || 0;
-          const newQty = currentQty + item?.productQty;
+          productSnapshot.forEach(async (prodChild) => {
+            const prodKey = prodChild.key; // key asli dari Firebase
+            const productData = prodChild.val();
 
-          await update(productRef, { qty: newQty });
+            const currentQty = productData?.qty || 0;
+            const newQty = currentQty + item?.productQty;
+
+            const realProductRef = ref(db, `product/${prodKey}`);
+            await update(realProductRef, { qty: newQty });
+          });
         }
       }
 

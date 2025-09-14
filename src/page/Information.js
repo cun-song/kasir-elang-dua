@@ -79,8 +79,8 @@ export default function Information() {
 
   useEffect(() => {
     // Omzet
-    const tempDataOmzet = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,0,0];
-    const tempDataLusin = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {},{},{}];
+    const tempDataOmzet = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+    const tempDataLusin = [{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}];
     let arr = createXData(14);
     let trans = Object?.values(transaction);
 
