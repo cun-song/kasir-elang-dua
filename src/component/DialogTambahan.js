@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { Box, Button, DialogActions, DialogContent, Grid, Typography, TextField, MenuItem, IconButton, useMediaQuery } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
-import { DISCOUNT_LIST, QTY_LIST } from "../constant/Home";
+import { DISCOUNT_LIST, Label_Size, QTY_LIST } from "../constant/Home";
 import StyledDialog from "./StyledDialog";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -38,7 +38,7 @@ const style = {
 };
 export default function DialogTambahan({ open = false, handleToggle }) {
   const [bonusData, setBonusData] = useState([{ productID: null, label: null, qty: null }]);
-  const [diskon, setDiskon] = useState({ besar: 0, kecil: 0 });
+  const [diskon, setDiskon] = useState({ besar: 0, kecil: 0, meja: 0 });
   const [listProduct, setListProduct] = useState([]);
   const dispatch = useDispatch();
 
@@ -87,6 +87,10 @@ export default function DialogTambahan({ open = false, handleToggle }) {
     const temp = { ...diskon, kecil: data };
     setDiskon(temp);
   }
+  function onChangeMeja(data) {
+    const temp = { ...diskon, meja: data };
+    setDiskon(temp);
+  }
   function save() {
     const filteredArray = bonusData.filter((item) => {
       return Object.values(item).every((value) => value !== null);
@@ -118,7 +122,7 @@ export default function DialogTambahan({ open = false, handleToggle }) {
           <Grid item display={"flex"} gap={3}>
             <Grid item>
               <Typography sx={style.labelBotol} mb={1}>
-                Botol Besar
+                Botol {Label_Size?.besar}
               </Typography>
 
               <TextField id="select-besar" select sx={{ width: isMobile ? "120px" : "180px" }} value={diskon?.besar} onChange={(e) => onChangeBesar(e.target.value)}>
@@ -131,9 +135,23 @@ export default function DialogTambahan({ open = false, handleToggle }) {
             </Grid>
             <Grid item>
               <Typography sx={style.labelBotol} mb={1}>
-                Botol Kecil
+                Botol {Label_Size?.kecil}
               </Typography>
               <TextField id="select-kecil" select sx={{ width: isMobile ? "120px" : "180px" }} value={diskon?.kecil} onChange={(e) => onChangeKecil(e.target.value)}>
+                {DISCOUNT_LIST.map((option) => (
+                  <MenuItem key={option.value} value={option.value}>
+                    {option.label}
+                  </MenuItem>
+                ))}
+              </TextField>
+            </Grid>
+          </Grid>
+          <Grid item mt={2}>
+            <Grid item>
+              <Typography sx={style.labelBotol} mb={1}>
+                Botol {Label_Size?.meja}
+              </Typography>
+              <TextField id="select-meja" select sx={{ width: isMobile ? "120px" : "180px" }} value={diskon?.meja} onChange={(e) => onChangeMeja(e.target.value)}>
                 {DISCOUNT_LIST.map((option) => (
                   <MenuItem key={option.value} value={option.value}>
                     {option.label}

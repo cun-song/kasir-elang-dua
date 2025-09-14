@@ -16,6 +16,7 @@ import timezone from "dayjs/plugin/timezone";
 import "dayjs/locale/id"; // Import Indonesian locale
 import { sendPdfToFirebaseJob, getServerTimeGMT7 } from "../redux/action/transactionAction";
 import { fetchProductData } from "../redux/action/productAction";
+import { Label_Size } from "../constant/Home";
 
 const css = {
   titleHeader: {
@@ -148,7 +149,7 @@ const Table = ({ data, date }) => {
               <tr key={product.id}>
                 <td style={css.tableBorder}>{index + 1}</td>
                 <td style={{ ...css.tableBorder, textAlign: "left", paddingLeft: "5px" }}>{product?.label}</td>
-                <td style={css.tableBorder}>{product?.size}</td>
+                <td style={css.tableBorder}>{Label_Size?.[product?.size.toLowerCase()]}</td>
                 <td style={css.tableBorder}>{decimalToFraction(product?.productQty)}</td>
                 <td style={css.tableBorder}>{product?.type}</td>
                 <td style={css.tableBorder}>{formattedNumber(product?.price)}</td>
@@ -172,7 +173,7 @@ const Table = ({ data, date }) => {
               <tr key={product.id}>
                 <td style={{ ...css.tableBorder, borderTop: data?.product[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>{nbl + index + 1}</td>
                 <td style={{ ...css.tableBorder, textAlign: "left", paddingLeft: "5px", borderTop: data?.product[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>{product?.label}</td>
-                <td style={{ ...css.tableBorder, borderTop: data?.product[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>{product?.size}</td>
+                <td style={{ ...css.tableBorder, borderTop: data?.product[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>{Label_Size?.[product?.size.toLowerCase()]}</td>
                 <td style={{ ...css.tableBorder, borderTop: data?.product[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>{decimalToFraction(product?.productQty)}</td>
                 <td style={{ ...css.tableBorder, borderTop: data?.product[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>{product?.type}</td>
                 <td style={{ ...css.tableBorder, borderTop: data?.product[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>Bonus</td>

@@ -1,4 +1,5 @@
 import { convertTimestamp } from "../utils/stingFormatted";
+import { Label_Size } from "./Home";
 
 const center = {
   headerAlign: "center",
@@ -37,7 +38,7 @@ export const CUSTOMER_HEADER = [
     headerName: "Diskon",
     ...center,
     renderCell: (diskon) => {
-      return `Besar: ${diskon?.value?.besar ?? 0}, Kecil: ${diskon?.value?.kecil ?? 0}`;
+      return `${Label_Size?.besar}: ${diskon?.value?.besar ?? 0}, ${Label_Size?.kecil}: ${diskon?.value?.kecil ?? 0}, ${Label_Size?.meja}: ${diskon?.value?.meja ?? 0}`;
     },
   },
   {

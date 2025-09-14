@@ -5,7 +5,7 @@ export const cartSlice = createSlice({
   initialState: {
     cartData: {},
     bonusData: [{ productID: null, label: null, qty: null }],
-    diskon: { besar: 0, kecil: 0 },
+    diskon: { besar: 0, kecil: 0, meja: 0 },
   },
   reducers: {
     setCartData: (state, action) => {

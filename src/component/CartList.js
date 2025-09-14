@@ -2,7 +2,7 @@ import { Grid, Typography, Box, IconButton } from "@mui/material";
 import React from "react";
 import CancelIcon from "@mui/icons-material/Cancel";
 import { formattedNumber } from "../utils/stingFormatted";
-
+import { Label_Size } from "../constant/Home";
 export default function CartList({ img, label, size, qty, price, remove = () => {} }) {
   const formattedValue = formattedNumber(qty * price);
 
@@ -35,7 +35,7 @@ export default function CartList({ img, label, size, qty, price, remove = () => 
                 lineHeight: "26px",
               }}
             >
-              {size}
+              {Label_Size?.[size.toLowerCase()]}
             </Box>
           </Grid>
           <Grid item>

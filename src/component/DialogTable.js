@@ -8,6 +8,7 @@ import Invoice from "./Invoice";
 import { useDispatch } from "react-redux";
 import { pushToPrintQueue } from "../redux/action/transactionAction";
 import { setLoading } from "../redux/sidenavReducer";
+import { Label_Size } from "../constant/Home";
 
 const center = {
   headerAlign: "center",
@@ -33,7 +34,9 @@ const HEADER = [
     flex: 2,
     renderCell: (size) => {
       return (
-        <Box sx={{ width: "67px", height: "26px", borderRadius: "8px", backgroundColor: `#${size?.value === "Besar" ? "F5EFEF" : size?.value === "Kecil" ? "FFB3B3" : "bae1ff"}`, textAlign: "center", lineHeight: "26px" }}>{size?.value}</Box>
+        <Box sx={{ width: "67px", height: "26px", borderRadius: "8px", backgroundColor: `#${size?.value === "Besar" ? "F5EFEF" : size?.value === "Kecil" ? "FFB3B3" : "bae1ff"}`, textAlign: "center", lineHeight: "26px" }}>
+          {Label_Size?.[size?.value?.toLowerCase()]}
+        </Box>
       );
     },
   },

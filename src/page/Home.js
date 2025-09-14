@@ -12,7 +12,7 @@ import kecapIkan from "../img/kecapIkan.png";
 import cuka from "../img/cuka.png";
 import spritus from "../img/spritus.png";
 import ButtonCategory from "../component/ButtonCategory";
-import { PRODUCT_CATEGORY } from "../constant/Home";
+import { PRODUCT_CATEGORY, Label_Size } from "../constant/Home";
 import ProductCard from "../component/ProductCard";
 import CartList from "../component/CartList";
 import DialogTambahan from "../component/DialogTambahan";
@@ -70,7 +70,7 @@ export default function Home() {
   const [category, setCategory] = useState(null);
   const [product, setProduct] = useState([]);
   const [subtotal, setSubtotal] = useState(0);
-  const [discount, setDiscount] = useState({ total: 0, besar: 0, kecil: 0 });
+  const [discount, setDiscount] = useState({ total: 0, besar: 0, kecil: 0, meja: 0 });
   const [total, setTotal] = useState(0);
   const [lusin, setLusin] = useState(0);
   const [openTambahan, setOpenTambahan] = useState(false);
@@ -211,21 +211,27 @@ export default function Home() {
       setOpenDrawer(false);
       setOpenCheckout(false);
       setSubtotal(0);
-      setDiscount({ total: 0, besar: 0, kecil: 0 });
+      setDiscount({ total: 0, besar: 0, kecil: 0, meja: 0 });
       setLusin(0);
       setListCart({});
       dispatch(setCartData({}));
       dispatch(setBonusData([{ productID: null, label: null, qty: null }]));
-      dispatch(setDiskon({ besar: 0, kecil: 0 }));
+      dispatch(setDiskon({ besar: 0, kecil: 0, meja: 0 }));
       dispatch(setTransactionCustomer({ customerID: "", ownerName: "", merchantName: "" }));
       dispatch(fetchProductData());
     }
   }, [refresh]);
 
   useEffect(() => {
-    const defaultDiskon = customerData.filter((cust) => cust?.id === defaultCustomer?.customerID)[0]?.discount ?? { besar: 0, kecil: 0 };
+    const rawDiskon = customerData.find((cust) => cust?.id === defaultCustomer?.customerID)?.discount ?? {};
+    const defaultDiskon = {
+      besar: 0,
+      kecil: 0,
+      meja: 0,
+      ...rawDiskon,
+    };
     dispatch(setDiskon(defaultDiskon));
-  }, [defaultCustomer]);
+  }, [defaultCustomer, customerData, dispatch]);
 
   useEffect(() => {
     let filteredProducts;
@@ -261,14 +267,17 @@ export default function Home() {
       const newCart = { ...cart, ...bonusObj };
       const totalQty = Object.values(newCart).reduce((acc, item) => acc + item?.productQty * item?.totalLusin, 0);
       const subtotal = Object.values(newCart).reduce((acc, item) => acc + item?.productQty * item?.price, 0);
-      const disc = Object.values(newCart).reduce((acc, item) => acc + item?.productQty * item?.totalLusin * (item?.price === 0 ? 0 : item?.size === "Besar" ? diskon?.besar : item?.size === "Kecil" ? diskon?.kecil : 0), 0);
+      const disc = Object.values(newCart).reduce(
+        (acc, item) => acc + item?.productQty * item?.totalLusin * (item?.price === 0 ? 0 : item?.size === "Besar" ? diskon?.besar : item?.size === "Kecil" ? diskon?.kecil : item?.size === "meja" ? diskon?.meja : 0),
+        0
+      );
       setLusin(totalQty);
       setSubtotal(subtotal);
-      setDiscount({ total: disc, besar: diskon?.besar, kecil: diskon?.kecil });
+      setDiscount({ total: disc, besar: diskon?.besar, kecil: diskon?.kecil, meja: diskon?.meja });
       setListCart(newCart);
     } else {
       setLusin(0);
-      setDiscount({ total: 0, besar: 0, kecil: 0 });
+      setDiscount({ total: 0, besar: 0, kecil: 0, meja: 0 });
       setSubtotal(0);
       setListCart({});
     }
@@ -450,8 +459,8 @@ export default function Home() {
             {defaultCustomer?.ownerName !== "-" && defaultCustomer?.merchantName !== "-" ? ", " : ""}
             {defaultCustomer?.merchantName !== "-" ? defaultCustomer?.merchantName : ""}
           </Typography>
-          <Typography sx={{ fontFamily: "poppins", fontSize: isMobile ? 16 : 20, color: "#12141E" }}>
-            Diskon Besar: {discount?.besar} Diskon Kecil: {discount?.kecil}
+          <Typography align="center" sx={{ fontFamily: "poppins", fontSize: isMobile ? 16 : 20, color: "#12141E" }}>
+            Diskon {Label_Size?.besar}: {discount?.besar} Diskon {Label_Size?.kecil}: {discount?.kecil} Diskon {Label_Size?.meja}: {discount?.meja}
           </Typography>
         </Grid>
       </DialogConfirmation>

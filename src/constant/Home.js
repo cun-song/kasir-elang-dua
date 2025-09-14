@@ -1,3 +1,5 @@
+import { Label } from "@mui/icons-material";
+
 export const PRODUCT_CATEGORY = {
   null: "Semua Produk",
   C1: "Produk Kecap Asin",
@@ -36,6 +38,10 @@ export const DISCOUNT_LIST = [
     value: 3000,
     label: "3000",
   },
+  {
+    value: 10000,
+    label: "10000",
+  },
 ];
 
 export const QTY_LIST = [
@@ -64,3 +70,10 @@ export const QTY_LIST = [
     label: "3",
   },
 ];
+
+export const Label_Size = {
+  besar: "620 ml",
+  kecil: "290 ml",
+  meja: "135 ml",
+  "5000 ml": "5000 ml",
+};

@@ -133,7 +133,7 @@ export default function History() {
       .map((key) => ({
         id: key,
         ...td[key],
-        discount: td[key]?.totalLusin * (td[key]?.price === 0 ? 0 : td[key]?.size === "Besar" ? data?.discount?.besar : td[key]?.size === "Kecil" ? data?.discount?.kecil : 0),
+        discount: td[key]?.totalLusin * (td[key]?.price === 0 ? 0 : td[key]?.size === "Besar" ? data?.discount?.besar : td[key]?.size === "Kecil" ? data?.discount?.kecil : td[key]?.size === "meja" ? data?.discount?.meja : 0),
         subtotal:
           td[key]?.price === 0
             ? 0
@@ -141,6 +141,8 @@ export default function History() {
             ? td[key]?.productQty * (td[key]?.price - td[key]?.totalLusin * data?.discount?.besar)
             : td[key]?.size === "Kecil"
             ? td[key]?.productQty * (td[key]?.price - td[key]?.totalLusin * data?.discount?.kecil)
+            : td[key]?.size === "meja"
+            ? td[key]?.productQty * (td[key]?.price - td[key]?.totalLusin * data?.discount?.meja)
             : td[key]?.productQty * td[key]?.price,
       }));
   }

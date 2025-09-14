@@ -24,11 +24,15 @@ export const PRODUCT_CATEGORY_SELECT = [
 export const PRODUCT_SIZE_SELECT = [
   {
     value: "Besar",
-    label: "Besar",
+    label: "620 ml",
   },
   {
     value: "Kecil",
-    label: "Kecil",
+    label: "290 ml",
+  },
+  {
+    value: "meja",
+    label: "135 ml",
   },
   {
     value: "5000 ml",

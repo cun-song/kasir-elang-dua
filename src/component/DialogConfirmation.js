@@ -8,7 +8,9 @@ export default function DialogConfirmation({ open = false, handleToggle, save, l
   return (
     <StyledDialog isOpen={open} handleToggle={handleToggle} useCloseBtn title="" width="30%">
       <DialogContent>
-        <Typography sx={{ fontSize: isMobile ? "18px" : "28px", fontWeight: "600", textAlign: "center", my: 2 }}>{label}</Typography>
+        <Typography align="center" sx={{ fontSize: isMobile ? "18px" : "28px", fontWeight: "600", textAlign: "center", my: 2 }}>
+          {label}
+        </Typography>
         {children}
       </DialogContent>
       <DialogActions>

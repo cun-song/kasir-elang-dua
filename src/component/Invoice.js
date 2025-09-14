@@ -11,10 +11,11 @@ import dayjs from "dayjs";
 import utc from "dayjs/plugin/utc";
 import timezone from "dayjs/plugin/timezone";
 import "dayjs/locale/id"; // Import Indonesian locale
-import { deleteTransaction,getServerTimeGMT7 } from "../redux/action/transactionAction";
+import { deleteTransaction, getServerTimeGMT7 } from "../redux/action/transactionAction";
 import { setLoading } from "../redux/sidenavReducer";
 import { useDispatch, useSelector } from "react-redux";
 import DialogConfirmation from "./DialogConfirmation";
+import { Label_Size } from "../constant/Home";
 
 const css = {
   titleHeader: {
@@ -87,12 +88,11 @@ const Invoice = ({ transaction, customer, total, grandTotal, discount, totalQty,
   dayjs.locale("id");
 
   function formatDate(dateString) {
-    if (!dateString || typeof dateString !== 'object' || typeof dateString.format !== 'function') {
-      return 'nun';
+    if (!dateString || typeof dateString !== "object" || typeof dateString.format !== "function") {
+      return "nun";
     }
-  
-    return dateString.format('D MMMM YYYY');
-  
+
+    return dateString.format("D MMMM YYYY");
   }
 
   const myTimezone = "Asia/Jakarta";
@@ -117,7 +117,7 @@ const Invoice = ({ transaction, customer, total, grandTotal, discount, totalQty,
   useEffect(() => {
     getServerTimeGMT7()
       .then((gmt7Time) => {
-        setDate(gmt7Time)
+        setDate(gmt7Time);
       })
       .catch(console.error);
   }, []);
@@ -173,7 +173,7 @@ const Invoice = ({ transaction, customer, total, grandTotal, discount, totalQty,
                 <tr key={product.id}>
                   <td style={css.tableBorder}>{index + 1}</td>
                   <td style={{ ...css.tableBorder, textAlign: "left", paddingLeft: "5px" }}>{product?.label}</td>
-                  <td style={css.tableBorder}>{product?.size}</td>
+                  <td style={css.tableBorder}>{Label_Size?.[product?.size.toLowerCase()]}</td>
                   <td style={css.tableBorder}>{decimalToFraction(product?.productQty)}</td>
                   <td style={css.tableBorder}>{product?.type}</td>
                   <td style={css.tableBorder}>{formattedNumber(product?.price)}</td>
@@ -198,7 +198,7 @@ const Invoice = ({ transaction, customer, total, grandTotal, discount, totalQty,
                 <tr key={product.id}>
                   <td style={{ ...css.tableBorder, borderTop: transaction[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>{nbl + index + 1}</td>
                   <td style={{ ...css.tableBorder, textAlign: "left", paddingLeft: "5px", borderTop: transaction[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>{product?.label}</td>
-                  <td style={{ ...css.tableBorder, borderTop: transaction[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>{product?.size}</td>
+                  <td style={{ ...css.tableBorder, borderTop: transaction[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>{Label_Size?.[product?.size.toLowerCase()]}</td>
                   <td style={{ ...css.tableBorder, borderTop: transaction[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>{decimalToFraction(product?.productQty)}</td>
                   <td style={{ ...css.tableBorder, borderTop: transaction[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>{product?.type}</td>
                   <td style={{ ...css.tableBorder, borderTop: transaction[nbl + index - 1]?.price !== 0 && product?.price === 0 ? "1px solid black" : "none" }}>Bonus</td>
