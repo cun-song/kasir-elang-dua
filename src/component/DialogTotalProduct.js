@@ -1,9 +1,9 @@
-import React, { useEffect } from "react";
-import { Box, DialogActions, DialogContent, Divider, Grid, Typography, useMediaQuery } from "@mui/material";
+import React from "react";
+import { DialogActions, DialogContent, Grid, Typography, useMediaQuery } from "@mui/material";
 import StyledDialog from "./StyledDialog";
 import { useState } from "react";
 import StyledTable from "./StyledTable";
-import { convertTimestamp, decimalToFraction, formattedNumber } from "../utils/stingFormatted";
+import { decimalToFraction } from "../utils/stingFormatted";
 const center = {
   headerAlign: "center",
   align: "center",

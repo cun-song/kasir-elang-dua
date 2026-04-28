@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Box, Button, DialogActions, DialogContent, Grid, Typography, TextField, MenuItem, IconButton, useMediaQuery } from "@mui/material";
+import { Button, DialogActions, DialogContent, Grid, Typography, TextField, MenuItem, IconButton, useMediaQuery } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import { DISCOUNT_LIST, Label_Size, QTY_LIST } from "../constant/Home";
 import StyledDialog from "./StyledDialog";

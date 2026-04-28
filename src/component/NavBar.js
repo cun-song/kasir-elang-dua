@@ -1,5 +1,5 @@
 import { Grid, Typography, useMediaQuery } from "@mui/material";
-import React, { useEffect } from "react";
+import React from "react";
 import { useSelector } from "react-redux";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 

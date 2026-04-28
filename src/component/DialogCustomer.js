@@ -1,10 +1,9 @@
 import React, { useEffect } from "react";
-import { Box, Button, DialogActions, DialogContent, Grid, Typography, TextField, MenuItem, IconButton } from "@mui/material";
+import { Button, DialogActions, DialogContent, Grid, Typography, TextField, MenuItem, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 import StyledDialog from "./StyledDialog";
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { pushTransaction } from "../redux/action/transactionAction";
+import { useDispatch } from "react-redux";
 import { AREA_SELECT } from "../constant/Customer";
 import { pushCustomer, updateCustomer } from "../redux/action/customerAction";
 import { setLoading } from "../redux/sidenavReducer";

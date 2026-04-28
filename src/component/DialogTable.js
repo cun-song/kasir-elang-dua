@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { Box, DialogActions, DialogContent, Button, Grid, Typography, useMediaQuery } from "@mui/material";
 import StyledDialog from "./StyledDialog";
 import { useState } from "react";
