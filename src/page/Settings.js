@@ -10,7 +10,7 @@ export default function Settings() {
   const dispatch = useDispatch();
 
   useEffect(() => {
-    dispatch(click(5));
+    dispatch(click(6));
     dispatch(setTitle("Pengaturan"));
   }, []);
 

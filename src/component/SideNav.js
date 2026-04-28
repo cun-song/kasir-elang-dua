@@ -13,6 +13,8 @@ import SettingsOutlinedIcon from "@mui/icons-material/SettingsOutlined";
 import SettingsRoundedIcon from "@mui/icons-material/SettingsRounded";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import InfoRoundedIcon from "@mui/icons-material/InfoRounded";
+import AssignmentIcon from "@mui/icons-material/Assignment";
+import AssignmentOutlinedIcon from "@mui/icons-material/AssignmentOutlined";
 
 import { useNavigate } from "react-router-dom";
 import { useSelector } from "react-redux";
@@ -55,7 +57,7 @@ export default function SideNav() {
           />
         </Grid>
         <Grid
-          gap={isMobile ? 0 : 5}
+          gap={isMobile ? 0 : 6}
           sx={{ display: "flex", flexDirection: isMobile ? "row" : "column", alignItems: "center", mt: isMobile ? 0 : 5, justifyContent: isMobile ? "space-around" : "center", width: isMobile ? "100vw !important" : "100%" }}
         >
           <IconButton
@@ -91,6 +93,7 @@ export default function SideNav() {
           >
             {value === 3 ? <ReceiptRoundedIcon sx={{ color: "#E06F2C", fontSize: 32 }} /> : <ReceiptOutlinedIcon sx={{ color: "#666666", fontSize: 32, opacity: 0.4 }} />}
           </IconButton>
+
           <IconButton
             sx={{ ":hover": { backgroundColor: "transparent" }, ":active": { backgroundColor: "transparent" }, display: role === "Super Admin" && !isMobile ? "block" : "none" }}
             onClick={() => {
@@ -99,6 +102,14 @@ export default function SideNav() {
           >
             {value === 4 ? <InfoRoundedIcon sx={{ color: "#E06F2C", fontSize: 32 }} /> : <InfoOutlinedIcon sx={{ color: "#666666", fontSize: 32, opacity: 0.4 }} />}
           </IconButton>
+          <IconButton
+            sx={{ ":hover": { backgroundColor: "transparent" }, ":active": { backgroundColor: "transparent" }, display: role === "Super Admin" && !isMobile ? "block" : "none" }}
+            onClick={() => {
+              navigate("/product-information");
+            }}
+          >
+            {value === 5 ? <AssignmentIcon sx={{ color: "#E06F2C", fontSize: 32 }} /> : <AssignmentOutlinedIcon sx={{ color: "#666666", fontSize: 32, opacity: 0.4 }} />}
+          </IconButton>
 
           <IconButton
             sx={{ ":hover": { backgroundColor: "transparent" }, ":active": { backgroundColor: "transparent" } }}
@@ -106,7 +117,7 @@ export default function SideNav() {
               navigate("/settings");
             }}
           >
-            {value === 5 ? <SettingsRoundedIcon sx={{ color: "#E06F2C", fontSize: 32 }} /> : <SettingsOutlinedIcon sx={{ color: "#666666", fontSize: 32, opacity: 0.4 }} />}
+            {value === 6 ? <SettingsRoundedIcon sx={{ color: "#E06F2C", fontSize: 32 }} /> : <SettingsOutlinedIcon sx={{ color: "#666666", fontSize: 32, opacity: 0.4 }} />}
           </IconButton>
         </Grid>
       </Grid>

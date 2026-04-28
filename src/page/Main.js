@@ -11,7 +11,7 @@ import ProtectedRoute from "../component/ProtectedRoute";
 import { AuthProvider } from "../utils/useAuth";
 import ProtectedSuperAdmin from "../component/ProtectedSuperAdmin";
 import Information from "./Information";
-
+import ProductInformation from "./ProductInformation";
 export default function Main() {
   const isMobile = useMediaQuery("(max-width: 600px)");
 
@@ -30,6 +30,9 @@ export default function Main() {
             <Route path="/history" element={<History />} />
             <Route element={<ProtectedSuperAdmin />}>
               <Route path="/information" element={<Information />} />
+            </Route>
+            <Route element={<ProtectedSuperAdmin />}>
+              <Route path="/product-information" element={<ProductInformation />} />
             </Route>
             <Route path="/settings" element={<Settings />} />
           </Route>
