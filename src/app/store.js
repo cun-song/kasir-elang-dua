@@ -4,6 +4,8 @@ import cartReducer from "../redux/cartReducer";
 import productReducer from "../redux/productReducer";
 import customerReducer from "../redux/customerReducer";
 import transactionReducer from "../redux/transactionReducer";
+import hppReducer from "../redux/hppReducer";
+import userReducer from "../redux/userReducer";
 
 export default configureStore({
   reducer: {
@@ -12,5 +14,7 @@ export default configureStore({
     product: productReducer,
     customer: customerReducer,
     transaction: transactionReducer,
+    hpp: hppReducer,
+    user: userReducer,
   },
 });

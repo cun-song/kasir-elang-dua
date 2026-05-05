@@ -1,6 +1,7 @@
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
 import React from "react";
+import { reset } from "../redux/sidenavReducer";
 
 export const signup = (email, password) => {
   const auth = getAuth();
@@ -18,11 +19,12 @@ export const signup = (email, password) => {
     });
 };
 
-export const signout = () => {
+export const signout = () => async (dispatch) => {
   const auth = getAuth();
   signOut(auth)
     .then(() => {
       // Sign-out successful.
+      dispatch(reset());
     })
     .catch((error) => {
       // An error happened.

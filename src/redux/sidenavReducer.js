@@ -29,9 +29,13 @@ export const sidenavSlice = createSlice({
     setOpenFailedLogin: (state, action) => {
       state.openFailedLogin = action.payload;
     },
+    reset: (state) => {
+      state.role = "";
+      state.name = "";
+    },
   },
 });
 
-export const { click, setTitle, setName, setRole, setLoading, setOpenFailedLogin } = sidenavSlice.actions;
+export const { click, setTitle, setName, setRole, setLoading, setOpenFailedLogin, reset } = sidenavSlice.actions;
 
 export default sidenavSlice.reducer;
