@@ -214,6 +214,7 @@ export default function Home() {
       setDiscount({ total: 0, besar: 0, kecil: 0, meja: 0 });
       setLusin(0);
       setListCart({});
+      setCategory(null)
       dispatch(setCartData({}));
       dispatch(setBonusData([{ productID: null, label: null, qty: null }]));
       dispatch(setDiskon({ besar: 0, kecil: 0, meja: 0 }));

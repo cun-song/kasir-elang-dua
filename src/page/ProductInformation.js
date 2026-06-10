@@ -380,7 +380,7 @@ export default function ProductInformation() {
   const margin = hargaEff > 0 ? (profitPU / hargaEff) * 100 : 0;
   const totRevenue = hargaEff * jumlahUnit;
   const totProfit = profitPU * jumlahUnit;
-  const bep = hppTotPU > 0 && profitPU > 0 ? Math.ceil((hppTotPU * jumlahUnit) / profitPU) : 0;
+  const bep = hppTotPU > 0 && hargaEff > 0 ? Math.ceil((hppTotPU * jumlahUnit) / hargaEff) : 0;
 
   const UL = unitType === "lusin" ? "Lusin" : "Dus";
   const pcol = profitPU >= 0 ? ACC : "#e63946";
