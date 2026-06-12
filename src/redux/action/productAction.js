@@ -1,12 +1,12 @@
 import { getDatabase, ref, get, push, set, serverTimestamp, child, query, orderByChild, startAt, update, equalTo } from "firebase/database";
+import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import dbConfig from "../../config/fbConfig";
-import { getDownloadURL, ref as refimage, getStorage } from "firebase/storage";
 import { setAllProduct, setOpenFailedProduct, setOpenSuccessProduct, setResetProduct } from "../productReducer";
 import { setLoading } from "../sidenavReducer";
 
 const getNextProductId = async (db) => {
   const dbRef = ref(db);
-  let nextId = "P1";
+  let nextId = "1";
 
   try {
     const snapshot = await get(child(dbRef, "product"));
@@ -21,7 +21,7 @@ const getNextProductId = async (db) => {
         })
         .pop();
       const newId = parseInt(lastId.substring(1), 10) + 1;
-      nextId = "P" + newId;
+      nextId = newId;
     }
   } catch (error) {
     console.error("Error getting last id: ", error);
@@ -29,16 +29,38 @@ const getNextProductId = async (db) => {
 
   return nextId;
 };
+const uploadProductImage = async (imageFile, productId) => {
+  const storage = getStorage();
+  const imgRef = storageRef(storage, `product/${productId}`);
+  await uploadBytes(imgRef, imageFile);
+  const downloadURL = await getDownloadURL(imgRef);
+  return downloadURL;
+};
 
-export const pushProduct = (data) => async (dispatch) => {
+export const pushProduct = (data, imageFile) => async (dispatch) => {
   const db = getDatabase(dbConfig);
   const dbRef = ref(db, "product");
   const productID = await getNextProductId(db);
+  const newProductId = "P" + productID;
+ 
+  let imgUrl = "";
+  if (imageFile) {
+    try {
+      imgUrl = await uploadProductImage(imageFile, newProductId);
+    } catch (error) {
+      console.error("Error uploading image:", error);
+      dispatch(setOpenFailedProduct({ isOpen: true, message: "Gagal upload foto produk" }));
+      dispatch(setLoading());
+      return;
+    }
+  }
+ 
   const snapshot = await push(dbRef);
   set(snapshot, {
     ...data,
-    id: productID,
-    img: "",
+    id: newProductId,
+    img: imgUrl,
+    index: productID,
     timestamp: serverTimestamp(),
   })
     .then(() => {
@@ -47,40 +69,65 @@ export const pushProduct = (data) => async (dispatch) => {
       dispatch(setLoading());
     })
     .catch((error) => {
-      console.error("Error pushing product: ", error);
+      console.error("Error pushing product:", error);
       dispatch(setOpenFailedProduct({ isOpen: true, message: "Error pushing product" }));
       dispatch(setLoading());
     });
 };
-export const updateProduct = (data) => async (dispatch) => {
+ 
+// ─────────────────────────────────────────────────────────────────────────────
+// UPDATE — Edit produk yang sudah ada
+//   data.img  : URL lama dari Firebase (dipakai jika imageFile null)
+//   imageFile : File | null   (jika ada → upload & replace URL lama)
+// ─────────────────────────────────────────────────────────────────────────────
+export const updateProduct = (data, imageFile) => async (dispatch) => {
   const db = getDatabase(dbConfig);
   const productRef = ref(db, "product");
   const idQuery = query(productRef, orderByChild("id"), equalTo(data?.id));
-
+ 
   get(idQuery)
-    .then((snapshot) => {
-      if (snapshot.exists()) {
-        snapshot.forEach((childSnapshot) => {
-          const key = childSnapshot.key;
-          const dbRef = ref(db, "product/" + key);
-          update(dbRef, {
-            ...data,
-            timestamp: serverTimestamp(),
-          })
-            .then(() => {
-              dispatch(setOpenSuccessProduct(true));
-              dispatch(setResetProduct());
-              dispatch(setLoading());
-            })
-            .catch((error) => {
-              console.error("Error updating product: ", error);
-              dispatch(setOpenFailedProduct({ isOpen: true, message: "Error updating product" }));
-              dispatch(setLoading());
-            });
-        });
-      } else {
+    .then(async (snapshot) => {
+      if (!snapshot.exists()) {
         console.log("No data found");
+        dispatch(setOpenFailedProduct({ isOpen: true, message: "Produk tidak ditemukan" }));
+        dispatch(setLoading());
+        return;
       }
+ 
+      // Tentukan URL gambar akhir
+      let imgUrl = data.img ?? ""; // default: pertahankan URL lama
+ 
+      if (imageFile) {
+        try {
+          // Upload overwrite ke path product/{id} → URL baru
+          imgUrl = await uploadProductImage(imageFile, data.id);
+        } catch (error) {
+          console.error("Error uploading image:", error);
+          dispatch(setOpenFailedProduct({ isOpen: true, message: "Gagal upload foto produk" }));
+          dispatch(setLoading());
+          return;
+        }
+      }
+ 
+      snapshot.forEach((childSnapshot) => {
+        const key = childSnapshot.key;
+        const dbRef = ref(db, "product/" + key);
+        update(dbRef, {
+          ...data,
+          img: imgUrl,
+          timestamp: serverTimestamp(),
+        })
+          .then(() => {
+            dispatch(setOpenSuccessProduct(true));
+            dispatch(setResetProduct());
+            dispatch(setLoading());
+          })
+          .catch((error) => {
+            console.error("Error updating product:", error);
+            dispatch(setOpenFailedProduct({ isOpen: true, message: "Error updating product" }));
+            dispatch(setLoading());
+          });
+      });
     })
     .catch((error) => {
       console.error("Error find product key:", error);
@@ -88,7 +135,6 @@ export const updateProduct = (data) => async (dispatch) => {
       dispatch(setLoading());
     });
 };
-
 export const fetchProductData = () => async (dispatch) => {
   const db = getDatabase(dbConfig);
   const dbRef = ref(db, "product");
@@ -126,7 +172,7 @@ export const fetchProductData = () => async (dispatch) => {
 
 const fetchImage = async (address) => {
   const storage = getStorage(dbConfig);
-  const ref = refimage(storage, address);
+  const ref = storageRef(storage, address);
   const url = await getDownloadURL(ref);
   return url;
 };
