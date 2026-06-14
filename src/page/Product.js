@@ -9,6 +9,7 @@ import kecapManis from "../img/kecapManis.png";
 import kecapIkan from "../img/kecapIkan.png";
 import cuka from "../img/cuka.png";
 import spritus from "../img/spritus.png";
+import jerigen from "../img/jerigen.png";
 import ButtonCategory from "../component/ButtonCategory";
 import { PRODUCT_CATEGORY } from "../constant/Home";
 import CloseIcon from "@mui/icons-material/Close";
@@ -139,14 +140,7 @@ export default function Product() {
   }
 
   function save() {
-    const isValid =
-      productName !== "" &&
-      productCategory !== null &&
-      productSize !== null &&
-      productQty !== 0 &&
-      productPrice !== 0 &&
-      productType !== null &&
-      productTotalLusin !== null;
+    const isValid = productName !== "" && productCategory !== null && productSize !== null && productQty !== 0 && productPrice !== 0 && productType !== null && productTotalLusin !== null;
 
     if (isValid) {
       const temp = {
@@ -191,10 +185,16 @@ export default function Product() {
   }, [allProduct]);
 
   useEffect(() => {
-    const filtered =
-      category === null ? allProduct : allProduct.filter((p) => p.categoryID === category);
-    setProduct(filtered);
-    setTotal(filtered.length);
+    let filteredProducts;
+    if (category === null) {
+      filteredProducts = allProduct;
+    } else if (category === "C6") {
+      filteredProducts = allProduct.filter((product) => product.type === "Gen");
+    } else {
+      filteredProducts = allProduct.filter((product) => product.categoryID === category);
+    }
+    setProduct(filteredProducts);
+    setTotal(filteredProducts.length);
   }, [category]);
 
   // ── Render ─────────────────────────────────────────────────────────────
@@ -206,51 +206,48 @@ export default function Product() {
   };
 
   return (
-    <Grid
-      container
-      sx={{ width: "100%", display: "flex", justifyContent: "space-between", height: "100vh" }}
-    >
+    <Grid container sx={{ width: "100%", display: "flex", justifyContent: "space-between", height: "100vh" }}>
       {/* ── Left panel ── */}
       <Grid item sx={{ pr: 5, height: "100%" }} xs={9}>
         <NavBar />
 
         {/* Category buttons */}
-        <Grid container mt={5} justifyContent={"space-between"}>
+        <Grid
+          container
+          mt={3}
+          wrap="nowrap"
+          sx={{
+            gap: 1.5,
+            overflowX: "auto",
+            pb: 1,
+            "&::-webkit-scrollbar": { display: "none" },
+          }}
+        >
           <ButtonCategory id={null} value={category} img={semuaProduk} label={"Semua Produk"} setCategory={setCategory} />
           <ButtonCategory id={"C1"} value={category} img={kecapAsin} label={"Kecap Asin"} setCategory={setCategory} />
           <ButtonCategory id={"C2"} value={category} img={kecapManis} label={"Kecap Manis"} setCategory={setCategory} />
           <ButtonCategory id={"C3"} value={category} img={cuka} label={"Cuka"} setCategory={setCategory} />
           <ButtonCategory id={"C4"} value={category} img={kecapIkan} label={"Kecap Ikan"} setCategory={setCategory} />
           <ButtonCategory id={"C5"} value={category} img={spritus} label={"Spritus"} setCategory={setCategory} />
+          <ButtonCategory id={"C6"} value={category} img={jerigen} label={"Jerigen"} setCategory={setCategory} />
         </Grid>
 
         {/* Title & count */}
         <Grid container justifyContent={"space-between"} alignItems={"center"} mt={3}>
           <Grid item>
-            <Typography sx={{ fontFamily: "poppins", fontSize: 28, fontWeight: "bold", color: "#12141E" }}>
-              {PRODUCT_CATEGORY[category]}
-            </Typography>
+            <Typography sx={{ fontFamily: "poppins", fontSize: 28, fontWeight: "bold", color: "#12141E" }}>{PRODUCT_CATEGORY[category]}</Typography>
           </Grid>
           <Grid item>
-            <Typography sx={{ fontFamily: "nunito", fontSize: 18, fontWeight: "semibold", color: "#6D6F75" }}>
-              {total} jenis produk
-            </Typography>
+            <Typography sx={{ fontFamily: "nunito", fontSize: 18, fontWeight: "semibold", color: "#6D6F75" }}>{total} jenis produk</Typography>
           </Grid>
         </Grid>
 
         {/* Product grid */}
-        <Grid
-          container
-          justifyContent={"space-between"}
-          alignItems={"center"}
-          mt={3}
-          rowGap={4}
-          overflow={"auto"}
-          maxHeight={"57%"}
-          sx={style.scroll}
-        >
+        <Grid container justifyContent={"space-between"} alignItems={"center"} mt={3} rowGap={2} overflow={"auto"} sx={{ ...style.scroll, height: "calc(100vh - 260px)" }}>
           {product.map((p, idx) => (
-            <ProductCardEdit key={idx} product={p} edit={(e) => edit(e)} disabled={editing} />
+            <Grid item key={product?.id} sx={{ width: "calc(50% - 10px)" }}>
+              <ProductCardEdit key={idx} product={p} edit={(e) => edit(e)} disabled={editing} />
+            </Grid>
           ))}
         </Grid>
       </Grid>
@@ -308,11 +305,7 @@ export default function Product() {
               >
                 {productImagePreview ? (
                   <>
-                    <img
-                      src={productImagePreview}
-                      alt="preview"
-                      style={{ width: "100%", height: "100%", objectFit: "contain" }}
-                    />
+                    <img src={productImagePreview} alt="preview" style={{ width: "100%", height: "100%", objectFit: "contain" }} />
                     {/* Tombol hapus gambar */}
                     <IconButton
                       onClick={(e) => {
@@ -335,23 +328,13 @@ export default function Product() {
                 ) : (
                   <Box textAlign="center" sx={{ pointerEvents: "none" }}>
                     <AddPhotoAlternateIcon sx={{ color: "#D9D9D9", fontSize: 44 }} />
-                    <Typography
-                      sx={{ fontFamily: "nunito", fontSize: 13, color: "#AAAAAA", mt: 0.5 }}
-                    >
-                      Klik untuk upload foto
-                    </Typography>
+                    <Typography sx={{ fontFamily: "nunito", fontSize: 13, color: "#AAAAAA", mt: 0.5 }}>Klik untuk upload foto</Typography>
                   </Box>
                 )}
               </Box>
 
               {/* Label nama file yang dipilih */}
-              {productImage && (
-                <Typography
-                  sx={{ fontFamily: "nunito", fontSize: 12, color: "#828282", mt: 0.5 }}
-                >
-                  {productImage.name}
-                </Typography>
-              )}
+              {productImage && <Typography sx={{ fontFamily: "nunito", fontSize: 12, color: "#828282", mt: 0.5 }}>{productImage.name}</Typography>}
 
               {/* Hidden file input */}
               <input
@@ -361,20 +344,19 @@ export default function Product() {
                 style={{ display: "none" }}
                 onChange={handleImageChange}
                 // Reset value agar onChange tetap trigger jika file sama dipilih ulang
-                onClick={(e) => { e.target.value = null; }}
+                onClick={(e) => {
+                  e.target.value = null;
+                }}
               />
             </Grid>
 
             {/* ── Nama ── */}
             <Grid item mt={2}>
-              <Typography sx={style.labelBotol} mb={1}>Nama</Typography>
+              <Typography sx={style.labelBotol} mb={1}>
+                Nama
+              </Typography>
               <Grid item container gap={2}>
-                <TextField
-                  id="productName"
-                  sx={{ width: "80%" }}
-                  value={productName}
-                  onChange={(e) => setProductName(e.target.value)}
-                />
+                <TextField id="productName" sx={{ width: "80%" }} value={productName} onChange={(e) => setProductName(e.target.value)} />
                 <IconButton onClick={() => setProductName("")} sx={iconBtnSx}>
                   <CloseIcon />
                 </IconButton>
@@ -383,17 +365,15 @@ export default function Product() {
 
             {/* ── Kategori ── */}
             <Grid item mt={2}>
-              <Typography sx={style.labelBotol} mb={1}>Kategori</Typography>
+              <Typography sx={style.labelBotol} mb={1}>
+                Kategori
+              </Typography>
               <Grid item container gap={2}>
-                <TextField
-                  id="select-category"
-                  select
-                  sx={{ width: "80%" }}
-                  value={productCategory}
-                  onChange={(e) => setProductCategory(e.target.value)}
-                >
+                <TextField id="select-category" select sx={{ width: "80%" }} value={productCategory} onChange={(e) => setProductCategory(e.target.value)}>
                   {PRODUCT_CATEGORY_SELECT.map((item, index) => (
-                    <MenuItem value={item?.value} key={index}>{item.label}</MenuItem>
+                    <MenuItem value={item?.value} key={index}>
+                      {item.label}
+                    </MenuItem>
                   ))}
                 </TextField>
                 <IconButton onClick={() => setProductCategory(null)} sx={iconBtnSx}>
@@ -404,17 +384,15 @@ export default function Product() {
 
             {/* ── Ukuran ── */}
             <Grid item mt={2}>
-              <Typography sx={style.labelBotol} mb={1}>Ukuran</Typography>
+              <Typography sx={style.labelBotol} mb={1}>
+                Ukuran
+              </Typography>
               <Grid item container gap={2}>
-                <TextField
-                  id="select-size"
-                  select
-                  sx={{ width: "80%" }}
-                  value={productSize}
-                  onChange={(e) => setProductSize(e.target.value)}
-                >
+                <TextField id="select-size" select sx={{ width: "80%" }} value={productSize} onChange={(e) => setProductSize(e.target.value)}>
                   {PRODUCT_SIZE_SELECT.map((item, index) => (
-                    <MenuItem value={item?.value} key={index}>{item.label}</MenuItem>
+                    <MenuItem value={item?.value} key={index}>
+                      {item.label}
+                    </MenuItem>
                   ))}
                 </TextField>
                 <IconButton onClick={() => setProductSize(null)} sx={iconBtnSx}>
@@ -425,17 +403,15 @@ export default function Product() {
 
             {/* ── Jenis ── */}
             <Grid item mt={2}>
-              <Typography sx={style.labelBotol} mb={1}>Jenis</Typography>
+              <Typography sx={style.labelBotol} mb={1}>
+                Jenis
+              </Typography>
               <Grid item container gap={2}>
-                <TextField
-                  id="select-type"
-                  select
-                  sx={{ width: "80%" }}
-                  value={productType}
-                  onChange={(e) => setProductType(e.target.value)}
-                >
+                <TextField id="select-type" select sx={{ width: "80%" }} value={productType} onChange={(e) => setProductType(e.target.value)}>
                   {PRODUCT_TYPE_SELECT.map((item, index) => (
-                    <MenuItem value={item?.value} key={index}>{item.label}</MenuItem>
+                    <MenuItem value={item?.value} key={index}>
+                      {item.label}
+                    </MenuItem>
                   ))}
                 </TextField>
                 <IconButton onClick={() => setProductType(null)} sx={iconBtnSx}>
@@ -446,17 +422,15 @@ export default function Product() {
 
             {/* ── Jumlah Lusin ── */}
             <Grid item mt={2}>
-              <Typography sx={style.labelBotol} mb={1}>Jumlah Lusin</Typography>
+              <Typography sx={style.labelBotol} mb={1}>
+                Jumlah Lusin
+              </Typography>
               <Grid item container gap={2}>
-                <TextField
-                  id="select-total-lusin"
-                  select
-                  sx={{ width: "80%" }}
-                  value={productTotalLusin}
-                  onChange={(e) => setProductTotalLusin(e.target.value)}
-                >
+                <TextField id="select-total-lusin" select sx={{ width: "80%" }} value={productTotalLusin} onChange={(e) => setProductTotalLusin(e.target.value)}>
                   {TOTAL_LUSIN_SELECT.map((item, index) => (
-                    <MenuItem value={item?.value} key={index}>{item.label}</MenuItem>
+                    <MenuItem value={item?.value} key={index}>
+                      {item.label}
+                    </MenuItem>
                   ))}
                 </TextField>
                 <IconButton onClick={() => setProductTotalLusin(null)} sx={iconBtnSx}>
@@ -467,16 +441,11 @@ export default function Product() {
 
             {/* ── Jumlah (Qty) ── */}
             <Grid item mt={2}>
-              <Typography sx={style.labelBotol} mb={1}>Jumlah</Typography>
+              <Typography sx={style.labelBotol} mb={1}>
+                Jumlah
+              </Typography>
               <Grid item container gap={2}>
-                <TextField
-                  InputProps={{ inputProps: { min: 0 } }}
-                  type="number"
-                  id="productQty"
-                  sx={{ width: "80%" }}
-                  value={productQty}
-                  onChange={(e) => setProductQty(e.target.value)}
-                />
+                <TextField InputProps={{ inputProps: { min: 0 } }} type="number" id="productQty" sx={{ width: "80%" }} value={productQty} onChange={(e) => setProductQty(e.target.value)} />
                 <IconButton onClick={() => setProductQty(0)} sx={iconBtnSx}>
                   <CloseIcon />
                 </IconButton>
@@ -485,16 +454,11 @@ export default function Product() {
 
             {/* ── Harga ── */}
             <Grid item mt={2}>
-              <Typography sx={style.labelBotol} mb={1}>Harga</Typography>
+              <Typography sx={style.labelBotol} mb={1}>
+                Harga
+              </Typography>
               <Grid item container gap={2}>
-                <TextField
-                  InputProps={{ inputProps: { min: 0 } }}
-                  type="number"
-                  id="productPrice"
-                  sx={{ width: "80%" }}
-                  value={productPrice}
-                  onChange={(e) => setProductPrice(e.target.value)}
-                />
+                <TextField InputProps={{ inputProps: { min: 0 } }} type="number" id="productPrice" sx={{ width: "80%" }} value={productPrice} onChange={(e) => setProductPrice(e.target.value)} />
                 <IconButton onClick={() => setProductPrice(0)} sx={iconBtnSx}>
                   <CloseIcon />
                 </IconButton>
@@ -538,16 +502,8 @@ export default function Product() {
       </Grid>
 
       {/* ── Dialogs ── */}
-      <DialogSuccess
-        open={productSuccess}
-        handleToggle={() => dispatch(setOpenSuccessProduct(false))}
-        message="Data Product Berhasil Disimpan!!"
-      />
-      <DialogFailed
-        open={productFailed?.isOpen}
-        handleToggle={() => dispatch(setOpenFailedProduct({ isOpen: false, message: "" }))}
-        message={productFailed?.message}
-      />
+      <DialogSuccess open={productSuccess} handleToggle={() => dispatch(setOpenSuccessProduct(false))} message="Data Product Berhasil Disimpan!!" />
+      <DialogFailed open={productFailed?.isOpen} handleToggle={() => dispatch(setOpenFailedProduct({ isOpen: false, message: "" }))} message={productFailed?.message} />
     </Grid>
   );
 }

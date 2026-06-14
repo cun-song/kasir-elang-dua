@@ -7,6 +7,7 @@ export const PRODUCT_CATEGORY = {
   C3: "Produk Cuka",
   C4: "Produk Kecap Ikan",
   C5: "Produk Spritus",
+  C6: "Produk Jerigen",
 };
 
 export const DISCOUNT_LIST = [

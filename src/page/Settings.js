@@ -27,6 +27,7 @@ import {
   TableHead,
   TableRow,
   Tooltip,
+  useMediaQuery,
 } from "@mui/material";
 import NavBar from "../component/NavBar";
 import { useDispatch, useSelector } from "react-redux";
@@ -460,6 +461,7 @@ export default function Settings() {
       </InputAdornment>
     );
   }
+  const isMobile = useMediaQuery("(max-width: 600px)");
 
   const filteredUsers = allUsers.filter((u) => u.username?.toLowerCase().includes(userSearch.toLowerCase()) || u.email?.toLowerCase().includes(userSearch.toLowerCase()));
   const rc = roleColor(role);
@@ -470,7 +472,7 @@ export default function Settings() {
         @import url('https://api.fontshare.com/v2/css?f[]=clash-display@400,500,600,700&display=swap');
         @keyframes fadeUp { from { opacity:0; transform:translateY(14px); } to { opacity:1; transform:translateY(0); } }
       `}</style>
-      <Box sx={{ width: "100%", pr: 5 }}>
+      <Box sx={{ width: "100%", pr: isMobile ? 0 : 5 }}>
         <NavBar />
         <Box sx={{ pb: 8, pt: 2, maxWidth: 860, mx: "auto" }}>
           {/* Header */}
