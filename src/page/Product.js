@@ -20,6 +20,8 @@ import { PRODUCT_CATEGORY_SELECT, PRODUCT_SIZE_SELECT, PRODUCT_TYPE_SELECT, TOTA
 import DialogSuccess from "../component/DialogSuccess";
 import DialogFailed from "../component/DialogFailed";
 import { setOpenSuccessProduct, setOpenFailedProduct } from "../redux/productReducer";
+import ProductReorderDialog from "../component/ProductReorderDialog";
+import SwapVertIcon from "@mui/icons-material/SwapVert";
 
 const style = {
   scroll: {
@@ -64,6 +66,7 @@ export default function Product() {
   const [productQty, setProductQty] = useState(0);
   const [productPrice, setProductPrice] = useState(0);
   const [productTotalLusin, setProductTotalLusin] = useState(0);
+  const [openReorder, setOpenReorder] = useState(false);
 
   // ── Image state ────────────────────────────────────────────────────────
   // productImage      → File object (gambar baru yang dipilih user)
@@ -237,8 +240,25 @@ export default function Product() {
           <Grid item>
             <Typography sx={{ fontFamily: "poppins", fontSize: 28, fontWeight: "bold", color: "#12141E" }}>{PRODUCT_CATEGORY[category]}</Typography>
           </Grid>
-          <Grid item>
+          <Grid item sx={{ display: "flex", alignItems: "center", gap: 2 }}>
             <Typography sx={{ fontFamily: "nunito", fontSize: 18, fontWeight: "semibold", color: "#6D6F75" }}>{total} jenis produk</Typography>
+            <Button
+              startIcon={<SwapVertIcon />}
+              onClick={() => setOpenReorder(true)}
+              sx={{
+                borderColor: "#E06F2C",
+                color: "#E06F2C",
+                ":hover": { backgroundColor: "#E06F2C", color: "white", borderColor: "#E06F2C" },
+                height: "40px",
+                borderRadius: "20px",
+                textTransform: "none",
+                fontFamily: "poppins",
+                fontSize: 13,
+              }}
+              variant="outlined"
+            >
+              Atur Urutan
+            </Button>
           </Grid>
         </Grid>
 
@@ -504,6 +524,7 @@ export default function Product() {
       {/* ── Dialogs ── */}
       <DialogSuccess open={productSuccess} handleToggle={() => dispatch(setOpenSuccessProduct(false))} message="Data Product Berhasil Disimpan!!" />
       <DialogFailed open={productFailed?.isOpen} handleToggle={() => dispatch(setOpenFailedProduct({ isOpen: false, message: "" }))} message={productFailed?.message} />
+      <ProductReorderDialog open={openReorder} handleToggle={() => setOpenReorder(false)} products={allProduct} />
     </Grid>
   );
 }
