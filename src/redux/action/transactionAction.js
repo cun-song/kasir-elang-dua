@@ -1,11 +1,13 @@
-import { getDatabase, ref, get, push, set, serverTimestamp, child, query, orderByChild, startAt, update, equalTo, remove, onValue } from "firebase/database";
+import { getDatabase, ref, get, push, set, serverTimestamp, child, query, orderByChild, startAt, update, equalTo, remove } from "firebase/database";
 import dbConfig, { storage, database } from "../../config/fbConfig";
 import { getDownloadURL, ref as storageRef, uploadBytes } from "firebase/storage";
-import { FieldValue } from "firebase/firestore";
-import { setOpenFailed, setOpenFailedUpdate, setOpenSuccess, setOpenSuccessUpdate, setReset, setTransactionHistory, settra } from "../transactionReducer";
+import { setOpenFailed, setOpenFailedUpdate, setOpenSuccess, setOpenSuccessUpdate, setReset, setTransactionHistory } from "../transactionReducer";
 import { setLoading } from "../sidenavReducer";
 import { v4 as uuidv4 } from "uuid";
 import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+
+dayjs.extend(utc);
 
 function generateString(number) {
   // Convert the number to a string
@@ -307,38 +309,63 @@ export const sendPdfToFirebaseJob = async (pdfBlob) => {
     return { success: false, error };
   }
 };
+
 export const getServerTimeGMT7 = async () => {
-  return new Promise((resolve, reject) => {
-    try {
-      const db = getDatabase();
-      const timeRef = ref(db, "utils/serverTime");
+  const db = getDatabase();
+  const timeRef = ref(db, "utils/serverTime");
 
-      // Trigger penulisan waktu server
-      set(timeRef, serverTimestamp());
+  // 1. Tulis serverTimestamp dan TUNGGU sampai benar-benar tersimpan di server
+  await set(timeRef, serverTimestamp());
 
-      // Ambil waktu server setelah tersimpan
-      onValue(
-        timeRef,
-        (snapshot) => {
-          const timestamp = snapshot.val();
-          if (timestamp) {
-            // Konversi dari UNIX timestamp ke objek dayjs
-            const serverTime = dayjs(timestamp);
-            // Tambahkan offset +7 jam
-            const gmt7Time = serverTime.utcOffset(7 * 60); // 7*60 menit
+  // 2. Baru baca nilainya — ini menjamin nilai yang didapat adalah
+  //    timestamp UNIX (ms) hasil resolusi server, bukan cache lama
+  const snapshot = await get(timeRef);
+  const timestamp = snapshot.val();
 
-            resolve(gmt7Time);
-          } else {
-            reject(new Error("Server timestamp not available"));
-          }
-        },
-        { onlyOnce: true }
-      );
-    } catch (error) {
-      reject(error);
-    }
-  });
+  if (!timestamp) {
+    throw new Error("Server timestamp not available");
+  }
+
+
+  // 3. PENTING: parse sebagai UTC dulu, baru offset ke +7
+  //    Ini murni UTC+7, tidak terpengaruh timezone/jam device sama sekali
+  const gmt7Time = dayjs.utc(timestamp).utcOffset(7 * 60);
+
+  return gmt7Time;
 };
+
+// export const getServerTimeGMT7 = async () => {
+//   return new Promise((resolve, reject) => {
+//     try {
+//       const db = getDatabase();
+//       const timeRef = ref(db, "utils/serverTime");
+
+//       // Trigger penulisan waktu server
+//       set(timeRef, serverTimestamp());
+
+//       // Ambil waktu server setelah tersimpan
+//       onValue(
+//         timeRef,
+//         (snapshot) => {
+//           const timestamp = snapshot.val();
+//           if (timestamp) {
+//             // Konversi dari UNIX timestamp ke objek dayjs
+//             const serverTime = dayjs(timestamp);
+//             // Tambahkan offset +7 jam
+//             const gmt7Time = serverTime.utcOffset(7 * 60); // 7*60 menit
+
+//             resolve(gmt7Time);
+//           } else {
+//             reject(new Error("Server timestamp not available"));
+//           }
+//         },
+//         { onlyOnce: true }
+//       );
+//     } catch (error) {
+//       reject(error);
+//     }
+//   });
+// };
 
 export const pushToPrintQueue = (data) => async (dispatch) => {
   const db = getDatabase();

@@ -1,22 +1,20 @@
 import React, { useEffect, useRef, useState } from "react";
 import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
 import elangVector from "../img/ElangVector.png";
 import { convertTimestamp, decimalToFraction, formattedNumber } from "./stingFormatted";
-import { renderToStaticMarkup } from "react-dom/server";
 import { useReactToPrint } from "react-to-print";
 import { useDispatch, useSelector } from "react-redux";
 import { setLoading } from "../redux/sidenavReducer";
 import { Box, Button, useMediaQuery } from "@mui/material";
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
-import dayjs from "dayjs";
-import utc from "dayjs/plugin/utc";
-import timezone from "dayjs/plugin/timezone";
 import "dayjs/locale/id"; // Import Indonesian locale
 import { sendPdfToFirebaseJob, getServerTimeGMT7 } from "../redux/action/transactionAction";
 import { fetchProductData } from "../redux/action/productAction";
 import { Label_Size } from "../constant/Home";
+import dayjs from "dayjs";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
 
 const css = {
   titleHeader: {
@@ -66,7 +64,6 @@ const css = {
     borderRight: "1px solid black",
     borderBottom: "1px solid black",
     textAlign: "center",
-    fontSize: "11px",
     fontSize: "16px",
     letterSpacing: "-2px",
     wordSpacing: "-3px",
@@ -102,7 +99,7 @@ const Table = ({ data, date }) => {
   return (
     <div style={{ padding: "20px", paddingLeft: "25px", paddingTop: "18px", width: "8in", height: "5.5in", boxSizing: "border-box", position: "relative" }}>
       <div style={{ position: "absolute", top: 28, left: 25 }}>
-        <img src={elangVector} style={{ height: "40px", width: "auto" }} />
+        <img alt="logo" src={elangVector} style={{ height: "40px", width: "auto" }} />
       </div>
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center", marginBottom: "10px", paddingBottom: "5px", borderBottom: "2px double black" }}>
         <h1 style={css.titleHeader}>Perusahaan Kecap ELANG DUA</h1>
@@ -359,15 +356,11 @@ const TableTotal = ({ data, date, authName, dataInvoice }) => {
   );
 };
 
-export const BulkPrinting = ({ data, dataRangkuman }) => {
-  dayjs.extend(utc);
-  dayjs.extend(timezone);
-  dayjs.locale("id");
 
-  // Set zona waktu yang Anda inginkan (contoh: Asia/Jakarta)
-  const myTimezone = "Asia/Jakarta";
-  const today = dayjs().tz(myTimezone);
-  const [date, setDate] = useState(today);
+
+export const BulkPrinting = ({ data, dataRangkuman }) => {
+  // date diinisialisasi null — TIDAK ada dayjs() lokal device di sini lagi
+  const [date, setDate] = useState(null);
   const dispatch = useDispatch();
   const isMobile = useMediaQuery("(max-width: 600px)");
   const printRef = useRef();
@@ -389,41 +382,44 @@ export const BulkPrinting = ({ data, dataRangkuman }) => {
   });
 
   const generatePDFAndUpload = async () => {
-    dispatch(setLoading()); // Mulai loading
+    dispatch(setLoading());
 
     const doc = new jsPDF();
-
-    // Menambahkan konten dari ref ke PDF
-    printRef.current.style.display = "block"; // Pastikan elemen terlihat saat diambil
+    printRef.current.style.display = "block";
     doc.html(printRef.current, {
       callback: async () => {
-        const pdfBlob = doc.output("blob"); // Mengonversi PDF menjadi Blob
-
-        // Upload PDF ke Firebase Storage menggunakan fungsi terpisah
+        const pdfBlob = doc.output("blob");
         const uploadResult = await sendPdfToFirebaseJob(pdfBlob);
 
         if (uploadResult.success) {
           console.log("PDF uploaded successfully:", uploadResult.url);
-
-          // Lakukan aksi lain setelah upload berhasil, misalnya update database atau trigger server
         } else {
           console.error("Error uploading PDF:", uploadResult.error);
         }
-        printRef.current.style.display = "none"; // Sembunyikan elemen setelah diambil
-        dispatch(setLoading()); // Menghentikan loading setelah selesai
+        printRef.current.style.display = "none";
+        dispatch(setLoading());
       },
-      // margin: [10, 10, 10, 10], // Margin dokumen PDF
-      // x: 10,
-      // y: 10,
     });
   };
+
   useEffect(() => {
+    let isMounted = true;
+
     getServerTimeGMT7()
       .then((gmt7Time) => {
-        setDate(gmt7Time);
+        if (isMounted) setDate(gmt7Time);
       })
-      .catch(console.error);
+      .catch((err) => {
+        console.error("Gagal mengambil waktu server:", err);
+        // date tetap null kalau gagal — TIDAK fallback ke dayjs() lokal,
+        // supaya tidak ada percampuran dengan jam device
+      });
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
+
   return (
     <div style={{ display: "flex", flexDirection: "column", alignItems: "center", width: "100%" }}>
       <div ref={printRef} className="hide-on-screen">
@@ -441,7 +437,15 @@ export const BulkPrinting = ({ data, dataRangkuman }) => {
       </div>
       <Box sx={{ display: "flex", alignItems: "center", width: "100%", justifyContent: "space-between" }}>
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="id">
-          <DatePicker sx={{ marginLeft: 2, mr: 6 }} value={date} disablePast views={["year", "month", "day"]} format="DD MMMM YYYY" onChange={(e) => setDate(e)} />
+          <DatePicker
+            sx={{ marginLeft: 2, mr: 6 }}
+            value={date}
+            referenceDate={date}
+            disablePast
+            views={["year", "month", "day"]}
+            format="DD MMMM YYYY"
+            onChange={(newDate) => setDate(newDate)}
+          />
         </LocalizationProvider>
         <Button
           onClick={isMobile ? generatePDFAndUpload : Print}
