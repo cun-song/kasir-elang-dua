@@ -1,4 +1,4 @@
-import { getDatabase, ref, get, push, set, serverTimestamp, child, query, orderByChild, startAt, update, equalTo } from "firebase/database";
+import { getDatabase, ref, get, push, set, serverTimestamp, child, query, orderByChild, update, equalTo } from "firebase/database";
 import { getStorage, ref as storageRef, uploadBytes, getDownloadURL } from "firebase/storage";
 import dbConfig from "../../config/fbConfig";
 import { setAllProduct, setOpenFailedProduct, setOpenSuccessProduct, setResetProduct } from "../productReducer";
@@ -42,7 +42,7 @@ export const pushProduct = (data, imageFile) => async (dispatch) => {
   const dbRef = ref(db, "product");
   const productID = await getNextProductId(db);
   const newProductId = "P" + productID;
- 
+
   let imgUrl = "";
   if (imageFile) {
     try {
@@ -54,7 +54,7 @@ export const pushProduct = (data, imageFile) => async (dispatch) => {
       return;
     }
   }
- 
+
   const snapshot = await push(dbRef);
   set(snapshot, {
     ...data,
@@ -74,7 +74,7 @@ export const pushProduct = (data, imageFile) => async (dispatch) => {
       dispatch(setLoading());
     });
 };
- 
+
 // ─────────────────────────────────────────────────────────────────────────────
 // UPDATE — Edit produk yang sudah ada
 //   data.img  : URL lama dari Firebase (dipakai jika imageFile null)
@@ -84,7 +84,7 @@ export const updateProduct = (data, imageFile) => async (dispatch) => {
   const db = getDatabase(dbConfig);
   const productRef = ref(db, "product");
   const idQuery = query(productRef, orderByChild("id"), equalTo(data?.id));
- 
+
   get(idQuery)
     .then(async (snapshot) => {
       if (!snapshot.exists()) {
@@ -93,10 +93,10 @@ export const updateProduct = (data, imageFile) => async (dispatch) => {
         dispatch(setLoading());
         return;
       }
- 
+
       // Tentukan URL gambar akhir
       let imgUrl = data.img ?? ""; // default: pertahankan URL lama
- 
+
       if (imageFile) {
         try {
           // Upload overwrite ke path product/{id} → URL baru
@@ -108,7 +108,7 @@ export const updateProduct = (data, imageFile) => async (dispatch) => {
           return;
         }
       }
- 
+
       snapshot.forEach((childSnapshot) => {
         const key = childSnapshot.key;
         const dbRef = ref(db, "product/" + key);
@@ -175,4 +175,44 @@ const fetchImage = async (address) => {
   const ref = storageRef(storage, address);
   const url = await getDownloadURL(ref);
   return url;
+};
+export const updateProductOrder = (orderedProducts) => async (dispatch) => {
+  const db = getDatabase(dbConfig);
+  const dbRef = ref(db);
+
+  try {
+    const snapshot = await get(child(dbRef, "product"));
+    if (!snapshot.exists()) {
+      dispatch(setOpenFailedProduct({ isOpen: true, message: "Produk tidak ditemukan" }));
+      dispatch(setLoading());
+      return;
+    }
+
+    const products = snapshot.val();
+
+    // map id produk -> key node firebase
+    const idToKey = {};
+    Object.entries(products).forEach(([key, val]) => {
+      idToKey[val?.id] = key;
+    });
+
+    // siapkan multi-path update, hanya mengubah field index
+    const updates = {};
+    orderedProducts.forEach((p, idx) => {
+      const key = idToKey[p?.id];
+      if (key) {
+        updates[`product/${key}/index`] = idx + 1;
+      }
+    });
+
+    await update(dbRef, updates);
+
+    dispatch(setOpenSuccessProduct(true));
+    dispatch(setResetProduct());
+    dispatch(setLoading());
+  } catch (error) {
+    console.error("Error updating product order:", error);
+    dispatch(setOpenFailedProduct({ isOpen: true, message: "Error mengatur urutan produk" }));
+    dispatch(setLoading());
+  }
 };

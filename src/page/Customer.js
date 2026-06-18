@@ -1,5 +1,5 @@
 import React from "react";
-import { Box, Typography, TextField, MenuItem, Button } from "@mui/material";
+import { Box, Typography, TextField, MenuItem, Button, useMediaQuery } from "@mui/material";
 import NavBar from "../component/NavBar";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
@@ -92,10 +92,11 @@ export default function Customer() {
       setOpenEdit(true);
     }
   }
+  const isMobile = useMediaQuery("(max-width: 600px)");
 
   return (
     <Box sx={{ width: "100%", height: "100%", display: "flex", justifyContent: "space-between" }}>
-      <Box sx={{ width: "100%", pr: 5 }}>
+      <Box sx={{ width: "100%", pr: isMobile ? 0 : 5, pl: isMobile ? 4 : 0 }}>
         <NavBar />
         <Box sx={{ backgroundColor: "white", borderRadius: "10px", p: 4, mt: 4 }}>
           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>

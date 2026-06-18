@@ -138,12 +138,12 @@ export default function History() {
           td[key]?.price === 0
             ? 0
             : td[key]?.size === "Besar"
-            ? td[key]?.productQty * (td[key]?.price - td[key]?.totalLusin * data?.discount?.besar)
-            : td[key]?.size === "Kecil"
-            ? td[key]?.productQty * (td[key]?.price - td[key]?.totalLusin * data?.discount?.kecil)
-            : td[key]?.size === "meja"
-            ? td[key]?.productQty * (td[key]?.price - td[key]?.totalLusin * data?.discount?.meja)
-            : td[key]?.productQty * td[key]?.price,
+              ? td[key]?.productQty * (td[key]?.price - td[key]?.totalLusin * data?.discount?.besar)
+              : td[key]?.size === "Kecil"
+                ? td[key]?.productQty * (td[key]?.price - td[key]?.totalLusin * data?.discount?.kecil)
+                : td[key]?.size === "meja"
+                  ? td[key]?.productQty * (td[key]?.price - td[key]?.totalLusin * data?.discount?.meja)
+                  : td[key]?.productQty * td[key]?.price,
       }));
   }
   function findCustomer(id) {
@@ -275,7 +275,7 @@ export default function History() {
   ];
   return (
     <Box sx={{ width: "100%", height: "100%", display: "flex", justifyContent: "space-between" }}>
-      <Box sx={{ width: "100%", pr: isMobile ? 0 : 5 }}>
+      <Box sx={{ width: "100%", pr: isMobile ? 0 : 5, pl: isMobile ? 4 : 0 }}>
         <NavBar />
         <Box sx={{ backgroundColor: isMobile ? "transparent" : "white", borderRadius: "10px", p: isMobile ? 0 : 4, mt: 4, width: isMobile ? "96%" : "auto" }}>
           <Box sx={{ display: "flex", justifyContent: "space-between", alignItems: isMobile ? "left" : "center", flexDirection: isMobile ? "column-reverse" : "row", gap: isMobile ? 2 : 0 }}>

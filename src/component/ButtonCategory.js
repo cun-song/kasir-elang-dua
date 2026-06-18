@@ -1,18 +1,61 @@
+import { Box, Typography } from "@mui/material";
 import React from "react";
-import { Button, Grid, Typography } from "@mui/material";
 
-export default function ButtonCategory({ value, id, label, img, setCategory = () => {} }) {
+export default function ButtonCategory({ id, value, img, label, setCategory }) {
+  const isActive = value === id;
+
   return (
-    <Button
-      sx={{ padding: 0, borderRadius: "18px", border: `1px solid ${value === id ? "#E66E27" : "#CDCBCA"}`, textTransform: "none" }}
-      onClick={() => {
-        setCategory(id);
+    <Box
+      onClick={() => setCategory(id)}
+      sx={{
+        display: "flex",
+        alignItems: "center",
+        gap: 1,
+        flexShrink: 0,
+        cursor: "pointer",
+        px: 2,
+        height: "40px",
+        borderRadius: "20px",
+        backgroundColor: isActive ? "#E06F2C" : "#F2F2F4",
+        transition: "all 0.2s ease",
+        "&:hover": {
+          backgroundColor: isActive ? "#E06F2C" : "#E8E8EB",
+        },
       }}
     >
-      <Grid item gap={2} sx={{ width: "172px", height: "192px", borderRadius: "18px", backgroundColor: `${value === id ? "#FDF1EA" : "#FFFFFF"}`, display: "flex", flexDirection: "column", alignItems: "center", pt: 5 }}>
-        <img src={img} alt={label} />
-        <Typography sx={{ color: `${value === id ? "#704332" : "#A59D9A"}`, fontSize: 18, fontFamily: "nunito" }}>{label}</Typography>
-      </Grid>
-    </Button>
+      <Box
+        sx={{
+          width: "22px",
+          height: "22px",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          flexShrink: 0,
+        }}
+      >
+        <img
+          src={img}
+          alt={label}
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "contain",
+            filter: isActive ? "brightness(0) invert(1)" : "none",
+          }}
+        />
+      </Box>
+      <Typography
+        noWrap
+        sx={{
+          fontFamily: "poppins",
+          fontSize: "13px",
+          fontWeight: "medium",
+          color: isActive ? "#FFFFFF" : "#12141E",
+          whiteSpace: "nowrap",
+        }}
+      >
+        {label}
+      </Typography>
+    </Box>
   );
 }

@@ -1,8 +1,18 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { Alert, Stack, IconButton } from "@mui/material";
 import CloseIcon from "@mui/icons-material/Close";
 
 export default function DialogSuccess({ open = false, handleToggle, message = "Pesanan Berhasil Dibuat" }) {
+  useEffect(() => {
+    if (open) {
+      const timer = setTimeout(() => {
+        handleToggle();
+      }, 3000);
+
+      return () => clearTimeout(timer);
+    }
+  }, [open]);
+
   return (
     <Stack
       sx={{
