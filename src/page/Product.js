@@ -261,7 +261,7 @@ export default function Product() {
         </Grid>
 
         {/* Product grid */}
-        <Grid container justifyContent={"space-between"} alignItems={"center"} mt={3} rowGap={2} overflow={"auto"} sx={{ ...style.scroll, height: "calc(100vh - 260px)" }}>
+        <Grid container justifyContent={"space-between"} mt={3} rowGap={2} overflow={"auto"} sx={{ ...style.scroll, height: "calc(100vh - 260px)" }}>
           {product.map((p, idx) => (
             <Grid item key={product?.id} sx={{ width: "calc(50% - 10px)" }}>
               <ProductCardEdit key={idx} product={p} edit={(e) => edit(e)} disabled={editing} />
