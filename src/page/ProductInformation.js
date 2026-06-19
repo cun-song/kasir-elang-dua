@@ -3,7 +3,6 @@ import React, { useState, useMemo, useCallback, useEffect } from "react";
 import { Box } from "@mui/material";
 import NavBar from "../component/NavBar";
 import { useDispatch, useSelector } from "react-redux";
-import { click, setTitle } from "../redux/sidenavReducer";
 import { subscribeProductList, fetchHpp, saveProduksi, saveBahan, saveKemasan, saveHarga, genRowId } from "../redux/action/hppAction";
 
 // ── palette ───────────────────────────────────────────────────────────────────
@@ -280,11 +279,7 @@ export default function ProductInformation() {
   // ── Redux state ──────────────────────────────────────────────────────────────
   const { productList, hppData, loadingProduct, loadingHpp, saveStatus, openSuccess, openFailed } = useSelector((state) => state.hpp);
 
-  // ── Navbar ───────────────────────────────────────────────────────────────────
-  useEffect(() => {
-    dispatch(click(5));
-    dispatch(setTitle("Informasi Biaya Produk"));
-  }, [dispatch]);
+
 
   // ── Subscribe product list on mount ──────────────────────────────────────────
   useEffect(() => {

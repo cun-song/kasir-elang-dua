@@ -31,7 +31,6 @@ import {
 } from "@mui/material";
 import NavBar from "../component/NavBar";
 import { useDispatch, useSelector } from "react-redux";
-import { click, setTitle } from "../redux/sidenavReducer";
 import { signout } from "../utils/Authentication";
 import { getAuth, reauthenticateWithCredential, EmailAuthProvider, updatePassword } from "firebase/auth";
 import { fetchAllUsers, createUser, deleteUserFromDB, resetUserPassword } from "../redux/action/userAction";
@@ -386,10 +385,7 @@ export default function Settings() {
   const [logoutOpen, setLogoutOpen] = useState(false);
   const [resetEmailSent, setResetEmailSent] = useState(false);
 
-  useEffect(() => {
-    dispatch(click(6));
-    dispatch(setTitle("Pengaturan"));
-  }, []);
+
   useEffect(() => {
     if (isSuperAdmin) dispatch(fetchAllUsers());
   }, [isSuperAdmin]);

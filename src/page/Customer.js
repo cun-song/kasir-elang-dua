@@ -1,10 +1,8 @@
 import React from "react";
-import { Box, Typography, TextField, MenuItem, Button, useMediaQuery } from "@mui/material";
+import { Box,Button, useMediaQuery } from "@mui/material";
 import NavBar from "../component/NavBar";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { click } from "../redux/sidenavReducer";
-import { setTitle } from "../redux/sidenavReducer";
 import StyledSearch from "../component/StyledSearch";
 import StyledTable from "../component/StyledTable";
 import { useSelector } from "react-redux";
@@ -35,8 +33,6 @@ export default function Customer() {
   const role = useSelector((state) => state.sidenav.role);
 
   useEffect(() => {
-    dispatch(click(2));
-    dispatch(setTitle("Pelanggan"));
     dispatch(fetchCustomerData());
   }, []);
 

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Box, Button, Grid, Typography, TextField, MenuItem, IconButton } from "@mui/material";
 import NavBar from "../component/NavBar";
 import { useDispatch, useSelector } from "react-redux";
-import { click, setLoading, setTitle } from "../redux/sidenavReducer";
+import { setLoading } from "../redux/sidenavReducer";
 import semuaProduk from "../img/semuaProduk.png";
 import kecapAsin from "../img/kecapAsin.png";
 import kecapManis from "../img/kecapManis.png";
@@ -177,8 +177,6 @@ export default function Product() {
   }, [refresh]);
 
   useEffect(() => {
-    dispatch(click(1));
-    dispatch(setTitle("Produk"));
     dispatch(fetchProductData());
   }, []);
 

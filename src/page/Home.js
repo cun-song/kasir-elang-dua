@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Drawer, Grid, IconButton, Typography, useMediaQuery, Box } from "@mui/material";
 import NavBar from "../component/NavBar";
 import { useDispatch, useSelector } from "react-redux";
-import { click, setLoading, setTitle } from "../redux/sidenavReducer";
+import { setLoading } from "../redux/sidenavReducer";
 import CloseIcon from "@mui/icons-material/Close";
 import ShoppingCartIcon from "@mui/icons-material/ShoppingCart";
 import ReplyIcon from "@mui/icons-material/Reply";
@@ -209,8 +209,7 @@ export default function Home() {
   }
 
   useEffect(() => {
-    dispatch(click(0));
-    dispatch(setTitle("Pemesanan"));
+
     dispatch(fetchProductData());
     dispatch(fetchCustomerData());
   }, []);
@@ -297,7 +296,7 @@ export default function Home() {
   // ─── PC checkout panel (tidak diubah sama sekali) ────────────────────────────
   const drawerCheckout = (
     <Grid item sx={{ backgroundColor: "#FFFFFF", height: "100%", width: isMobile ? "100vw" : "" }} xs={isMobile ? 0 : 3}>
-      <Grid p={3}>
+      <Grid p={3} sx={{height:"100%"}}>
         <Grid item container gap={2} mt={1}>
           <Typography sx={{ ...style.textCustomer, fontWeight: "medium" }}>Nama Pemesan: </Typography>
           <Grid item sx={style.rowCheckout}>

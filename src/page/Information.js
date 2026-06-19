@@ -1,6 +1,5 @@
 import React, { useEffect, useState, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { click, setTitle } from "../redux/sidenavReducer";
 import {
   Box,
   MenuItem,
@@ -16,7 +15,6 @@ import {
   Avatar,
   Stack,
   LinearProgress,
-  Paper,
   alpha,
   Table,
   TableBody,
@@ -404,8 +402,6 @@ export default function Information() {
   const findProduct = (id) => Object.values(product).find((p) => p?.id === id);
 
   useEffect(() => {
-    dispatch(click(4));
-    dispatch(setTitle("Informasi"));
     dispatch(fetchTransactionHistory(99999));
     dispatch(fetchCustomerData());
     dispatch(fetchProductData());

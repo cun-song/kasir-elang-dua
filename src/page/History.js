@@ -3,10 +3,8 @@ import { Box, Typography, TextField, MenuItem, Button, ButtonGroup, useMediaQuer
 import NavBar from "../component/NavBar";
 import { useEffect } from "react";
 import { useDispatch } from "react-redux";
-import { click, setLoading } from "../redux/sidenavReducer";
-import { setTitle } from "../redux/sidenavReducer";
+import { setLoading } from "../redux/sidenavReducer";
 import StyledSearch from "../component/StyledSearch";
-import StyledTable from "../component/StyledTable";
 import { fetchTransactionHistory, updatePaid, updateShipped } from "../redux/action/transactionAction";
 import { useSelector } from "react-redux";
 import { HISTORY_HEADER, LAST_DATE_LIST, TRANSACTION_SEARCH_ITEM } from "../constant/History";
@@ -19,7 +17,7 @@ import DialogTotalProduct from "../component/DialogTotalProduct";
 import StyledTableTransaction from "../component/StyledTableTransaction";
 import DialogSuccess from "../component/DialogSuccess";
 import DialogFailed from "../component/DialogFailed";
-import { setOpenFailed, setOpenFailedUpdate, setOpenSuccess, setOpenSuccessUpdate } from "../redux/transactionReducer";
+import { setOpenFailedUpdate,  setOpenSuccessUpdate } from "../redux/transactionReducer";
 import DialogConfirmation from "../component/DialogConfirmation";
 
 export default function History() {
@@ -52,8 +50,7 @@ export default function History() {
   const isMobile = useMediaQuery("(max-width: 600px)");
 
   useEffect(() => {
-    dispatch(click(3));
-    dispatch(setTitle("Transaksi"));
+
     dispatch(fetchTransactionHistory(lastDate));
     dispatch(fetchCustomerData());
   }, []);

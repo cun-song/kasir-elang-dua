@@ -1,6 +1,6 @@
 import React from "react";
 import { Routes, Route } from "react-router-dom";
-import { Box, Dialog, Typography, useMediaQuery } from "@mui/material";
+import { Box, useMediaQuery } from "@mui/material";
 import Home from "./Home";
 import SideNav from "../component/SideNav";
 import Product from "./Product";
@@ -18,7 +18,7 @@ export default function Main() {
   return (
     <AuthProvider>
       <SideNav />
-      <Box sx={{ backgroundColor: "#F4F4F4", width: "100%", height: "100%", paddingLeft: isMobile ? 0 : 6, display: "flex", flexDirection: "column" }}>
+      <Box sx={{ backgroundColor: "#F4F4F4", width: "100%", height: "100%", paddingLeft: isMobile ? 0 : "96px", display: "flex", flexDirection: "column" }}>
         <Routes>
           <Route element={<ProtectedRoute />}>
             <Route path="/" element={<Home />} />
