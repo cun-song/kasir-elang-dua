@@ -57,7 +57,7 @@ const MENU_GROUPS = [
     items: [
       { id: 0, label: "Transaksi Penjualan", path: "/", icon: ShoppingCartOutlinedIcon, iconActive: ShoppingCartIcon },
       { id: 3, label: "Data Penjualan", path: "/history", icon: ReceiptOutlinedIcon, iconActive: ReceiptRoundedIcon },
-      { id: 10, label: "Returan", path: null, icon: KeyboardReturnOutlinedIcon, iconActive: KeyboardReturnIcon },
+      { id: 10, label: "Returan", path: "/returan", icon: KeyboardReturnOutlinedIcon, iconActive: KeyboardReturnIcon },
       { id: 11, label: "Titip Bon", path: null, icon: StickyNote2OutlinedIcon, iconActive: StickyNote2Icon },
       { id: 12, label: "Piutang", path: null, icon: RequestQuoteOutlinedIcon, iconActive: RequestQuoteIcon },
     ],

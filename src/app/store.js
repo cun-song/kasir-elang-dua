@@ -6,6 +6,7 @@ import customerReducer from "../redux/customerReducer";
 import transactionReducer from "../redux/transactionReducer";
 import hppReducer from "../redux/hppReducer";
 import userReducer from "../redux/userReducer";
+import returanReducer from "../redux/returanReducer";
 
 export default configureStore({
   reducer: {
@@ -16,5 +17,6 @@ export default configureStore({
     transaction: transactionReducer,
     hpp: hppReducer,
     user: userReducer,
+    returan: returanReducer,
   },
 });

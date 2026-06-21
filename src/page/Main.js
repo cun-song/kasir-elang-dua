@@ -6,6 +6,7 @@ import SideNav from "../component/SideNav";
 import Product from "./Product";
 import Customer from "./Customer";
 import History from "./History";
+import Returan from "./Returan";
 import Settings from "./Settings";
 import ProtectedRoute from "../component/ProtectedRoute";
 import { AuthProvider } from "../utils/useAuth";
@@ -28,6 +29,7 @@ export default function Main() {
             <Route path="/customer" element={<Customer />} />
 
             <Route path="/history" element={<History />} />
+            <Route path="/returan" element={<Returan />} />
             <Route element={<ProtectedSuperAdmin />}>
               <Route path="/information" element={<Information />} />
             </Route>
