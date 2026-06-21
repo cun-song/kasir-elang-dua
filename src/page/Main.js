@@ -13,6 +13,7 @@ import { AuthProvider } from "../utils/useAuth";
 import ProtectedSuperAdmin from "../component/ProtectedSuperAdmin";
 import Information from "./Information";
 import ProductInformation from "./ProductInformation";
+import TitipBon from "./TitipBon";
 export default function Main() {
   const isMobile = useMediaQuery("(max-width: 600px)");
 
@@ -30,6 +31,7 @@ export default function Main() {
 
             <Route path="/history" element={<History />} />
             <Route path="/returan" element={<Returan />} />
+            <Route path="/titip-bon" element={<TitipBon />} />
             <Route element={<ProtectedSuperAdmin />}>
               <Route path="/information" element={<Information />} />
             </Route>

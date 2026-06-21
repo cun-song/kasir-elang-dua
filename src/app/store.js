@@ -7,6 +7,7 @@ import transactionReducer from "../redux/transactionReducer";
 import hppReducer from "../redux/hppReducer";
 import userReducer from "../redux/userReducer";
 import returanReducer from "../redux/returanReducer";
+import titipBonReducer from "../redux/titipBonReducer";
 
 export default configureStore({
   reducer: {
@@ -18,5 +19,6 @@ export default configureStore({
     hpp: hppReducer,
     user: userReducer,
     returan: returanReducer,
+    titipBon: titipBonReducer,
   },
 });
