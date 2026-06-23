@@ -120,21 +120,6 @@ export const TITIPBON_INVOICE_HEADER = [
     },
   },
   {
-    field: "lusin",
-    headerName: "Total Lusin",
-    ...center,
-    minWidth: 110,
-  },
-  {
-    field: "discountTotal",
-    headerName: "Diskon",
-    ...center,
-    minWidth: 130,
-    renderCell: (params) => {
-      return `Rp ${formattedNumber(params?.value || 0)}`;
-    },
-  },
-  {
     field: "total",
     headerName: "Total",
     ...center,
@@ -189,21 +174,6 @@ export const TITIPBON_DETAIL_INVOICE_HEADER = [
     minWidth: 160,
     renderCell: (params) => {
       return convertTimestampDate(params?.value);
-    },
-  },
-  {
-    field: "lusin",
-    headerName: "Total Lusin",
-    ...center,
-    minWidth: 110,
-  },
-  {
-    field: "discount",
-    headerName: "Diskon",
-    ...center,
-    minWidth: 130,
-    renderCell: (params) => {
-      return `Rp ${formattedNumber(params?.value || 0)}`;
     },
   },
   {

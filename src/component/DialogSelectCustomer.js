@@ -40,6 +40,7 @@ export default function DialogSelectCustomer({ open = false, handleToggle }) {
   const [customerID, setCustomerID] = useState(null);
   const [area, setArea] = useState("Singkawang");
   const [ownerList, setOwnerList] = useState([]);
+  const [autocompleteOpen, setAutocompleteOpen] = useState(false);
 
   const dispatch = useDispatch();
   const customer = useSelector((state) => state?.customer?.allCustomer);
@@ -56,6 +57,12 @@ export default function DialogSelectCustomer({ open = false, handleToggle }) {
   function removeCustomer() {
     setCustomerID(null);
   }
+
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && !autocompleteOpen) {
+      save();
+    }
+  };
 
   useEffect(() => {
     if (open) {
@@ -78,7 +85,7 @@ export default function DialogSelectCustomer({ open = false, handleToggle }) {
   }, [customer, area]);
   return (
     <StyledDialog isOpen={open} handleToggle={handleToggle} useCloseBtn width="30%" title="Pilih Pelanggan">
-      <DialogContent>
+      <DialogContent onKeyDown={handleKeyDown}>
         <Grid>
           <Grid item mt={2}>
             <Typography sx={style.labelBotol} mb={1}>
@@ -108,6 +115,8 @@ export default function DialogSelectCustomer({ open = false, handleToggle }) {
                 getOptionLabel={(option) => option.label}
                 value={ownerList.find((item) => item.value === customerID) || null}
                 onChange={(event, newValue) => setCustomerID(newValue ? newValue.value : "")}
+                onOpen={() => setAutocompleteOpen(true)}
+                onClose={() => setAutocompleteOpen(false)}
                 renderInput={(params) => <TextField {...params} sx={{ width: "100%" }} placeholder="Cari Pemesan..." />}
                 isOptionEqualToValue={(option, value) => option.value === value.value}
                 noOptionsText="Tidak ada hasil"

@@ -79,8 +79,6 @@ const css = {
  */
 const TitipBonTable = ({ data }) => {
   const invoices = data?.invoices || [];
-  const minimumRows = 7;
-  const rowsToAdd = Math.max(0, minimumRows - invoices.length);
 
   // Build customer display
   const customerName = [
@@ -90,9 +88,11 @@ const TitipBonTable = ({ data }) => {
     .filter(Boolean)
     .join(", ");
 
-  // Calculate totals
-  const totalLusin = invoices.reduce((acc, inv) => acc + (inv?.lusin || 0), 0);
-  const totalDiskon = invoices.reduce((acc, inv) => acc + (inv?.discount || 0), 0);
+  const leftInvoices = invoices.slice(0, 7);
+  const rightInvoices = invoices.slice(7, 14);
+
+  const leftBlankRows = Math.max(0, 7 - leftInvoices.length);
+  const rightBlankRows = Math.max(0, 7 - rightInvoices.length);
 
   return (
     <div
@@ -153,110 +153,137 @@ const TitipBonTable = ({ data }) => {
             <p style={css.infoValue}>{data?.timestamp ? convertTimestampDate(data.timestamp) : ""}</p>
           </div>
           <div style={{ display: "flex", alignItems: "center", marginBottom: "3px" }}>
-            <p style={{ ...css.infoLabel, minWidth: "60px" }}>Sales</p>
+            <p style={{ ...css.infoLabel, minWidth: "60px" }}>Admin</p>
             <p style={{ ...css.infoLabel, minWidth: "15px", textAlign: "center" }}>:</p>
             <p style={css.infoValue}>{data?.createdBy || ""}</p>
           </div>
         </div>
       </div>
 
-      {/* ═══════ INVOICE TABLE ═══════ */}
-      <table style={{ width: "100%", borderCollapse: "collapse" }}>
-        <thead>
-          <tr>
-            <th style={{ ...css.headerBorder, width: "4%" }}>No</th>
-            <th style={{ ...css.headerBorder, width: "18%" }}>ID Invoice</th>
-            <th style={{ ...css.headerBorder, width: "20%" }}>Tanggal Invoice</th>
-            <th style={{ ...css.headerBorder, width: "12%" }}>Total Lusin</th>
-            <th style={{ ...css.headerBorder, width: "18%" }}>Diskon (Rp)</th>
-            <th style={{ ...css.headerBorder, width: "22%" }}>Total (Rp)</th>
-          </tr>
-        </thead>
-        <tbody>
-          {invoices.map((inv, index) => (
-            <tr key={index}>
-              <td style={css.tableBorder}>{index + 1}</td>
-              <td style={css.tableBorder}>{inv.invoiceId}</td>
-              <td style={css.tableBorder}>{inv.invoiceTimestamp ? convertTimestampDate(inv.invoiceTimestamp) : ""}</td>
-              <td style={css.tableBorder}>{inv.lusin || 0}</td>
-              <td style={{ ...css.tableBorder, textAlign: "right", paddingRight: "8px" }}>{formattedNumber(Math.round(inv.discount || 0))}</td>
-              <td style={{ ...css.tableBorder, textAlign: "right", paddingRight: "8px" }}>{formattedNumber(Math.round(inv.total || 0))}</td>
-            </tr>
-          ))}
-          {/* Empty rows to fill minimum */}
-          {Array.from({ length: rowsToAdd }, (_, index) => (
-            <tr key={`blank-${index}`} style={{ height: "22px" }}>
-              <td style={css.tableBorder}></td>
-              <td style={css.tableBorder}></td>
-              <td style={css.tableBorder}></td>
-              <td style={css.tableBorder}></td>
-              <td style={css.tableBorder}></td>
-              <td style={css.tableBorder}></td>
-            </tr>
-          ))}
-          {/* Closing border row */}
-          <tr style={{ height: "2px" }}>
-            <td style={css.tableBorderLast}></td>
-            <td style={css.tableBorderLast}></td>
-            <td style={css.tableBorderLast}></td>
-            <td style={css.tableBorderLast}></td>
-            <td style={css.tableBorderLast}></td>
-            <td style={css.tableBorderLast}></td>
-          </tr>
-          {/* TOTAL LUSIN */}
-          <tr>
-            <td colSpan={3} rowSpan={3}>
-              {/* Catatan */}
-              <div style={{ marginTop: "6px" }}>
-                <div style={{ border: "1px solid black", padding: "4px 8px", minWidth: "180px" }}>
-                  <p style={{ marginBlock: "0", fontSize: "11px", fontWeight: "bold" }}>Catatan :</p>
-                  <p style={{ marginBlock: "2px", fontSize: "11px", borderBottom: "1px solid black", minHeight: "14px" }}>{"\u00A0"}</p>
-                  <p style={{ marginBlock: "2px", fontSize: "11px", borderBottom: "1px solid black", minHeight: "14px" }}>{"\u00A0"}</p>
-                </div>
-              </div>
-            </td>
-            <td colSpan={2} style={{ textAlign: "right", fontWeight: "bold", fontSize: "16px", paddingRight: "8px", fontFamily: "Courier New", letterSpacing: "0px", wordSpacing: "-3px" }}>TOTAL LUSIN</td>
-            <td style={{ borderLeft: "1px solid black", borderRight: "1px solid black", textAlign: "right", paddingRight: "8px", fontWeight: "bold", fontSize: "16px", fontFamily: "Courier New", letterSpacing: "-2px", wordSpacing: "-3px" }}>
-              {totalLusin}
-            </td>
-          </tr>
-          {/* TOTAL DISKON */}
-          <tr>
-            <td colSpan={2} style={{ textAlign: "right", fontWeight: "bold", fontSize: "16px", paddingRight: "8px", fontFamily: "Courier New", letterSpacing: "0px", wordSpacing: "-3px" }}>TOTAL DISKON</td>
-            <td style={{ borderLeft: "1px solid black", borderRight: "1px solid black", textAlign: "right", paddingRight: "8px", fontWeight: "bold", fontSize: "16px", fontFamily: "Courier New", letterSpacing: "-2px", wordSpacing: "-3px" }}>
-              Rp {formattedNumber(Math.round(totalDiskon))}
-            </td>
-          </tr>
-          {/* GRAND TOTAL */}
-          <tr>
-            <td colSpan={2} style={{ textAlign: "right", fontWeight: "bold", fontSize: "16px", paddingRight: "8px", fontFamily: "Courier New", letterSpacing: "0px", wordSpacing: "-3px" }}>GRAND TOTAL</td>
-            <td style={{ borderLeft: "1px solid black", borderRight: "1px solid black", borderBottom: "1px solid black", textAlign: "right", paddingRight: "8px", fontWeight: "bold", fontSize: "16px", fontFamily: "Courier New", letterSpacing: "-2px", wordSpacing: "-3px" }}>
-              Rp {formattedNumber(Math.round(data?.grandTotal || 0))}
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      {/* ═══════ INVOICE TABLES (SIDE-BY-SIDE) ═══════ */}
+      <div style={{ display: "flex", gap: "16px", marginBottom: "8px" }}>
+        {/* LEFT TABLE */}
+        <div style={{ flex: 1 }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr>
+                <th style={{ ...css.headerBorder, width: "8%" }}>No</th>
+                <th style={{ ...css.headerBorder, width: "37%" }}>ID Invoice</th>
+                <th style={{ ...css.headerBorder, width: "25%" }}>Tanggal</th>
+                <th style={{ ...css.headerBorder, width: "30%" }}>Total (Rp)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {leftInvoices.map((inv, index) => (
+                <tr key={index} style={{ height: "22px" }}>
+                  <td style={css.tableBorder}>{index + 1}</td>
+                  <td style={css.tableBorder}>{inv.invoiceId}</td>
+                  <td style={css.tableBorder}>{inv.invoiceTimestamp ? convertTimestampDate(inv.invoiceTimestamp) : ""}</td>
+                  <td style={{ ...css.tableBorder, textAlign: "right", paddingRight: "8px" }}>{formattedNumber(Math.round(inv.total || 0))}</td>
+                </tr>
+              ))}
+              {Array.from({ length: leftBlankRows }, (_, index) => (
+                <tr key={`blank-left-${index}`} style={{ height: "22px" }}>
+                  <td style={css.tableBorder}></td>
+                  <td style={css.tableBorder}></td>
+                  <td style={css.tableBorder}></td>
+                  <td style={css.tableBorder}></td>
+                </tr>
+              ))}
+              <tr style={{ height: "2px" }}>
+                <td style={css.tableBorderLast}></td>
+                <td style={css.tableBorderLast}></td>
+                <td style={css.tableBorderLast}></td>
+                <td style={css.tableBorderLast}></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        {/* RIGHT TABLE */}
+        <div style={{ flex: 1 }}>
+          <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <thead>
+              <tr>
+                <th style={{ ...css.headerBorder, width: "8%" }}>No</th>
+                <th style={{ ...css.headerBorder, width: "37%" }}>ID Invoice</th>
+                <th style={{ ...css.headerBorder, width: "25%" }}>Tanggal</th>
+                <th style={{ ...css.headerBorder, width: "30%" }}>Total (Rp)</th>
+              </tr>
+            </thead>
+            <tbody>
+              {rightInvoices.map((inv, index) => (
+                <tr key={index} style={{ height: "22px" }}>
+                  <td style={css.tableBorder}>{index + 8}</td>
+                  <td style={css.tableBorder}>{inv.invoiceId}</td>
+                  <td style={css.tableBorder}>{inv.invoiceTimestamp ? convertTimestampDate(inv.invoiceTimestamp) : ""}</td>
+                  <td style={{ ...css.tableBorder, textAlign: "right", paddingRight: "8px" }}>{formattedNumber(Math.round(inv.total || 0))}</td>
+                </tr>
+              ))}
+              {Array.from({ length: rightBlankRows }, (_, index) => (
+                <tr key={`blank-right-${index}`} style={{ height: "22px" }}>
+                  <td style={css.tableBorder}></td>
+                  <td style={css.tableBorder}></td>
+                  <td style={css.tableBorder}></td>
+                  <td style={css.tableBorder}></td>
+                </tr>
+              ))}
+              <tr style={{ height: "2px" }}>
+                <td style={css.tableBorderLast}></td>
+                <td style={css.tableBorderLast}></td>
+                <td style={css.tableBorderLast}></td>
+                <td style={css.tableBorderLast}></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      {/* ═══════ SUMMARY & NOTES SECTION ═══════ */}
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginTop: "2px" }}>
+        {/* Catatan (Left Side) */}
+        <div style={{ border: "1px solid black", padding: "6px 10px", flex: 0.65, boxSizing: "border-box" }}>
+          <p style={{ marginBlock: "0", fontSize: "10px", fontWeight: "bold" }}>CATATAN:</p>
+          <p style={{ marginBlock: "2px 0px", fontSize: "10px", lineHeight: "1.2" }}>• Dokumen ini merupakan rekap beberapa invoice penjualan</p>
+          <p style={{ marginBlock: "2px 0px", fontSize: "10px", lineHeight: "1.2" }}>• Pembayaran atas dokumen ini akan dialokasikan ke seluruh invoice yang tercantum</p>
+          <p style={{ marginBlock: "2px 0px", fontSize: "10px", lineHeight: "1.2" }}>• Bon Asli wajib ditarik bila telah melakukan pelunasan</p>
+        </div>
+
+        {/* Grand Total (Right Side) */}
+        <div style={{ display: "flex", justifyContent: "flex-end", alignItems: "center", flex: 0.35 }}>
+          <table style={{ borderCollapse: "collapse" }}>
+            <tbody>
+              <tr>
+                <td style={{ textAlign: "right", fontWeight: "bold", fontSize: "16px", paddingRight: "8px", fontFamily: "Courier New", letterSpacing: "0px", wordSpacing: "-3px", border: "none" }}>GRAND TOTAL</td>
+                <td style={{ border: "1px solid black", textAlign: "right", padding: "4px 8px", fontWeight: "bold", fontSize: "20px", fontFamily: "Courier New", letterSpacing: "-2px", wordSpacing: "-3px" }}>
+                  {formattedNumber(Math.round(data?.grandTotal || 0))}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
 
       {/* ═══════ SIGNATURE AREAS ═══════ */}
-      <div style={{ display: "flex", justifyContent: "space-around", marginTop: "12px" }}>
+      <div style={{ display: "flex", justifyContent: "space-around", marginTop: "6px" }}>
         {/* Pelanggan */}
         <div style={{ width: "160px", textAlign: "center" }}>
-          <p style={{ marginBlock: "0", fontSize: "12px" }}>Diterima Oleh,</p>
-          <div style={{ height: "50px" }}></div>
+          <p style={{ marginBlock: "0", fontSize: "14px" }}>Diterima Oleh,</p>
+          <div style={{ height: "70px" }}></div>
           <div style={{ display: "flex", justifyContent: "center" }}>
             <div style={{ borderBottom: "1px solid black", width: "130px", height: "1px" }}></div>
           </div>
-          <p style={{ marginBlock: "2px", fontSize: "12px", fontWeight: "500" }}>Pelanggan</p>
+          <p style={{ marginBlock: "2px", fontSize: "14px", fontWeight: "500" }}>Pelanggan</p>
         </div>
 
         {/* Admin */}
         <div style={{ width: "160px", textAlign: "center" }}>
-          <p style={{ marginBlock: "0", fontSize: "12px" }}>Dibuat Oleh,</p>
-          <div style={{ height: "50px" }}></div>
+          <p style={{ marginBlock: "0", fontSize: "14px" }}>Dibuat Oleh,</p>
+          <div style={{ height: "70px" }}></div>
           <div style={{ display: "flex", justifyContent: "center" }}>
             <div style={{ borderBottom: "1px solid black", width: "130px", height: "1px" }}></div>
           </div>
-          <p style={{ marginBlock: "2px", fontSize: "12px", fontWeight: "500" }}>Admin</p>
+          <p style={{ marginBlock: "2px", fontSize: "14px", fontWeight: "500" }}>Admin</p>
         </div>
       </div>
     </div>
