@@ -9,45 +9,51 @@ import utc from "dayjs/plugin/utc";
 
 dayjs.extend(utc);
 
-function generateString(number) {
-  // Convert the number to a string
-  let numStr = number.toString();
-
-  // Determine the number of leading zeros needed
-  let numLeadingZeros = 7 - numStr.length;
-
-  // Generate the leading zeros
-  let leadingZeros = "0".repeat(numLeadingZeros);
-
-  // Concatenate "T", the leading zeros, and the number string
-  let result = "T" + leadingZeros + numStr;
-
-  return result;
-}
+const getTransactionNumber = (id) => {
+  if (!id) return 0;
+  const dashIndex = id.indexOf("-");
+  if (dashIndex !== -1) {
+    const numPart = id.substring(dashIndex + 1);
+    return parseInt(numPart, 10) || 0;
+  }
+  const numPart = id.replace(/^[a-zA-Z]+/, "");
+  return parseInt(numPart, 10) || 0;
+};
 
 const getNextTransactionId = async (db) => {
   const dbRef = ref(db);
-  let nextId = "T0000001";
+  let dateStr = dayjs().utcOffset(7 * 60).format("YYYYMMDD");
+  try {
+    const serverTime = await getServerTimeGMT7();
+    dateStr = serverTime.format("YYYYMMDD");
+  } catch (error) {
+    console.error("Error getting server time, falling back to local time: ", error);
+  }
+
+  let nextNumber = 1;
 
   try {
     const snapshot = await get(child(dbRef, "transaction"));
     if (snapshot.exists()) {
       const transactions = snapshot.val();
-      const ids = Object.values(transactions).map((trans) => trans.id);
-      const lastId = ids
-        .sort((a, b) => {
-          const numA = parseInt(a.substring(1), 10);
-          const numB = parseInt(b.substring(1), 10);
-          return numA - numB;
-        })
-        .pop();
-      const lastNumber = parseInt(lastId.substring(1), 10);
-      nextId = generateString(lastNumber + 1);
+      const ids = Object.values(transactions)
+        .map((trans) => trans.id)
+        .filter(Boolean);
+
+      let maxNumber = 0;
+      ids.forEach((id) => {
+        const num = getTransactionNumber(id);
+        if (num > maxNumber) {
+          maxNumber = num;
+        }
+      });
+      nextNumber = maxNumber + 1;
     }
   } catch (error) {
     console.error("Error getting last id: ", error);
   }
 
+  const nextId = `TR${dateStr}-${nextNumber}`;
   return nextId;
 };
 
