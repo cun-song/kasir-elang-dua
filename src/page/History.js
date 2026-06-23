@@ -17,7 +17,7 @@ import DialogTotalProduct from "../component/DialogTotalProduct";
 import StyledTableTransaction from "../component/StyledTableTransaction";
 import DialogSuccess from "../component/DialogSuccess";
 import DialogFailed from "../component/DialogFailed";
-import { setOpenFailedUpdate,  setOpenSuccessUpdate } from "../redux/transactionReducer";
+import { setOpenFailedUpdate, setOpenSuccessUpdate } from "../redux/transactionReducer";
 import DialogConfirmation from "../component/DialogConfirmation";
 
 export default function History() {
@@ -66,12 +66,20 @@ export default function History() {
     let tempData = Object.values(transaction)?.map((t) => {
       return { ...t, area: findCustomer(t?.customerID)?.area };
     });
-    const field = sortData[0]?.field ?? "id";
+    const field = sortData[0]?.field ?? "timestamp";
     const sort = sortData[0]?.sort ?? "desc";
     if (field === "id") {
+      const getTransactionNumber = (id) => {
+        if (!id) return 0;
+        const dashIndex = id.indexOf("-");
+        if (dashIndex !== -1) {
+          return parseInt(id.substring(dashIndex + 1), 10) || 0;
+        }
+        return parseInt(id.replace(/^[a-zA-Z]+/, ""), 10) || 0;
+      };
       tempData.sort((a, b) => {
-        const numA = parseInt(a?.id.substring(1), 10);
-        const numB = parseInt(b?.id.substring(1), 10);
+        const numA = getTransactionNumber(a?.id);
+        const numB = getTransactionNumber(b?.id);
         return sort === "asc" ? numA - numB : numB - numA;
       });
     } else if (field === "ownerName" || field === "merchantName" || field === "area") {
